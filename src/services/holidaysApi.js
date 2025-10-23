@@ -1,5 +1,4 @@
-import api from './api.js';
-
+import api from './client.js';
 
 /**
  * Obtiene todos los festivos

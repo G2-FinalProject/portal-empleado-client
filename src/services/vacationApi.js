@@ -1,4 +1,4 @@
-import api from './api.js';
+import api from './client.js';
 
 /**
  * Crea una nueva solicitud de vacaciones
