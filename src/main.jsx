@@ -1,13 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
-// import App from './app.jsx'
 //se añade la importación de AppRouter
-import AppRouter from './routes/AppRouter.jsx'
-import { BrowserRouter } from 'react-router-dom'
-
-
-
+import AppRouter from './routes/Router.jsx'
+import { RouterProvider } from 'react-router-dom'
+import routerPortal from './routes/Router.jsx'
 
 /* MAIN.JSX =
 - Conectar React con el DOM (el HTML)
@@ -16,10 +13,6 @@ import { BrowserRouter } from 'react-router-dom'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <AppRouter>
-      </AppRouter>
-    </BrowserRouter>
-      {/* <App /> */}
+    <RouterProvider router={routerPortal} />
   </StrictMode>,
 )
