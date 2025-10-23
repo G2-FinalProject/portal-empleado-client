@@ -1,7 +1,7 @@
-/* 
+/*
 APP.JSX:
 - Organizar la estructura de tu aplicación
-- Manejar rutas (Router)
+- Manejar rutas (Router) --> Esta función va en AppRouter.jsx
 - Contener la lógica principal
 - Poder crecer sin problemas
 */
@@ -15,7 +15,7 @@ function App() {
         <h1 className="text-4xl font-bold text-center text-indigo-600 mb-4">
           🎉 Portal del Empleado
         </h1>
-        
+
         <p className="text-center text-gray-600 mb-6">
           Configuración de Tailwind CSS completada con éxito
         </p>
@@ -25,17 +25,17 @@ function App() {
             <h3 className="font-bold mb-2">✅ Colores</h3>
             <p className="text-sm">bg-blue-500 funcionando</p>
           </div>
-          
+
           <div className="bg-green-500 text-white p-4 rounded-lg text-center">
             <h3 className="font-bold mb-2">✅ Padding</h3>
             <p className="text-sm">p-4 aplicado correctamente</p>
           </div>
-          
+
           <div className="bg-purple-500 text-white p-4 rounded-lg text-center">
             <h3 className="font-bold mb-2">✅ Flexbox</h3>
             <p className="text-sm">flex items-center</p>
           </div>
-          
+
           <div className="bg-pink-500 text-white p-4 rounded-lg text-center">
             <h3 className="font-bold mb-2">✅ Grid</h3>
             <p className="text-sm">grid-cols-2 activo</p>
