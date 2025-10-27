@@ -1,4 +1,4 @@
-import api from './client.js';
+import api from '../api/client';
 
 /**
 *@param {Object} credentials--credenciales del ususario
