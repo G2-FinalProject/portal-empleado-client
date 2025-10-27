@@ -3,26 +3,35 @@ import LoginPage from '../pages/LoginPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import EmployeeDashboard from '../pages/EmployeeDashboard';
 import AdminDashboard from '../pages/AdminDashboard';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const routerPortal = createBrowserRouter([
   {
-    path: "/",
-    element: < Navigate to="/login" />
+    path: '/',
+    element: <Navigate to='/login' replace />
   },
   {
-    path: "/login",
-    element: < LoginPage />
+    path: '/login',
+    element: <LoginPage />
   },
   {
-    path: "/employee",
-    element: <EmployeeDashboard />
+    path: '/employee',
+    element: (
+      <ProtectedRoute allowedRoles={['employee', 'manager']}>
+        <EmployeeDashboard />
+      </ProtectedRoute>
+    )
   },
   {
-    path: "/admin",
-    element: <AdminDashboard />
+    path: '/admin',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminDashboard />
+      </ProtectedRoute>
+    )
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFoundPage />
   }
 ]);
