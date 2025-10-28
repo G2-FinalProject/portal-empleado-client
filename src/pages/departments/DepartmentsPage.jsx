@@ -1,0 +1,1 @@
+//✅ Admin gestiona departamentos (CRUD)

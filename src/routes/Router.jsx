@@ -1,23 +1,34 @@
-// src/router/Router.jsx
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
-import NotFoundPage from '../pages/NotFoundPage';
+import LoginPage from '../pages/auth/LoginPage';
+import NotFoundPage from '../pages/errors/NotFoundPage';
+import NotAuthorizedPage from '../pages/errors/NotAuthorizedPage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
-// MVP Pages
+// Requests
 import MyRequestsPage from '../pages/requests/MyRequestsPage';
 import TeamRequestsPage from '../pages/requests/TeamRequestsPage';
 import AllRequestsPage from '../pages/requests/AllRequestsPage';
-import HolidaysPage from '../pages/holidays/HolidaysPage';
+
+// Holidays
 import MyHolidaysPage from '../pages/holidays/MyHolidaysPage';
+import HolidaysPage from '../pages/holidays/HolidaysPage';
+
+// Admin
 import UsersPage from '../pages/users/UsersPage';
 import DepartmentsPage from '../pages/departments/DepartmentsPage';
-import ProfilePage from '../pages/users/ProfilePage';
 
 const router = createBrowserRouter([
-  { path: '/', element: <Navigate to="/login" replace /> },
-  { path: '/login', element: <LoginPage /> },
+  // 🏠 Públicas
+  {
+    path: '/',
+    element: <Navigate to="/login" replace />
+  },
+  {
+    path: '/login',
+    element: <LoginPage />
+  },
 
+  // 📋 Solicitudes de Vacaciones
   {
     path: '/requests/my',
     element: (
@@ -43,6 +54,7 @@ const router = createBrowserRouter([
     ),
   },
 
+  // 🎄 Festivos
   {
     path: '/holidays/my',
     element: (
@@ -59,6 +71,8 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+
+  // 👤 Gestión de Usuarios (solo Admin)
   {
     path: '/users',
     element: (
@@ -67,6 +81,8 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+
+  // 🏢 Gestión de Departamentos (solo Admin)
   {
     path: '/departments',
     element: (
@@ -75,16 +91,16 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  {
-    path: '/profile',
-    element: (
-      <ProtectedRoute allowedRoles={['employee', 'manager', 'admin']}>
-        <ProfilePage />
-      </ProtectedRoute>
-    ),
-  },
 
-  { path: '*', element: <NotFoundPage /> },
+  // ⚠️ Errores
+  {
+    path: '/unauthorized',
+    element: <NotAuthorizedPage />
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />
+  },
 ]);
 
 export default router;
