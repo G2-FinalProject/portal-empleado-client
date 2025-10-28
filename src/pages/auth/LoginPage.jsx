@@ -11,3 +11,15 @@
 //     navigate('/requests/my'); // Employee → Sus solicitudes (la página del prototipo)
 //   }
 // };
+
+
+
+function LoginPage() {
+  return (
+    <div>
+      <h1>Login Page</h1>
+    </div>
+  );
+}
+
+export default LoginPage;
