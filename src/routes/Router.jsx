@@ -4,21 +4,27 @@ import NotFoundPage from '../pages/errors/NotFoundPage';
 import NotAuthorizedPage from '../pages/errors/NotAuthorizedPage';
 import ProtectedRoute from '../components/ProtectedRoute';
 
+// Mis gestiones
+import UserPage from '../pages/users/UserPage';
+
 // Requests
-import MyRequestsPage from '../pages/requests/MyRequestsPage';
-import TeamRequestsPage from '../pages/requests/TeamRequestsPage';
-import AllRequestsPage from '../pages/requests/AllRequestsPage';
+import RequestsPage from '../pages/requests/RequestsPage';
 
-// Holidays
-import MyHolidaysPage from '../pages/holidays/MyHolidaysPage';
-import HolidaysPage from '../pages/holidays/HolidaysPage';
+// Location Holidays
+import LocationListPage from '../pages/locationHolidays/LocationListPage';
+import CreateLocationPage from '../pages/locationHolidays/CreateLocationPage';
+import EditLocationPage from '../pages/locationHolidays/EditLocationPage';
+import DetailLocationPage from '../pages/locationHolidays/DetailLocationPage';
 
-// Admin
-import UsersPage from '../pages/users/UsersPage';
-import DepartmentsPage from '../pages/departments/DepartmentsPage';
+// Employee Management
+import EmployeeListPage from '../pages/employeeManagement/EmployeeListPage';
+import CreateEmployeePage from '../pages/employeeManagement/CreateEmployeePage';
+import EditEmployeePage from '../pages/employeeManagement/EditEmployeePage';
+import DetailEmployeePage from '../pages/employeeManagement/DetailEmployeePage';
+
 
 const router = createBrowserRouter([
-  // 🏠 Públicas
+  // Públicas
   {
     path: '/',
     element: <Navigate to="/login" replace />
@@ -28,66 +34,93 @@ const router = createBrowserRouter([
     element: <LoginPage />
   },
 
-  // 📋 Solicitudes de Vacaciones
+    // Mis gestiones 
   {
-    path: '/requests/my',
+    path: '/myportal',
     element: (
       <ProtectedRoute allowedRoles={['employee', 'manager', 'admin']}>
-        <MyRequestsPage />
+        <UserPage />
       </ProtectedRoute>
     ),
   },
+
+
+  // Solicitudes de Vacaciones
+  
   {
-    path: '/requests/team',
+    path: '/requests',
     element: (
       <ProtectedRoute allowedRoles={['manager', 'admin']}>
-        <TeamRequestsPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/requests/all',
-    element: (
-      <ProtectedRoute allowedRoles={['admin']}>
-        <AllRequestsPage />
+        <RequestsPage />
       </ProtectedRoute>
     ),
   },
 
-  // 🎄 Festivos
+ // Festivos por localización (solo Admin)
   {
-    path: '/holidays/my',
+    path: '/locations',
     element: (
-      <ProtectedRoute allowedRoles={['employee', 'manager', 'admin']}>
-        <MyHolidaysPage />
+      <ProtectedRoute allowedRoles={['admin']}>
+        <LocationListPage />
       </ProtectedRoute>
     ),
   },
   {
-    path: '/holidays',
+    path: '/locations/create',
     element: (
       <ProtectedRoute allowedRoles={['admin']}>
-        <HolidaysPage />
+        <CreateLocationPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/locations/:id/edit',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <EditLocationPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/locations/:id',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <DetailLocationPage />
       </ProtectedRoute>
     ),
   },
 
-  // 👤 Gestión de Usuarios (solo Admin)
+
+// Gestión de Empleados (solo Admin)
   {
-    path: '/users',
+    path: '/employees',
     element: (
       <ProtectedRoute allowedRoles={['admin']}>
-        <UsersPage />
+        <EmployeeListPage />
       </ProtectedRoute>
     ),
   },
-
-  // 🏢 Gestión de Departamentos (solo Admin)
   {
-    path: '/departments',
+    path: '/employees/create',
     element: (
       <ProtectedRoute allowedRoles={['admin']}>
-        <DepartmentsPage />
+        <CreateEmployeePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/employees/:id/edit',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <EditEmployeePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/employees/:id',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <DetailEmployeePage />
       </ProtectedRoute>
     ),
   },
