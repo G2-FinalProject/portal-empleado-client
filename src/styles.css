@@ -1,13 +1,24 @@
 @import "tailwindcss";
 
+/* Configuración de Tailwind v4 */
+/* stylelint-disable-next-line at-rule-no-unknown */
+@theme {
+  /* Colores de marca CoHispania */
+  --color-cohispania-blue: #1f2a44;
+  --color-cohispania-orange: #f68d2e;
+
+  /* Fuente Open Sans */
+  --font-family-sans: 'Open Sans', system-ui, sans-serif;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(23, 3, 3, 0.87);
-  background-color: #f6f1f1;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
