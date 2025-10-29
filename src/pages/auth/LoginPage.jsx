@@ -8,6 +8,7 @@ import useAuthStore from '../../stores/authStore';
 import logo from '../../assets/cohispania_logo.svg';
 import loginImage from '../../assets/images/login_image.jpg';
 import toast from 'react-hot-toast'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
+import { Button } from '../../components/ui';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -174,25 +175,15 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <button
+             <Button
               type="submit"
-              disabled={isLoading}
-              style={{
-                backgroundColor: '#F68D2E',
-                color: '#1F2A44',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-              }}
-              className="w-full py-3.5 px-4 font-semibold rounded-lg transition duration-200 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed hover:opacity-90 flex items-center justify-center gap-2"
+              variant="primary"
+              size="medium"
+              fullWidth
+              loading={isLoading}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Iniciando sesión...</span>
-                </>
-              ) : (
-                <span>Iniciar sesión</span>
-              )}
-            </button>
+              Iniciar sesión
+            </Button>
           </form>
         </div>
       </div>
