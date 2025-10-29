@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { login as apiLogin } from '../../services/authApi';
 import useAuthStore from '../../stores/authStore';
-import logo from '../../assets/logo.jpg';
-import loginImage from '../../assets/login_image.jpg';
+import logo from '../../assets/cohispania_logo.svg';
+import loginImage from '../../assets/images/login_image.jpg';
 import toast from 'react-hot-toast'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 
 export default function LoginPage() {
@@ -69,11 +69,11 @@ export default function LoginPage() {
       {/* LEFT SIDE - Formulario */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24">
         {/* Logo */}
-        <div className="mb-12">
+        <div className="justify">
           <img
             src={logo}
             alt="CoHispania Logo"
-            className="h-12"
+            className="h-24 w-auto"
           />
         </div>
 
