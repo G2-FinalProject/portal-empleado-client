@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 /* Configuración de Tailwind v4 */
+/* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   /* Colores de marca CoHispania */
   --color-cohispania-blue: #1f2a44;
