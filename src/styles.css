@@ -1,14 +1,30 @@
 @import "tailwindcss";
 
+@theme {
+  /* Colores */
+  --color-cohispania-orange: #F68D2E;
+  --color-cohispania-blue: #1F2A44;
+  --color-light-background: #F4F6FA;
+  --color-gray-stroke: #E0E4EA;
+  --color-red-400: #EC5B59;
+  --color-light-green-400: #9CCC65;
+  --color-light-green-600: #7CB342;
+  --color-indigo-400: #6171C9;
+  --color-purple-400: #AB47BC;
+  --color-light-green-800: #558B2F;
+  --color-gray-400: #656775;
+  --color-gray-300: #80828E;
+
+  /* Tipografía */
+  --font-sans: "Open Sans", sans-serif;
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(23, 3, 3, 0.87);
-  background-color: #f6f1f1;
-
+  color:  --color-cohispania-blue;
+  background-color: --color-light-background;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
