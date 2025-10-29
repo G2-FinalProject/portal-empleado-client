@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(),
     tailwindcss()],
   server: {
-    port: 5173, // Fuerza el puerto 5174 (como la configuración de cors del backend)
+    port: 5173, // Fuerza el puerto 5173 (como la configuración de cors del backend)
   },
   preview: {
     port: 5173, 
