@@ -1,12 +1,13 @@
 // src/pages/auth/LoginPage.jsx
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { login as apiLogin } from '../../services/authApi';
 import useAuthStore from '../../stores/authStore';
 import logo from '../../assets/logo.jpg';
 import loginImage from '../../assets/login_image.jpg';
+import toast from 'react-hot-toast'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -29,10 +30,35 @@ export default function LoginPage() {
       });
 
       loginStore(response.token, response.sesionData);
+      //Toast de éxito
+      toast.success('¡Bienvenido de vuelta!', {
+        style: {
+          background: '#1F2A44',
+          color: '#fff',
+        },
+        iconTheme: {
+          primary: '#F68D2E',
+          secondary: '#fff',
+        },
+      });
       navigate('/myportal');
 
     } catch (error) {
       console.error('❌ Error en login:', error);
+      // Toast de error
+      toast.error(
+      error.response?.data?.message || 'Email o contraseña incorrectos',
+      {
+        style: {
+          background: '#1F2A44',
+          color: '#fff',
+        },
+        iconTheme: {
+          primary: '#ef4444',
+          secondary: '#fff',
+        },
+      }
+    );
     } finally {
       setIsLoading(false);
     }
