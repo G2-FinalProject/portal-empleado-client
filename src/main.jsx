@@ -5,6 +5,7 @@ import './styles.css'
 import AppRouter from './routes/Router.jsx'
 import { RouterProvider } from 'react-router-dom'
 import routerPortal from './routes/Router.jsx'
+import { Sidebar } from './components/SideBar.jsx'
 
 /* MAIN.JSX =
 - Conectar React con el DOM (el HTML)
@@ -14,5 +15,6 @@ import routerPortal from './routes/Router.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={routerPortal} />
+    <Sidebar/>
   </StrictMode>,
 )

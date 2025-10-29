@@ -1,17 +1,17 @@
 import { LayoutDashboard, ClipboardList, Users, UserPlus, Calendar, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import useAuthStore from '../stores/authStore';
 
 export function Sidebar() {
-  // Obtenemos el usuario actual y la función de logout del contexto
-  const { user, logout } = useAuth();
+  // Obtenemos el usuario actual y la función de logout del store de Zustand
+  const { user, logout } = useAuthStore();
 
   // Definimos los elementos del menú para cada tipo de rol
   // Employee solo ve "Mis gestiones"
   const employeeItems = [
     { 
       title: 'Mis gestiones', 
-      url: '/dashboard', 
+      url: '/myportal', 
       icon: LayoutDashboard 
     },
   ];
@@ -20,12 +20,12 @@ export function Sidebar() {
   const managerItems = [
     { 
       title: 'Mis gestiones', 
-      url: '/dashboard', 
+      url: '/myportal', 
       icon: LayoutDashboard 
     },
     { 
       title: 'Solicitudes', 
-      url: '/manager/requests', 
+      url: '/requests', 
       icon: ClipboardList 
     },
   ];
@@ -34,38 +34,38 @@ export function Sidebar() {
   const adminItems = [
     { 
       title: 'Mis gestiones', 
-      url: '/dashboard', 
+      url: '/myportal', 
       icon: LayoutDashboard 
     },
     { 
       title: 'Solicitudes', 
-      url: '/admin/requests', 
+      url: '/requests', 
       icon: ClipboardList 
     },
     { 
       title: 'Empleados', 
-      url: '/admin/employees', 
+      url: '/employees', 
       icon: Users 
     },
     { 
       title: 'Nuevo Empleado', 
-      url: '/admin/employees/new', 
+      url: '/employees/create', 
       icon: UserPlus 
     },
     { 
       title: 'Festivos Poblaciones', 
-      url: '/admin/holidays', 
+      url: '/locations', 
       icon: Calendar 
     },
   ];
 
   // Función que decide qué menú mostrar según el rol del usuario
   const getMenuItems = () => {
-    // Si el usuario tiene role_id, usamos eso para determinar el rol
-    // Asumiendo: 1 = employee, 2 = manager, 3 = admin
-    if (user?.role_id === 3) {
+    // Usamos roleId del store de Zustand
+    // Roles: 1 = admin, 2 = manager, 3 = employee
+    if (user?.roleId === 1) {
       return adminItems;
-    } else if (user?.role_id === 2) {
+    } else if (user?.roleId === 2) {
       return managerItems;
     } else {
       return employeeItems;
@@ -74,8 +74,8 @@ export function Sidebar() {
 
   // Función para obtener el nombre del rol en texto
   const getRoleName = () => {
-    if (user?.role_id === 3) return 'Administrador';
-    if (user?.role_id === 2) return 'Manager';
+    if (user?.roleId === 1) return 'Administrador';
+    if (user?.roleId === 2) return 'Manager';
     return 'Empleado';
   };
 
@@ -128,13 +128,13 @@ export function Sidebar() {
           {/* Avatar con la inicial del nombre */}
           <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
             <span className="text-white font-semibold text-sm">
-              {user?.first_name?.charAt(0).toUpperCase() || 'U'}
+              {user?.firstName?.charAt(0).toUpperCase() || 'U'}
             </span>
           </div>
           {/* Nombre y rol */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.first_name}
+              {user?.firstName || 'Usuario'}
             </p>
             <p className="text-xs text-gray-500 truncate">
               {getRoleName()}
