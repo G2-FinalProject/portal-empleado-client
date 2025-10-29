@@ -1,25 +1,10 @@
-// ✅ Página de login
-// En LoginPage.jsx, después de login exitoso:
-// const handleLoginSuccess = () => {
-//   const { isAdmin, isManager, isEmployee } = useAuthStore.getState();
+// src/pages/auth/LoginPage.jsx
 
-//   if (isAdmin()) {
-//     navigate('/users'); // Admin → Gestión de usuarios
-//   } else if (isManager()) {
-//     navigate('/requests/team'); // Manager → Aprobar solicitudes
-//   } else {
-//     navigate('/requests/my'); // Employee → Sus solicitudes (la página del prototipo)
-//   }
-// };
-
-
-
-function LoginPage() {
+export default function LoginPage() {
   return (
     <div>
       <h1>Login Page</h1>
+      <p>Formulario de inicio de sesión</p>
     </div>
   );
 }
-
-export default LoginPage;
