@@ -1,6 +1,6 @@
 import { LayoutDashboard, ClipboardList, Users, UserPlus, Calendar, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import useAuthStore from '../stores/authStore';
+import useAuthStore from '../../stores/authStore';
 
 export function Sidebar() {
   // Obtenemos el usuario actual y la función de logout del store de Zustand
