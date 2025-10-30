@@ -21,17 +21,6 @@ export default function MainLayout() {
           >
             <PanelLeft className="h-5 w-5" />
           </button>
-
-          {/* Botón de notificaciones (opcional-Desarrollo futuro)
-          <button
-            className="p-2 rounded-lg hover:bg-gray-stroke/50 transition-colors text-cohispania-blue relative"
-            aria-label="Notificaciones"
-          >
-            <Bell className="h-5 w-5" />
-          /* Badge de notificaciones (ejemplo) 
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-cohispania-orange"></span>
-          </button>
-          */}
         </header>
 
         {/* Contenido principal */}
