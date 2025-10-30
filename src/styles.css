@@ -1,25 +1,37 @@
 @import "tailwindcss";
 
-/* Configuración de Tailwind v4 */
-/* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
-  /* Colores de marca CoHispania */
-  --color-cohispania-blue: #1f2a44;
-  --color-cohispania-orange: #f68d2e;
+  /* Colores */
+  --color-cohispania-orange: #F68D2E;
+  --color-cohispania-blue: #1F2A44;
+  --color-light-background: #F4F6FA;
+  --color-gray-stroke: #E0E4EA;
+  --color-blue-stroke: #273758;
+  --color-red-400: #EC5B59;
+  --color-light-green-400: #9CCC65;
+  --color-light-green-600: #7CB342;
+  --color-light-green-800: #558B2F;
+  --color-indigo-400: #6171C9;
+  --color-purple-400: #AB47BC;
+  --color-gray-100:#C9C9CE;
+  --color-gray-200:#A5A6AE;
+  --color-gray-300: #80828E;
+  --color-gray-400: #656775;
 
-  /* Fuente Open Sans */
+
+
+  /* Tipografía */
   --font-family-sans: 'Open Sans', system-ui, sans-serif;
+  --font-sans: "Open Sans", sans-serif;
+
 }
 
 :root {
-  font-family: 'Open Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color:  --color-cohispania-blue;
+  background-color: --color-light-background;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
