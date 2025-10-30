@@ -132,15 +132,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  // En Router.jsx, añade esta ruta temporal:
-{
-  path: '/test-vacation-store',
-  element: (
-    <ProtectedRoute allowedRoles={['employee', 'manager', 'admin']}>
-      <TestVacationStore />
-    </ProtectedRoute>
-  ),
-},
 
   // ==========================================
   // ⚠️ RUTA 404
