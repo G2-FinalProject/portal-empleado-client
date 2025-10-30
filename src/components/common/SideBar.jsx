@@ -2,7 +2,7 @@ import { LayoutDashboard, ClipboardList, Users, UserPlus, Calendar, LogOut } fro
 import { NavLink } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
-export function Sidebar() {
+export default function Sidebar() {
   // Obtenemos el usuario actual y la función de logout del store de Zustand
   const { user, logout } = useAuthStore();
 

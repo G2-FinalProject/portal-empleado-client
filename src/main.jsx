@@ -5,7 +5,6 @@ import './styles.css'
 import AppRouter from './routes/Router.jsx'
 import { RouterProvider } from 'react-router-dom'
 import routerPortal from './routes/Router.jsx'
-import { Sidebar } from './components/common/SideBar.jsx'
 import { Toaster } from 'react-hot-toast'
 
 /* MAIN.JSX =
@@ -16,7 +15,6 @@ import { Toaster } from 'react-hot-toast'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={routerPortal} />
-    <Sidebar/>
      <Toaster position="top-right" />
   </StrictMode>,
 )

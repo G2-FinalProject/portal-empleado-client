@@ -1,7 +1,7 @@
-import { Sidebar } from '../components/common/SideBar';
+import Sidebar from '../components/common/SideBar';
 import { Outlet } from 'react-router-dom';
 
-export function MainLayout() {
+export default function MainLayout() {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar fijo a la izquierda */}
