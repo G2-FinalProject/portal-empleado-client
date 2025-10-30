@@ -1,13 +1,12 @@
-import { LayoutDashboard, ClipboardList, Users, UserPlus, Calendar, LogOut } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Users, Calendar, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 import cohispaniaLogo from '../../assets/isotipo_CoHispania_Cuadrado_fondo.svg';
 
-export default function Sidebar() {
-  // Obtenemos el usuario actual y la función de logout del store de Zustand
+export default function Sidebar({ isOpen = true }) {
   const { user, logout } = useAuthStore();
 
-  // Definimos los elementos del menú para cada tipo de rol
+  // Elementos del menú para cada tipo de rol
   // Employee solo ve "Mis gestiones"
   const employeeItems = [
     { 
@@ -55,10 +54,9 @@ export default function Sidebar() {
     },
   ];
 
-  // Función que decide qué menú mostrar según el rol del usuario
+  // Función para mostrar según el rol del usuario
+  // Roles: 1 = admin, 2 = manager, 3 = employee
   const getMenuItems = () => {
-    // Usamos roleId del store de Zustand
-    // Roles: 1 = admin, 2 = manager, 3 = employee
     if (user?.roleId === 1) {
       return adminItems;
     } else if (user?.roleId === 2) {
@@ -68,7 +66,6 @@ export default function Sidebar() {
     }
   };
 
-  // Función para obtener el nombre del rol en texto
   const getRoleName = () => {
     if (user?.roleId === 1) return 'Administrador';
     if (user?.roleId === 2) return 'Manager';
@@ -76,7 +73,17 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-cohispania-blue border-r border-blue-stroke flex flex-col h-screen">
+    <aside 
+      className={`
+        ${isOpen ? 'w-64' : 'w-20'} 
+        bg-cohispania-blue 
+        border-r border-blue-stroke 
+        flex flex-col 
+        h-screen 
+        transition-all duration-300 
+        ease-in-out
+      `}
+    >
       {/* Header con logo */}
       <div className="flex items-center gap-3 px-6 py-4 border-b border-blue-stroke">
         <img src={cohispaniaLogo} alt="Cohispania" className="h-10 w-10" />
