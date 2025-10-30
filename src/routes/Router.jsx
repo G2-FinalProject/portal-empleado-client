@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LoginPage from '../pages/auth/LoginPage';
 import NotFoundPage from '../pages/errors/NotFoundPage';
 import NotAuthorizedPage from '../pages/errors/NotAuthorizedPage';
+import TestVacationStore from '../pages/errors/TestVacationStore';
 import ProtectedRoute from '../components/ProtectedRoute';
 
 // Mis gestiones
@@ -43,6 +44,15 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  // En Router.jsx, añade esta ruta temporal:
+{
+  path: '/test-vacation-store',
+  element: (
+    <ProtectedRoute allowedRoles={['employee', 'manager', 'admin']}>
+      <TestVacationStore />
+    </ProtectedRoute>
+  ),
+},
 
 
   // Solicitudes de Vacaciones
