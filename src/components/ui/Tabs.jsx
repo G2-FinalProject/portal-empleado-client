@@ -41,8 +41,7 @@ export default function Tabs({
     <div className={className}>
       {/* Pestañas */}
       <div
-        className="flex gap-6 border-b"
-        style={{ borderColor: '#E0E4EA' }} // gray-stroke
+        className="flex gap-6 border-b border-gray-stroke"
         role="tablist"
       >
         {tabs.map((tab) => {
@@ -55,13 +54,12 @@ export default function Tabs({
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => handleTabChange(tab.id)}
-              className="relative pb-4 px-1 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
-              style={{
-                color: isActive ? '#1F2A44' : '#80828E', // cohispania-blue : gray-300
-                fontWeight: isActive ? 600 : 400,
-                borderBottom: isActive ? '3px solid #1F2A44' : '3px solid transparent',
-                marginBottom: '-1px',
-              }}
+              className={`relative pb-4 px-1 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                isActive
+                  ? 'text-cohispania-blue font-semibold border-b-[3px] border-cohispania-blue'
+                  : 'text-gray-300 font-normal border-b-[3px] border-transparent'
+              }`}
+              style={{ marginBottom: '-1px' }}
             >
               <span className="text-base">{tab.label}</span>
 
