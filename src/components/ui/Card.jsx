@@ -16,7 +16,7 @@ export default function Card({
   onClick,
   ...props
 }) {
-  const baseStyles = 'bg-white rounded-lg transition-all duration-200';
+  const baseStyles = 'bg-white rounded-lg transition-all duration-200 border border-gray-stroke';
 
   const paddingStyles = padding ? 'p-6' : '';
 
@@ -27,10 +27,6 @@ export default function Card({
   const clickableStyles = onClick
     ? 'cursor-pointer hover:scale-[1.01]'
     : '';
-
-  const borderStyle = {
-    border: '1px solid #E0E4EA', // gray-stroke
-  };
 
   const combinedClassName = `
     ${baseStyles}
@@ -44,7 +40,6 @@ export default function Card({
 
   return (
     <Component
-      style={borderStyle}
       className={combinedClassName}
       onClick={onClick}
       {...props}
