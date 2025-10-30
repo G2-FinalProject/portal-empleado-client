@@ -6,14 +6,19 @@
   --color-cohispania-blue: #1F2A44;
   --color-light-background: #F4F6FA;
   --color-gray-stroke: #E0E4EA;
+  --color-blue-stroke: #273758;
   --color-red-400: #EC5B59;
   --color-light-green-400: #9CCC65;
   --color-light-green-600: #7CB342;
+  --color-light-green-800: #558B2F;
   --color-indigo-400: #6171C9;
   --color-purple-400: #AB47BC;
-  --color-light-green-800: #558B2F;
-  --color-gray-400: #656775;
+  --color-gray-100:#C9C9CE;
+  --color-gray-200:#A5A6AE;
   --color-gray-300: #80828E;
+  --color-gray-400: #656775;
+
+
 
   /* Tipografía */
   --font-family-sans: 'Open Sans', system-ui, sans-serif;

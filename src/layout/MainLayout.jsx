@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 export default function MainLayout() {
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-light-background">
       {/* Sidebar fijo a la izquierda */}
       <Sidebar />
       

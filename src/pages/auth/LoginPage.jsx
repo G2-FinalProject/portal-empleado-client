@@ -1,4 +1,4 @@
-// src/pages/auth/LoginPage.jsx
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 import { useNavigate } from 'react-router-dom';
