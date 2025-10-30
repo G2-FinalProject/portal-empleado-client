@@ -17,40 +17,16 @@ export default function Badge({
   // Estilos base
   const baseStyles = 'inline-flex items-center justify-center font-semibold rounded-full';
 
-  // Estilos por variante (usando colores exactos de styles.css y Figma)
-  const variantInlineStyles = {
-    primary: {
-      backgroundColor: '#F68D2E', // cohispania-orange
-      color: '#1F2A44', // cohispania-blue
-    },
-    secondary: {
-      backgroundColor: '#1F2A44', // cohispania-blue
-      color: '#FFFFFF',
-    },
-    success: {
-      backgroundColor: '#7CB342', // light-green-600
-      color: '#FFFFFF',
-    },
-    warning: {
-      backgroundColor: '#F68D2E', // cohispania-orange
-      color: '#1F2A44',
-    },
-    danger: {
-      backgroundColor: '#EC5B59', // red-400
-      color: '#FFFFFF',
-    },
-    info: {
-      backgroundColor: '#6171C9', // indigo-400
-      color: '#FFFFFF',
-    },
-    purple: {
-      backgroundColor: '#AB47BC', // purple-400 (para badges de pestañas)
-      color: '#FFFFFF',
-    },
-    neutral: {
-      backgroundColor: '#E0E4EA', // gray-stroke
-      color: '#656775', // gray-400
-    },
+  // Estilos por variante usando clases personalizadas de Tailwind
+  const variantStyles = {
+    primary: 'bg-cohispania-orange text-cohispania-blue',
+    secondary: 'bg-cohispania-blue text-white',
+    success: 'bg-light-green-600 text-white',
+    warning: 'bg-cohispania-orange text-cohispania-blue',
+    danger: 'bg-red-400 text-white',
+    info: 'bg-indigo-400 text-white',
+    purple: 'bg-purple-400 text-white',
+    neutral: 'bg-gray-stroke text-gray-400',
   };
 
   // Estilos por tamaño
@@ -63,13 +39,13 @@ export default function Badge({
   // Combinar estilos
   const combinedClassName = `
     ${baseStyles}
+    ${variantStyles[variant]}
     ${sizeStyles[size]}
     ${className}
   `.trim();
 
   return (
     <span
-      style={variantInlineStyles[variant]}
       className={combinedClassName}
       {...props}
     >
