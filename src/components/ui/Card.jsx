@@ -1,0 +1,55 @@
+/**
+ * Card - Componente contenedor reutilizable
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Contenido del card
+ * @param {string} props.className - Clases CSS adicionales
+ * @param {boolean} props.padding - Si debe tener padding interno (default: true)
+ * @param {boolean} props.shadow - Si debe tener sombra (default: true)
+ * @param {Function} props.onClick - Función al hacer click (hace el card clickeable)
+ */
+export default function Card({
+  children,
+  className = '',
+  padding = true,
+  shadow = true,
+  onClick,
+  ...props
+}) {
+  const baseStyles = 'bg-white rounded-lg transition-all duration-200';
+
+  const paddingStyles = padding ? 'p-6' : '';
+
+  const shadowStyles = shadow
+    ? 'shadow-sm hover:shadow-md'
+    : '';
+
+  const clickableStyles = onClick
+    ? 'cursor-pointer hover:scale-[1.01]'
+    : '';
+
+  const borderStyle = {
+    border: '1px solid #E0E4EA', // gray-stroke
+  };
+
+  const combinedClassName = `
+    ${baseStyles}
+    ${paddingStyles}
+    ${shadowStyles}
+    ${clickableStyles}
+    ${className}
+  `.trim();
+
+  const Component = onClick ? 'button' : 'div';
+
+  return (
+    <Component
+      style={borderStyle}
+      className={combinedClassName}
+      onClick={onClick}
+      {...props}
+    >
+      {children}
+    </Component>
+  );
+}
