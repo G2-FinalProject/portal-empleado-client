@@ -1,6 +1,7 @@
 import { LayoutDashboard, ClipboardList, Users, UserPlus, Calendar, LogOut } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
+import cohispaniaLogo from '../../assets/isotipo_CoHispania_Cuadrado_fondo.svg';
 
 export default function Sidebar() {
   // Obtenemos el usuario actual y la función de logout del store de Zustand
@@ -78,9 +79,7 @@ export default function Sidebar() {
     <aside className="w-64 bg-cohispania-blue border-r border-blue-stroke flex flex-col h-screen">
       {/* Header con logo */}
       <div className="flex items-center gap-3 px-6 py-4 border-b border-blue-stroke">
-        <div className="h-10 w-10 bg-cohispania-orange rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-xl">C</span>
-        </div>
+        <img src={cohispaniaLogo} alt="Cohispania" className="h-10 w-10" />
         <div className="flex flex-col">
           <span className="text-sm font-bold text-white">CoHispania</span>
           <span className="text-xs text-gray-100">Portal del Empleado</span>
