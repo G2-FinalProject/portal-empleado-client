@@ -28,7 +28,7 @@ function FullScreenSpinner({ label = 'Cargando...' }) {
 
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const isLoading = useAuthStore((s) => s.isLoading);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const token = useAuthStore((s) => s.token);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
@@ -36,7 +36,7 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   if (isLoading) return <FullScreenSpinner />;
 
   // 2) No autenticado
-  if (!isAuthenticated()) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
