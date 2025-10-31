@@ -1,4 +1,4 @@
-// src/pages/auth/LoginPage.jsx
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 import { useNavigate } from 'react-router-dom';
@@ -123,7 +123,7 @@ export default function LoginPage() {
                   color: '#1F2A44',
                   border: '1px solid #E0E4EA'
                 }}
-                className="w-full px-4 py-3 rounded-lg placeholder-[#1F2A44] placeholder-opacity-60 focus:ring-2 focus:ring-[#F68D2E] focus:border-[#F68D2E] outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('email', {
                   required: 'El email es obligatorio',
                   pattern: {
@@ -158,7 +158,7 @@ export default function LoginPage() {
                   color: '#1F2A44',
                   border: '1px solid #E0E4EA'
                 }}
-                className="w-full px-4 py-3 rounded-lg placeholder-[#1F2A44] placeholder-opacity-60 focus:ring-2 focus:ring-[#F68D2E] focus:border-[#F68D2E] outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('password', {
                   required: 'La contraseña es obligatoria',
                   minLength: {

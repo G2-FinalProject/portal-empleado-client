@@ -1,8 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
-//se añade la importación de AppRouter
-import AppRouter from './routes/Router.jsx'
 import { RouterProvider } from 'react-router-dom'
 import routerPortal from './routes/Router.jsx'
 import { Toaster } from 'react-hot-toast'
