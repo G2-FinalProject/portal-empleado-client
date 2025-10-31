@@ -5,11 +5,15 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import { getMyHolidays } from "../../services/holidaysApi";
 import { create as createVacationRequest } from "../../services/vacationApi";
+import { getProfile } from "../../services/authApi";
 import Button from "../ui/Button";
 
-const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
+const VacationRequestCalendar = ({ onRequestCreated }) => {
   // Estado para los festivos
   const [holidays, setHolidays] = useState([]);
+
+  // Estado para el perfil del usuario
+  const [userProfile, setUserProfile] = useState(null);
 
   // Estado para las fechas seleccionadas en el calendario
   const [selectedRange, setSelectedRange] = useState(null);
@@ -20,24 +24,35 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
   // Estado para controlar si se está enviando la solicitud
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Cargar festivos al montar el componente
+  // Estado para controlar la carga inicial
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Cargar datos iniciales al montar el componente
   useEffect(() => {
-    fetchMyHolidays();
+    fetchInitialData();
   }, []);
 
   /**
-   * Obtiene los festivos del usuario desde el backend
+   * Obtiene el perfil del usuario y los festivos
    */
-  const fetchMyHolidays = async () => {
+  const fetchInitialData = async () => {
+    setIsLoading(true);
     try {
-      const data = await getMyHolidays();
+      // Ejecutamos ambas peticiones en paralelo para que sea más rápido
+      const [profile, holidaysData] = await Promise.all([
+        getProfile(),
+        getMyHolidays(),
+      ]);
+
+      // Guardamos el perfil del usuario
+      setUserProfile(profile);
 
       // Convertimos los festivos al formato de FullCalendar
-      const holidayEvents = data.map((holiday) => ({
+      const holidayEvents = holidaysData.map((holiday) => ({
         title: "Festivo",
         start: holiday.date, // Formato: 'YYYY-MM-DD'
         display: "background",
-        backgroundColor: "#fee2e2", // Rojo muy claro
+        backgroundColor: "#fee2e2",
         borderColor: "#fca5a5",
         extendedProps: {
           isHoliday: true,
@@ -46,7 +61,10 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
 
       setHolidays(holidayEvents);
     } catch (error) {
-      console.error("Error al cargar festivos:", error);
+      console.error("Error al cargar datos iniciales:", error);
+      alert("Error al cargar los datos. Por favor, recarga la página.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -144,9 +162,9 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
     }
 
     // Validación 2: Verificar que no excede los días disponibles
-    if (selectedRange.workingDays > availableDays) {
+    if (selectedRange.workingDays > userProfile.available_days) {
       alert(
-        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${availableDays} disponibles.`
+        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${userProfile.available_days} disponibles.`
       );
       return;
     }
@@ -172,6 +190,10 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
       if (selectedRange.calendarApi) {
         selectedRange.calendarApi.unselect();
       }
+
+      // Recargamos el perfil para actualizar los días disponibles
+      const updatedProfile = await getProfile();
+      setUserProfile(updatedProfile);
 
       // Notificamos al componente padre
       if (onRequestCreated) {
@@ -199,6 +221,24 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
       selectedRange.calendarApi.unselect();
     }
   };
+
+  // Mostrar mensaje de carga mientras se obtienen los datos
+  if (isLoading) {
+    return (
+      <div className="w-full p-8 text-center">
+        <p className="text-gray-300">Cargando calendario...</p>
+      </div>
+    );
+  }
+
+  // Si no hay perfil, mostrar error
+  if (!userProfile) {
+    return (
+      <div className="w-full p-8 text-center">
+        <p className="text-red-400">Error al cargar el perfil de usuario</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -238,21 +278,21 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
               {/* Información de las fechas */}
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-500">Desde:</span>
+                  <span className="text-sm text-gray-300">Desde:</span>
                   <span className="font-medium text-cohispania-blue">
                     {formatDate(selectedRange.start)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-500">Hasta:</span>
+                  <span className="text-sm text-gray-300">Hasta:</span>
                   <span className="font-medium text-cohispania-blue">
                     {formatDate(selectedRange.end)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-300">
                     Total días laborables:
                   </span>
                   <span className="font-semibold text-cohispania-orange">
@@ -261,11 +301,11 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-300">
                     Días disponibles:
                   </span>
                   <span className="font-medium text-cohispania-blue">
-                    {availableDays} días
+                    {userProfile.available_days} días
                   </span>
                 </div>
               </div>
@@ -274,7 +314,7 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="comments"
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-400"
                 >
                   Comentarios (opcional)
                 </label>
@@ -289,7 +329,7 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
               </div>
 
               {/* Mensaje de advertencia si excede días disponibles */}
-              {selectedRange.workingDays > availableDays && (
+              {selectedRange.workingDays > userProfile.available_days && (
                 <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-sm">
                   ⚠️ No tienes suficientes días disponibles
                 </div>
@@ -301,7 +341,7 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
                   variant="primary"
                   size="medium"
                   loading={isSubmitting}
-                  disabled={selectedRange.workingDays > availableDays}
+                  disabled={selectedRange.workingDays > userProfile.available_days}
                   onClick={handleSubmitRequest}
                   fullWidth
                 >
@@ -321,7 +361,7 @@ const VacationRequestCalendar = ({ availableDays, onRequestCreated }) => {
             </div>
           ) : (
             // Si NO hay selección, mostramos un mensaje
-            <p className="text-sm text-gray-500 text-center py-8">
+            <p className="text-sm text-gray-300 text-center py-8">
               Selecciona un rango de fechas en el calendario para crear una
               nueva solicitud
             </p>
