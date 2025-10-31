@@ -5,15 +5,15 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import { getMyHolidays } from "../../services/holidaysApi";
 import { create as createVacationRequest } from "../../services/vacationApi";
-import { getProfile } from "../../services/authApi";
+import { getVacationSummary } from "../../services/authApi"; 
 import Button from "../ui/Button";
 
 const VacationRequestCalendar = ({ onRequestCreated }) => {
   // Estado para los festivos
   const [holidays, setHolidays] = useState([]);
 
-  // Estado para el perfil del usuario
-  const [userProfile, setUserProfile] = useState(null);
+  // Estado para el resumen de vacaciones
+  const [vacationSummary, setVacationSummary] = useState(null);
 
   // Estado para las fechas seleccionadas en el calendario
   const [selectedRange, setSelectedRange] = useState(null);
@@ -33,24 +33,24 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   }, []);
 
   /**
-   * Obtiene el perfil del usuario y los festivos
+   * Obtiene el resumen de vacaciones y los festivos
    */
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
       // Ejecutamos ambas peticiones en paralelo para que sea más rápido
-      const [profile, holidaysData] = await Promise.all([
-        getProfile(),
+      const [summary, holidaysData] = await Promise.all([
+        getVacationSummary(), 
         getMyHolidays(),
       ]);
 
-      // Guardamos el perfil del usuario
-      setUserProfile(profile);
+      // Guardamos el resumen
+      setVacationSummary(summary);
 
       // Convertimos los festivos al formato de FullCalendar
       const holidayEvents = holidaysData.map((holiday) => ({
         title: "Festivo",
-        start: holiday.date, // Formato: 'YYYY-MM-DD'
+        start: holiday.date,
         display: "background",
         backgroundColor: "#fee2e2",
         borderColor: "#fca5a5",
@@ -74,12 +74,10 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   const handleDateSelect = (selectInfo) => {
     const start = selectInfo.start;
     const end = new Date(selectInfo.end);
-    end.setDate(end.getDate() - 1); // FullCalendar suma un día extra
+    end.setDate(end.getDate() - 1);
 
-    // Calculamos cuántos días laborables hay en el rango
     const workingDays = calculateWorkingDays(start, end);
 
-    // Guardamos la selección
     setSelectedRange({
       start: start,
       end: end,
@@ -100,13 +98,9 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       const dayOfWeek = current.getDay();
       const dateString = current.toISOString().split("T")[0];
 
-      // Verificamos si es fin de semana (0=domingo, 6=sábado)
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-      // Verificamos si es festivo
       const isHoliday = holidays.some((h) => h.start === dateString);
 
-      // Si NO es fin de semana NI festivo, lo contamos
       if (!isWeekend && !isHoliday) {
         count++;
       }
@@ -119,19 +113,16 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
   /**
    * Determina si una fecha se puede seleccionar
-   * Retorna false para fines de semana y festivos
    */
   const isDateSelectable = (selectInfo) => {
     const date = selectInfo.start;
     const dayOfWeek = date.getDay();
     const dateString = date.toISOString().split("T")[0];
 
-    // No permitir fines de semana
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       return false;
     }
 
-    // No permitir festivos
     const isHoliday = holidays.some((h) => h.start === dateString);
     if (isHoliday) {
       return false;
@@ -141,7 +132,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   };
 
   /**
-   * Formatea una fecha al estilo español (ej: "15 de marzo de 2025")
+   * Formatea una fecha al estilo español
    */
   const formatDate = (date) => {
     return date.toLocaleDateString("es-ES", {
@@ -155,16 +146,15 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
    * Envía la solicitud de vacaciones al backend
    */
   const handleSubmitRequest = async () => {
-    // Validación 1: Verificar que hay fechas seleccionadas
     if (!selectedRange) {
       alert("Por favor, selecciona un rango de fechas en el calendario");
       return;
     }
 
-    // Validación 2: Verificar que no excede los días disponibles
-    if (selectedRange.workingDays > userProfile.available_days) {
+
+    if (selectedRange.workingDays > vacationSummary.remaining_days) {
       alert(
-        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${userProfile.available_days} disponibles.`
+        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`
       );
       return;
     }
@@ -172,35 +162,29 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     setIsSubmitting(true);
 
     try {
-      // Preparamos los datos para enviar al backend
       const requestData = {
-        startDate: selectedRange.start.toISOString().split("T")[0], // 'YYYY-MM-DD'
-        endDate: selectedRange.end.toISOString().split("T")[0], // 'YYYY-MM-DD'
-        reason: comments || undefined, // Solo enviamos si hay comentarios
+        startDate: selectedRange.start.toISOString().split("T")[0],
+        endDate: selectedRange.end.toISOString().split("T")[0],
+        reason: comments || undefined,
       };
 
-      // Llamamos al servicio para crear la solicitud
       await createVacationRequest(requestData);
 
-      // Limpiamos todo después de enviar
       setSelectedRange(null);
       setComments("");
 
-      // Limpiamos la selección visual del calendario
       if (selectedRange.calendarApi) {
         selectedRange.calendarApi.unselect();
       }
 
-      // Recargamos el perfil para actualizar los días disponibles
-      const updatedProfile = await getProfile();
-      setUserProfile(updatedProfile);
 
-      // Notificamos al componente padre
+      const updatedSummary = await getVacationSummary();
+      setVacationSummary(updatedSummary);
+
       if (onRequestCreated) {
         onRequestCreated();
       }
 
-      // Mostramos mensaje de éxito
       alert("¡Solicitud enviada correctamente!");
     } catch (error) {
       console.error("Error al crear solicitud:", error);
@@ -222,7 +206,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     }
   };
 
-  // Mostrar mensaje de carga mientras se obtienen los datos
+  // Mostrar mensaje de carga
   if (isLoading) {
     return (
       <div className="w-full p-8 text-center">
@@ -231,11 +215,11 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     );
   }
 
-  // Si no hay perfil, mostrar error
-  if (!userProfile) {
+  // Mostrar error si no hay resumen
+  if (!vacationSummary) {
     return (
       <div className="w-full p-8 text-center">
-        <p className="text-red-400">Error al cargar el perfil de usuario</p>
+        <p className="text-red-400">Error al cargar el resumen de vacaciones</p>
       </div>
     );
   }
@@ -272,7 +256,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
             Resumen de Solicitud
           </h3>
 
-          {/* Si hay un rango seleccionado, mostramos el resumen */}
           {selectedRange ? (
             <div className="flex flex-col gap-6">
               {/* Información de las fechas */}
@@ -305,7 +288,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
                     Días disponibles:
                   </span>
                   <span className="font-medium text-cohispania-blue">
-                    {userProfile.available_days} días
+                    {vacationSummary.remaining_days} días
                   </span>
                 </div>
               </div>
@@ -328,8 +311,8 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
                 />
               </div>
 
-              {/* Mensaje de advertencia si excede días disponibles */}
-              {selectedRange.workingDays > userProfile.available_days && (
+              {/* Mensaje de advertencia */}
+              {selectedRange.workingDays > vacationSummary.remaining_days && (
                 <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-sm">
                   ⚠️ No tienes suficientes días disponibles
                 </div>
@@ -341,7 +324,9 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
                   variant="primary"
                   size="medium"
                   loading={isSubmitting}
-                  disabled={selectedRange.workingDays > userProfile.available_days}
+                  disabled={
+                    selectedRange.workingDays > vacationSummary.remaining_days
+                  }
                   onClick={handleSubmitRequest}
                   fullWidth
                 >
@@ -360,7 +345,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
               </div>
             </div>
           ) : (
-            // Si NO hay selección, mostramos un mensaje
             <p className="text-sm text-gray-300 text-center py-8">
               Selecciona un rango de fechas en el calendario para crear una
               nueva solicitud
