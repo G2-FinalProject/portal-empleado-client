@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -10,45 +11,27 @@ import Button from "../ui/Button";
 import toast from "react-hot-toast";
 
 const VacationRequestCalendar = ({ onRequestCreated }) => {
-  // Estado para los festivos
   const [holidays, setHolidays] = useState([]);
-
-  // Estado para el resumen de vacaciones
   const [vacationSummary, setVacationSummary] = useState(null);
-
-  // Estado para las fechas seleccionadas en el calendario
   const [selectedRange, setSelectedRange] = useState(null);
-
-  // Estado para el campo de comentarios
   const [comments, setComments] = useState("");
-
-  // Estado para controlar si se está enviando la solicitud
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Estado para controlar la carga inicial
   const [isLoading, setIsLoading] = useState(true);
 
-  // Cargar datos iniciales al montar el componente
   useEffect(() => {
     fetchInitialData();
   }, []);
 
-  /**
-   * Obtiene el resumen de vacaciones y los festivos
-   */
   const fetchInitialData = async () => {
     setIsLoading(true);
     try {
-      // Ejecutamos ambas peticiones en paralelo para que sea más rápido
       const [summary, holidaysData] = await Promise.all([
         getVacationSummary(),
         getMyHolidays(),
       ]);
 
-      // Guardamos el resumen
       setVacationSummary(summary);
 
-      // Convertimos los festivos al formato de FullCalendar
       const isMobileDevice = window.innerWidth < 640;
 
       const holidayEvents = holidaysData.map((holiday) => ({
@@ -71,9 +54,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     }
   };
 
-  /**
-   * Se ejecuta cuando el usuario selecciona un rango de fechas en el calendario
-   */
   const handleDateSelect = (selectInfo) => {
     const start = selectInfo.start;
     const end = new Date(selectInfo.end);
@@ -89,10 +69,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     });
   };
 
-  /**
-   * Calcula los días laborables entre dos fechas
-   * (excluye fines de semana y festivos)
-   */
   const calculateWorkingDays = (startDate, endDate) => {
     let count = 0;
     const current = new Date(startDate);
@@ -114,9 +90,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     return count;
   };
 
-  /**
-   * Determina si una fecha se puede seleccionar
-   */
   const isDateSelectable = (selectInfo) => {
     const date = selectInfo.start;
     const dayOfWeek = date.getDay();
@@ -134,9 +107,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     return true;
   };
 
-  /**
-   * Formatea una fecha al estilo español
-   */
   const formatDate = (date) => {
     return date.toLocaleDateString("es-ES", {
       day: "numeric",
@@ -145,9 +115,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     });
   };
 
-  /**
-   * Envía la solicitud de vacaciones al backend
-   */
   const handleSubmitRequest = async () => {
     if (!selectedRange) {
       toast.error("Por favor, selecciona un rango de fechas en el calendario");
@@ -157,17 +124,15 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     if (selectedRange.workingDays > vacationSummary.remaining_days) {
       toast.error(
         `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`,
-        { duration: 5000 } // Más tiempo para leer el mensaje
+        { duration: 5000 }
       );
       return;
     }
 
     setIsSubmitting(true);
-
     const loadingToast = toast.loading("Enviando solicitud...");
 
     try {
-      // ✅ Ajustar al formato que espera el backend
       const requestData = {
         start_date: selectedRange.start.toISOString().split("T")[0],
         end_date: selectedRange.end.toISOString().split("T")[0],
@@ -190,6 +155,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       if (onRequestCreated) {
         onRequestCreated();
       }
+
       toast.success("¡Solicitud enviada correctamente!", {
         id: loadingToast,
       });
@@ -208,9 +174,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     }
   };
 
-  /**
-   * Cancela la selección actual
-   */
   const handleCancelSelection = () => {
     setSelectedRange(null);
     setComments("");
@@ -218,12 +181,13 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     if (selectedRange?.calendarApi) {
       selectedRange.calendarApi.unselect();
     }
+
     toast("Selección cancelada", {
-      icon: "↩️",
+      icon: "ℹ️",
+      duration: 2000,
     });
   };
 
-  // Mostrar mensaje de carga
   if (isLoading) {
     return (
       <div className="w-full p-8 text-center">
@@ -232,7 +196,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     );
   }
 
-  // Mostrar error si no hay resumen
   if (!vacationSummary) {
     return (
       <div className="w-full p-8 text-center">
@@ -243,10 +206,21 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      {/* ✅ Layout responsive: 1 columna en móvil, 2 en desktop */}
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:gap-6 p-2 sm:p-4">
+
+      <div
+        className={`
+          flex flex-col gap-4 lg:gap-6 p-2 sm:p-4
+          ${selectedRange ? "lg:grid lg:grid-cols-2" : ""}
+        `}
+      >
         {/* COLUMNA IZQUIERDA: Calendario */}
-        <div className="border border-gray-stroke rounded-lg p-2 sm:p-4 bg-white overflow-x-auto">
+        <div
+          className={`
+            border border-gray-stroke rounded-lg p-2 sm:p-4 bg-white overflow-x-auto
+            transition-all duration-300
+            ${selectedRange ? "" : "lg:max-w-3xl lg:mx-auto"}
+          `}
+        >
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
@@ -264,26 +238,32 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
             buttonText={{
               today: "Hoy",
             }}
-            // ✅ Configuración responsive
             height="auto"
             aspectRatio={1.35}
             handleWindowResize={true}
             windowResizeDelay={100}
-            // ✅ Tamaño de texto más pequeño en móvil
             dayHeaderFormat={{ weekday: "short" }}
-            // ✅ Estilos personalizados
             dayCellClassNames="text-xs sm:text-sm"
             eventClassNames="text-xs"
           />
+          
+          {/* ✅ Mensaje informativo cuando no hay selección */}
+          {!selectedRange && (
+            <div className="mt-4 p-4 bg-blue-50 border border-indigo-400 rounded-md">
+              <p className="text-sm text-indigo-500 text-center">
+                Selecciona un rango de fechas en el calendario para crear una solicitud de vacaciones
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* COLUMNA DERECHA: Resumen y formulario */}
-        <div className="border border-gray-stroke rounded-lg p-4 sm:p-6 bg-white">
-          <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-cohispania-blue">
-            Resumen de Solicitud
-          </h3>
+        {/* COLUMNA DERECHA: Resumen y formulario de selección */}
+        {selectedRange && (
+          <div className="border border-gray-stroke rounded-lg p-4 sm:p-6 bg-white animate-fadeIn">
+            <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-cohispania-blue">
+              Resumen de Solicitud
+            </h3>
 
-          {selectedRange ? (
             <div className="flex flex-col gap-4 sm:gap-6">
               {/* Información de las fechas */}
               <div className="flex flex-col gap-2 sm:gap-3">
@@ -375,13 +355,8 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
                 </Button>
               </div>
             </div>
-          ) : (
-            <p className="text-xs sm:text-sm text-gray-300 text-center py-6 sm:py-8">
-              Selecciona un rango de fechas en el calendario para crear una
-              nueva solicitud
-            </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

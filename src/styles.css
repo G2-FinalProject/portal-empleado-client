@@ -12,6 +12,7 @@
   --color-light-green-600: #7CB342;
   --color-light-green-800: #558B2F;
   --color-indigo-400: #6171C9;
+  --color-indigo-500: #3F51B5;
   --color-purple-400: #AB47BC;
   --color-gray-100:#C9C9CE;
   --color-gray-200:#A5A6AE;
@@ -24,7 +25,10 @@
   --font-family-sans: 'Open Sans', system-ui, sans-serif;
   --font-sans: "Open Sans", sans-serif;
 
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-slide-in: slide-in 0.3s ease-out;
 }
+
 
 :root {
   line-height: 1.5;
@@ -37,7 +41,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 
 /* Ajustes para el calendario en móvil */
