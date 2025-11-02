@@ -161,12 +161,14 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
     setIsSubmitting(true);
 
-    try {
-      const requestData = {
-        startDate: selectedRange.start.toISOString().split("T")[0],
-        endDate: selectedRange.end.toISOString().split("T")[0],
-        reason: comments || undefined,
-      };
+  try {
+    // ✅ Ajustar al formato que espera el backend
+    const requestData = {
+      start_date: selectedRange.start.toISOString().split("T")[0],
+      end_date: selectedRange.end.toISOString().split("T")[0],
+      requested_days: selectedRange.workingDays,
+      comments: comments || null,
+    };
 
       await createVacationRequest(requestData);
 
