@@ -10,7 +10,7 @@ import api from '../api/client';
  */
 export const create = async (requestData) => {
   try {
-    const response = await api.post('/vacation-requests', requestData);
+    const response = await api.post('/vacations', requestData);
     return response.data;
   } catch (error) {
     throw error;
@@ -23,7 +23,7 @@ export const create = async (requestData) => {
  */
 export const getMyRequests = async () => {
   try {
-    const response = await api.get('/vacation-requests/my-requests');
+    const response = await api.get('/vacations/my-requests'); //TODO: endpoint pendiente backend
     return response.data;
   } catch (error) {
     throw error;
@@ -36,7 +36,7 @@ export const getMyRequests = async () => {
  */
 export const getAll = async () => {
   try {
-    const response = await api.get('/vacation-requests');
+    const response = await api.get('/vacations');
     return response.data;
   } catch (error) {
     throw error;
@@ -50,7 +50,7 @@ export const getAll = async () => {
  */
 export const approve = async (id) => {
   try {
-    const response = await api.put(`/vacation-requests/${id}/approve`);
+    const response = await api.put(`/vacations/${id}/approve`);
     return response.data;
   } catch (error) {
     throw error;
@@ -66,7 +66,7 @@ export const approve = async (id) => {
  */
 export const reject = async (id, data) => {
   try {
-    const response = await api.put(`/vacation-requests/${id}/reject`, data);
+    const response = await api.put(`/vacations/${id}/reject`, data);
     return response.data;
   } catch (error) {
     throw error;
