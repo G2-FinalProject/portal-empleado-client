@@ -5,9 +5,9 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from "@fullcalendar/core/locales/es";
 import { getMyHolidays } from "../../services/holidaysApi";
 import { create as createVacationRequest } from "../../services/vacationApi";
-import { getVacationSummary } from "../../services/authApi"; 
+import { getVacationSummary } from "../../services/authApi";
 import Button from "../ui/Button";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 const VacationRequestCalendar = ({ onRequestCreated }) => {
   // Estado para los festivos
@@ -41,7 +41,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     try {
       // Ejecutamos ambas peticiones en paralelo para que sea más rápido
       const [summary, holidaysData] = await Promise.all([
-        getVacationSummary(), 
+        getVacationSummary(),
         getMyHolidays(),
       ]);
 
@@ -49,8 +49,10 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       setVacationSummary(summary);
 
       // Convertimos los festivos al formato de FullCalendar
+      const isMobileDevice = window.innerWidth < 640;
+
       const holidayEvents = holidaysData.map((holiday) => ({
-        title: "Festivo",
+        title: isMobileDevice ? "🎉 F" : "Festivo",
         start: holiday.holiday_date,
         display: "background",
         backgroundColor: "#fee2e2",
@@ -63,7 +65,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       setHolidays(holidayEvents);
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
-      toast.error('Error al cargar los datos. Por favor, recarga la página.');;
+      toast.error("Error al cargar los datos. Por favor, recarga la página.");
     } finally {
       setIsLoading(false);
     }
@@ -148,10 +150,9 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
    */
   const handleSubmitRequest = async () => {
     if (!selectedRange) {
-       toast.error('Por favor, selecciona un rango de fechas en el calendario');
+      toast.error("Por favor, selecciona un rango de fechas en el calendario");
       return;
     }
-
 
     if (selectedRange.workingDays > vacationSummary.remaining_days) {
       toast.error(
@@ -163,16 +164,16 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
     setIsSubmitting(true);
 
-    const loadingToast = toast.loading('Enviando solicitud...');
+    const loadingToast = toast.loading("Enviando solicitud...");
 
-  try {
-    // ✅ Ajustar al formato que espera el backend
-    const requestData = {
-      start_date: selectedRange.start.toISOString().split("T")[0],
-      end_date: selectedRange.end.toISOString().split("T")[0],
-      requested_days: selectedRange.workingDays,
-      comments: comments || null,
-    };
+    try {
+      // ✅ Ajustar al formato que espera el backend
+      const requestData = {
+        start_date: selectedRange.start.toISOString().split("T")[0],
+        end_date: selectedRange.end.toISOString().split("T")[0],
+        requested_days: selectedRange.workingDays,
+        comments: comments || null,
+      };
 
       await createVacationRequest(requestData);
 
@@ -183,22 +184,21 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         selectedRange.calendarApi.unselect();
       }
 
-
       const updatedSummary = await getVacationSummary();
       setVacationSummary(updatedSummary);
 
       if (onRequestCreated) {
         onRequestCreated();
       }
-       toast.success('¡Solicitud enviada correctamente!', {
+      toast.success("¡Solicitud enviada correctamente!", {
         id: loadingToast,
       });
-
     } catch (error) {
       console.error("Error al crear solicitud:", error);
-      const errorMessage = error.response?.data?.message 
-        || 'Error al enviar la solicitud. Por favor, inténtalo de nuevo.';
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        "Error al enviar la solicitud. Por favor, inténtalo de nuevo.";
+
       toast.error(errorMessage, {
         id: loadingToast,
         duration: 5000,
@@ -218,8 +218,8 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     if (selectedRange?.calendarApi) {
       selectedRange.calendarApi.unselect();
     }
-    toast('Selección cancelada', {
-      icon: '↩️',
+    toast("Selección cancelada", {
+      icon: "↩️",
     });
   };
 
@@ -245,7 +245,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     <div className="w-full max-w-7xl mx-auto">
       {/* ✅ Layout responsive: 1 columna en móvil, 2 en desktop */}
       <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:gap-6 p-2 sm:p-4">
-        
         {/* COLUMNA IZQUIERDA: Calendario */}
         <div className="border border-gray-stroke rounded-lg p-2 sm:p-4 bg-white overflow-x-auto">
           <FullCalendar
@@ -271,7 +270,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
             handleWindowResize={true}
             windowResizeDelay={100}
             // ✅ Tamaño de texto más pequeño en móvil
-            dayHeaderFormat={{ weekday: 'short' }}
+            dayHeaderFormat={{ weekday: "short" }}
             // ✅ Estilos personalizados
             dayCellClassNames="text-xs sm:text-sm"
             eventClassNames="text-xs"
@@ -289,14 +288,18 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
               {/* Información de las fechas */}
               <div className="flex flex-col gap-2 sm:gap-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">Desde:</span>
+                  <span className="text-xs sm:text-sm text-gray-300">
+                    Desde:
+                  </span>
                   <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
                     {formatDate(selectedRange.start)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">Hasta:</span>
+                  <span className="text-xs sm:text-sm text-gray-300">
+                    Hasta:
+                  </span>
                   <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
                     {formatDate(selectedRange.end)}
                   </span>
