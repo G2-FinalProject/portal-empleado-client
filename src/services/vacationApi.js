@@ -46,11 +46,15 @@ export const getAll = async () => {
 /**
  * Aprueba una solicitud de vacaciones
  * @param {string|number} id - ID de la solicitud a aprobar
+ * @param {string} comment - Comentario opcional
  * @returns {Promise} Datos de la solicitud aprobada
  */
-export const approve = async (id) => {
+export const approve = async (id, comment = null) => {
   try {
-    const response = await api.put(`/vacations/${id}/approve`);
+    const response = await api.patch(`/vacations/${id}/review`, {
+      status: 'APPROVED',
+      comment: comment
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -66,7 +70,26 @@ export const approve = async (id) => {
  */
 export const reject = async (id, data) => {
   try {
-    const response = await api.put(`/vacations/${id}/reject`, data);
+    const response = await api.patch(`/vacations/${id}/review`, {
+      status: 'REJECTED',
+      comment: data.reason
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+/**
+ * 🆕 Obtiene el resumen de vacaciones del usuario
+ * Incluye: allowance_days, remaining_days, used_days
+ * @param {string|number} userId - ID del usuario
+ * @returns {Promise} { allowance_days, remaining_days, used_days }
+ */
+export const getVacationSummary = async (userId) => {
+  try {
+    const response = await api.get(`/users/${userId}/vacations/summary`);
     return response.data;
   } catch (error) {
     throw error;
