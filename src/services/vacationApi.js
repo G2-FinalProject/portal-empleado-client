@@ -3,9 +3,10 @@ import api from '../api/client';
 /**
  * Crea una nueva solicitud de vacaciones
  * @param {Object} requestData - Datos de la solicitud
- * @param {string} requestData.startDate - Fecha de inicio de las vacaciones
- * @param {string} requestData.endDate - Fecha de fin de las vacaciones
- * @param {string} requestData.reason - Motivo de la solicitud (opcional)
+ * @param {string} requestData.start_date - Fecha de inicio
+ * @param {string} requestData.end_date - Fecha de fin
+ * @param {number} requestData.requested_days - Días solicitados
+ * @param {string} requestData.comments - Comentarios (opcional)
  * @returns {Promise} Datos de la solicitud creada
  */
 export const create = async (requestData) => {
@@ -23,7 +24,7 @@ export const create = async (requestData) => {
  */
 export const getMyRequests = async () => {
   try {
-    const response = await api.get('/vacations/my-requests'); //TODO: endpoint pendiente backend
+    const response = await api.get('/vacations');
     return response.data;
   } catch (error) {
     throw error;
@@ -79,7 +80,6 @@ export const reject = async (id, data) => {
     throw error;
   }
 };
-
 
 /**
  * 🆕 Obtiene el resumen de vacaciones del usuario

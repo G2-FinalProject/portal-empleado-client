@@ -216,7 +216,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         {/* COLUMNA IZQUIERDA: Calendario */}
         <div
           className={`
-            border border-gray-stroke rounded-lg p-2 sm:p-4 bg-white overflow-x-auto
+            border border-gray-stroke rounded-lg p-2 sm:p-2 bg-white overflow-x-auto
             transition-all duration-300
             ${selectedRange ? "" : "lg:max-w-3xl lg:mx-auto"}
           `}

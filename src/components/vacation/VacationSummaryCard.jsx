@@ -43,13 +43,13 @@ const VacationSummaryCards = () => {
           </span>
         </div>
 
-        {/* Pendiente */}
+        {/* Pendiente 
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium text-gray-600">Pendientes</span>
-          <span className="font-extrabold text-lg text-yellow-600">
+          <span className="font-extrabold text-lg text-gray-200">
             {stats.pending}
           </span>
-        </div>
+        </div>*/}
       </div>
 
       {/* Separador */}
