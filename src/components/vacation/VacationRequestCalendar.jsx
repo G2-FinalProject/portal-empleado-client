@@ -7,6 +7,7 @@ import { getMyHolidays } from "../../services/holidaysApi";
 import { create as createVacationRequest } from "../../services/vacationApi";
 import { getVacationSummary } from "../../services/authApi"; 
 import Button from "../ui/Button";
+import toast from 'react-hot-toast';
 
 const VacationRequestCalendar = ({ onRequestCreated }) => {
   // Estado para los festivos
@@ -50,7 +51,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       // Convertimos los festivos al formato de FullCalendar
       const holidayEvents = holidaysData.map((holiday) => ({
         title: "Festivo",
-        start: holiday.date,
+        start: holiday.holiday_date,
         display: "background",
         backgroundColor: "#fee2e2",
         borderColor: "#fca5a5",
@@ -62,7 +63,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       setHolidays(holidayEvents);
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
-      alert("Error al cargar los datos. Por favor, recarga la página.");
+      toast.error('Error al cargar los datos. Por favor, recarga la página.');;
     } finally {
       setIsLoading(false);
     }
@@ -147,19 +148,22 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
    */
   const handleSubmitRequest = async () => {
     if (!selectedRange) {
-      alert("Por favor, selecciona un rango de fechas en el calendario");
+       toast.error('Por favor, selecciona un rango de fechas en el calendario');
       return;
     }
 
 
     if (selectedRange.workingDays > vacationSummary.remaining_days) {
-      alert(
-        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`
+      toast.error(
+        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`,
+        { duration: 5000 } // Más tiempo para leer el mensaje
       );
       return;
     }
 
     setIsSubmitting(true);
+
+    const loadingToast = toast.loading('Enviando solicitud...');
 
   try {
     // ✅ Ajustar al formato que espera el backend
@@ -186,11 +190,19 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       if (onRequestCreated) {
         onRequestCreated();
       }
+       toast.success('¡Solicitud enviada correctamente!', {
+        id: loadingToast,
+      });
 
-      alert("¡Solicitud enviada correctamente!");
     } catch (error) {
       console.error("Error al crear solicitud:", error);
-      alert("Error al enviar la solicitud. Por favor, inténtalo de nuevo.");
+      const errorMessage = error.response?.data?.message 
+        || 'Error al enviar la solicitud. Por favor, inténtalo de nuevo.';
+      
+      toast.error(errorMessage, {
+        id: loadingToast,
+        duration: 5000,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -206,6 +218,9 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
     if (selectedRange?.calendarApi) {
       selectedRange.calendarApi.unselect();
     }
+    toast('Selección cancelada', {
+      icon: '↩️',
+    });
   };
 
   // Mostrar mensaje de carga
