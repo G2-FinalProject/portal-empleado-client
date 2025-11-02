@@ -16,10 +16,28 @@ export const getAll = async () => {
 /**
  * Obtiene los festivos que aplican al usuario autenticado
  * @returns {Promise} Lista de festivos del usuario
- */
+
 export const getMyHolidays = async () => {
   try {
     const response = await api.get('/holidays/my-holidays');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+*/
+
+/** Cuando esté el endpoint, borrar este y descomentar el anterior (L16-28)
+ * Obtiene los festivos del usuario autenticado
+ * (Temporal: obtiene todos y los filtra en el frontend)
+ */
+export const getMyHolidays = async () => {
+  try {
+    // Por ahora, obtenemos todos los festivos
+    const response = await api.get('/holidays');
+    
+    // TODO: Filtrar por location_id del usuario cuando tengamos el endpoint
+    // Por ahora devolvemos todos
     return response.data;
   } catch (error) {
     throw error;
