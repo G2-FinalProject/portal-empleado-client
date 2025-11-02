@@ -2,7 +2,7 @@ import VacationRequestCalendar from '../../components/vacation/VacationRequestCa
 
 export default function UserPage() {
   return (
-    <div className="p-8">
+    <div className="p-2">
       <h1 className="text-2xl font-bold text-cohispania-blue">Mi Portal</h1>
       <p className="text-gray-600 mt-2">Bienvenido al Portal del Empleado</p>
       <VacationRequestCalendar/>
