@@ -242,10 +242,12 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   }
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+    <div className="w-full max-w-7xl mx-auto">
+      {/* ✅ Layout responsive: 1 columna en móvil, 2 en desktop */}
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 lg:gap-6 p-2 sm:p-4">
+        
         {/* COLUMNA IZQUIERDA: Calendario */}
-        <div className="border border-gray-stroke rounded-lg p-4 bg-white">
+        <div className="border border-gray-stroke rounded-lg p-2 sm:p-4 bg-white overflow-x-auto">
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
@@ -256,55 +258,64 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
             select={handleDateSelect}
             selectAllow={isDateSelectable}
             headerToolbar={{
-              left: "prev,next today",
+              left: "prev,next",
               center: "title",
-              right: "",
+              right: "today",
             }}
-            height="auto"
             buttonText={{
               today: "Hoy",
             }}
+            // ✅ Configuración responsive
+            height="auto"
+            aspectRatio={1.35}
+            handleWindowResize={true}
+            windowResizeDelay={100}
+            // ✅ Tamaño de texto más pequeño en móvil
+            dayHeaderFormat={{ weekday: 'short' }}
+            // ✅ Estilos personalizados
+            dayCellClassNames="text-xs sm:text-sm"
+            eventClassNames="text-xs"
           />
         </div>
 
         {/* COLUMNA DERECHA: Resumen y formulario */}
-        <div className="border border-gray-stroke rounded-lg p-6 bg-white">
-          <h3 className="text-lg font-bold mb-6 text-cohispania-blue">
+        <div className="border border-gray-stroke rounded-lg p-4 sm:p-6 bg-white">
+          <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-cohispania-blue">
             Resumen de Solicitud
           </h3>
 
           {selectedRange ? (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 sm:gap-6">
               {/* Información de las fechas */}
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2 sm:gap-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-300">Desde:</span>
-                  <span className="font-medium text-cohispania-blue">
+                  <span className="text-xs sm:text-sm text-gray-300">Desde:</span>
+                  <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
                     {formatDate(selectedRange.start)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-300">Hasta:</span>
-                  <span className="font-medium text-cohispania-blue">
+                  <span className="text-xs sm:text-sm text-gray-300">Hasta:</span>
+                  <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
                     {formatDate(selectedRange.end)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-300">
+                  <span className="text-xs sm:text-sm text-gray-300">
                     Total días laborables:
                   </span>
-                  <span className="font-semibold text-cohispania-orange">
+                  <span className="font-semibold text-sm sm:text-base text-cohispania-orange">
                     {selectedRange.workingDays} días
                   </span>
                 </div>
 
                 <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-sm text-gray-300">
+                  <span className="text-xs sm:text-sm text-gray-300">
                     Días disponibles:
                   </span>
-                  <span className="font-medium text-cohispania-blue">
+                  <span className="font-medium text-sm sm:text-base text-cohispania-blue">
                     {vacationSummary.remaining_days} días
                   </span>
                 </div>
@@ -314,29 +325,29 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
               <div className="flex flex-col gap-2">
                 <label
                   htmlFor="comments"
-                  className="text-sm font-medium text-gray-400"
+                  className="text-xs sm:text-sm font-medium text-gray-400"
                 >
                   Comentarios (opcional)
                 </label>
                 <textarea
                   id="comments"
-                  className="w-full px-3 py-2 border border-gray-stroke rounded-md text-sm resize-y focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-stroke rounded-md text-xs sm:text-sm resize-y focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent"
                   placeholder="Añade algún comentario sobre tu solicitud..."
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  rows={4}
+                  rows={3}
                 />
               </div>
 
               {/* Mensaje de advertencia */}
               {selectedRange.workingDays > vacationSummary.remaining_days && (
-                <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-sm">
+                <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-xs sm:text-sm">
                   ⚠️ No tienes suficientes días disponibles
                 </div>
               )}
 
               {/* Botones */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   variant="primary"
                   size="medium"
@@ -362,7 +373,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-300 text-center py-8">
+            <p className="text-xs sm:text-sm text-gray-300 text-center py-6 sm:py-8">
               Selecciona un rango de fechas en el calendario para crear una
               nueva solicitud
             </p>
