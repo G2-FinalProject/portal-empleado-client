@@ -10,57 +10,51 @@ const VacationSummaryCards = () => {
     return <VacationSummaryCardsSkeleton />;
   }
 
-  // Calculamos el porcentaje usado para la barra de progreso
+  // Porcentaje usado para la barra de progreso
   const percentageUsed = stats.total > 0 
     ? (stats.used / stats.total) * 100 
     : 0;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-stroke p-6">
-      {/* Título de la card */}
-      <h2 className="text-xl font-bold text-cohispania-blue mb-6">
+     <div className="bg-white rounded-lg border border-gray-stroke p-4 w-full max-w-xs">
+      {/* Título de la card - más pequeño */}
+      <h2 className="text-lg font-bold text-cohispania-blue mb-4">
         Balance de Vacaciones
       </h2>
 
-      {/* Lista de estadísticas */}
-      <div className="space-y-4">
-        
-        {/* Total asignado */}
-        <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-600">Total asignado</span>
-          <span className="font-extrabold text-xl text-cohispania-blue">{stats.total}</span>
-        </div>
+      {/* Lista de estadísticas - espaciado reducido */}
+      <div className="space-y-3">
 
-        {/* Disponible - */}
+        {/* Disponible */}
         <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-600">Disponible</span>
-          <span className="font-extrabold text-xl text-cohispania-orange">{stats.available}</span>
+          <span className="text-sm font-medium text-gray-600">Disponible</span>
+          <span className="font-extrabold text-lg text-cohispania-orange">{stats.available}</span>
         </div>
 
         {/* Usado */}
         <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-600">Usado</span>
-          <span className="font-extrabold text-xl text-cohispania-blue">{stats.used}</span>
+          <span className="text-sm font-medium text-gray-600">Usado</span>
+          <span className="font-extrabold text-lg text-cohispania-blue">{stats.used}</span>
         </div>
 
-        {/* Pendiente - */}
+        {/* Pendiente */}
         <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-600">Pendiente</span>
-          <span className="font-extrabold text-xl text-cohispania-blue">{stats.pending}</span>
+          <span className="text-sm font-medium text-gray-600">Pendiente</span>
+          <span className="font-extrabold text-lg text-cohispania-blue">{stats.pending}</span>
         </div>
       </div>
 
-      {/* Separador */}
-      <div className="border-t border-gray-stroke my-6"></div>
+      {/* Separador - más pequeño */}
+      <div className="border-t border-gray-stroke my-4"></div>
 
-      {/* Sección de progreso anual */}
-      <div className="bg-light-background rounded-lg p-4">
-        <p className="text-base font-bold text-gray-700 mb-3">
+      {/* Sección de progreso anual - más compacta */}
+      <div className="bg-light-background rounded-lg p-3">
+        <p className="text-sm font-bold text-gray-700 mb-2">
           Progreso Anual
         </p>
 
-        {/* Barra de progreso */}
-        <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+        {/* Barra de progreso - más pequeña */}
+        <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
           <div 
             className="h-full bg-cohispania-orange transition-all duration-300 ease-in-out"
             style={{ width: `${percentageUsed}%` }}
@@ -78,33 +72,32 @@ const VacationSummaryCards = () => {
 
 /**
  * Skeleton que se muestra mientras cargan los datos
- * Imita la estructura del componente real
+ * Ahora con 3 filas en lugar de 4
  */
 const VacationSummaryCardsSkeleton = () => {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
-      {/* Título skeleton */}
-      <div className="h-6 bg-gray-200 rounded w-48 mb-6"></div>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 w-full max-w-sm animate-pulse">
+      {/* Título skeleton - más pequeño */}
+      <div className="h-5 bg-gray-200 rounded w-40 mb-4"></div>
 
-      {/* Lista de estadísticas skeleton */}
-      <div className="space-y-4">
-        {/* Creamos 4 filas skeleton */}
-        {[1, 2, 3, 4].map((i) => (
+      {/* Lista de estadísticas skeleton - 3 filas más compactas */}
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
           <div key={i} className="flex justify-between items-center">
-            <div className="h-4 bg-gray-200 rounded w-24"></div>
-            <div className="h-6 bg-gray-200 rounded w-12"></div>
+            <div className="h-4 bg-gray-200 rounded w-20"></div>
+            <div className="h-5 bg-gray-200 rounded w-10"></div>
           </div>
         ))}
       </div>
 
-      {/* Separador skeleton */}
-      <div className="border-t border-gray-200 my-6"></div>
+      {/* Separador skeleton - más pequeño */}
+      <div className="border-t border-gray-200 my-4"></div>
 
-      {/* Progreso anual skeleton */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="h-4 bg-gray-200 rounded w-32 mb-3"></div>
-        <div className="w-full bg-gray-200 rounded-full h-3"></div>
-        <div className="h-3 bg-gray-200 rounded w-40 mt-2"></div>
+      {/* Progreso anual skeleton - más compacto */}
+      <div className="bg-gray-50 rounded-lg p-3">
+        <div className="h-4 bg-gray-200 rounded w-28 mb-2"></div>
+        <div className="w-full bg-gray-200 rounded-full h-2"></div>
+        <div className="h-3 bg-gray-200 rounded w-32 mt-2"></div>
       </div>
     </div>
   );
