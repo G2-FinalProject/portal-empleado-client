@@ -38,15 +38,31 @@ export const register = async (userData) => {
 };
 
 /**
- * Obtener perfil completo del usuario autenticado
- * @returns {Promise} Datos completos del perfil de usuario
+ * Obtener resumen de vacaciones del usuario autenticado
+ * @returns {Promise} { allowance_days, remaining_days, used_days }
  */
-export const getProfile = async () => {
+export const getVacationSummary = async () => {
   try {
-    const response = await api.get('/users/profile');
+    // Obtenemos el token desde localStorage (como lo hace el authStore)
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    // Decodificamos el token para obtener el ID del usuario
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Token inválido');
+    }
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const userId = payload.id;
+
+    // Llamamos al endpoint correcto del backend
+    const response = await api.get(`/users/${userId}/vacations/summary`);
     return response.data;
   } catch (error) {
     throw error;
   }
 };
-
