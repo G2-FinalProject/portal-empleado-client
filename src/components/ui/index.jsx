@@ -54,13 +54,23 @@
 // Button: Botón reutilizable con variantes (primary, secondary, danger, ghost)
 export { default as Button } from './Button';
 
+// Badge: Etiquetas y contadores con variantes de color
+export { default as Badge } from './Badge';
+
+// Card: Contenedor reutilizable para contenido
+export { default as Card } from './Card';
+
+// Tabs: Sistema de pestañas con contenido
+export { default as Tabs } from './Tabs';
+
+// Input: Campo de input integrado con React Hook Form
+export { default as Input } from './Input';
+
 // TODO: Añadir más componentes aquí según se vayan creando
 // Ejemplos futuros:
-// export { default as Card } from './Card';
-// export { default as Input } from './Input';
-// export { default as FormField } from './FormField';
+// export { default as Textarea } from './Textarea';
+// export { default as Select } from './Select';
 // export { default as Modal } from './Modal';
-// export { default as Badge } from './Badge';
 // export { default as Avatar } from './Avatar';
 // export { default as Spinner } from './Spinner';
 // export { default as Skeleton } from './Skeleton';
@@ -70,19 +80,18 @@ export { default as Button } from './Button';
  *
  * Desde cualquier componente de la aplicación:
  *
- * import { Button } from '../../components/ui';
+ * import { Button, Input } from '../../components/ui';
  *
  * function MiComponente() {
  *   return (
- *     <Button variant="primary" size="medium">
- *       Haz click aquí
- *     </Button>
+ *     <>
+ *       <Input label="Email" name="email" type="email" />
+ *       <Button variant="primary" size="medium">
+ *         Enviar
+ *       </Button>
+ *     </>
  *   );
  * }
- *
- * Cuando tengamos más componentes:
- *
- * import { Button, Card, Input } from '../../components/ui';
  *
  * ¡Todo desde un solo import!
  */
