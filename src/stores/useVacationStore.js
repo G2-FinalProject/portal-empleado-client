@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import * as vacationApi from "../services/vacationApi";
 
-
 /**
  * Mapea los datos de una solicitud del backend al formato del frontend
  */
@@ -36,18 +35,18 @@ const calculateStats = (requests) => {
   const used = requests
     .filter(r => r.status === 'approved')
     .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
-
+  
   const pending = requests
     .filter(r => r.status === 'pending')
     .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
 
   // FALLBACK: Si no tenemos datos de la BD, devolvemos valores mínimos
   // Esto solo debería pasar si falla la llamada a getVacationSummary
-  return {
+  return { 
     total: used,
     available: 0,
-    used,
-    pending
+    used, 
+    pending 
   };
 };
 
@@ -89,7 +88,7 @@ const useVacationStore = create((set, get) => ({
       const requests = (response.data || response).map(mapRequest);
       const userId = getUserIdFromToken();
       let summaryData = null;
-
+      
       if (userId) {
         try {
           summaryData = await vacationApi.getVacationSummary(userId);
@@ -98,30 +97,30 @@ const useVacationStore = create((set, get) => ({
           console.warn('⚠️ No se pudo obtener el summary, usando valores calculados:', summaryError);
         }
       }
-
-      const stats = summaryData
+      
+      const stats = summaryData 
         ? {
             total: summaryData.remaining_days + summaryData.used_days,
             available: summaryData.remaining_days,
-            used: summaryData.used_days,
+            used: summaryData.used_days, 
             pending: requests
               .filter(r => r.status === 'pending')
               .reduce((sum, r) => sum + (r.requestedDays || 0), 0)
           }
         : calculateStats(requests); // Fallback si no hay summary
-
+      
       console.log('📊 Stats calculadas:', stats);
-
-      set({
+      
+      set({ 
         myRequests: requests,
         stats,
-        loading: false
+        loading: false 
       });
     } catch (error) {
       console.error('❌ Error en fetchMyRequests:', error);
-      set({
+      set({ 
         error: error.response?.data?.message || error.message || "Error al cargar solicitudes",
-        loading: false
+        loading: false 
       });
       throw error;
     }
@@ -137,22 +136,22 @@ const useVacationStore = create((set, get) => ({
       const newRequest = mapRequest(response.data || response);
       const { myRequests, stats } = get();
       const updated = [newRequest, ...myRequests];
-
+      
       // Recalcular stats (el pending aumenta)
       const newPending = updated
         .filter(r => r.status === 'pending')
         .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
-
-      set({
+      
+      set({ 
         myRequests: updated,
         stats: { ...stats, pending: newPending },
-        loading: false
+        loading: false 
       });
       return newRequest;
     } catch (error) {
-      set({
+      set({ 
         error: error.response?.data?.message || error.message || "Error al crear solicitud",
-        loading: false
+        loading: false 
       });
       throw error;
     }
@@ -173,15 +172,15 @@ const useVacationStore = create((set, get) => ({
     try {
       const response = await vacationApi.getAll();
       let requests = (response.data || response).map(mapRequest);
-
+      
       if (filters.status) requests = requests.filter(r => r.status === filters.status);
       if (filters.userId) requests = requests.filter(r => r.requesterId === filters.userId);
-
+      
       set({ allRequests: requests, loading: false });
     } catch (error) {
-      set({
+      set({ 
         error: error.response?.data?.message || error.message || "Error al cargar solicitudes",
-        loading: false
+        loading: false 
       });
       throw error;
     }
@@ -196,15 +195,15 @@ const useVacationStore = create((set, get) => ({
       const response = await vacationApi.approve(id, comment);
       const updated = mapRequest(response.data || response);
       const { allRequests } = get();
-      set({
+      set({ 
         allRequests: allRequests.map(r => r.id === id ? updated : r),
-        loading: false
+        loading: false 
       });
       return updated;
     } catch (error) {
-      set({
+      set({ 
         error: error.response?.data?.message || error.message || "Error al aprobar solicitud",
-        loading: false
+        loading: false 
       });
       throw error;
     }
@@ -219,15 +218,15 @@ const useVacationStore = create((set, get) => ({
       const response = await vacationApi.reject(id, { reason: comment });
       const updated = mapRequest(response.data || response);
       const { allRequests } = get();
-      set({
+      set({ 
         allRequests: allRequests.map(r => r.id === id ? updated : r),
-        loading: false
+        loading: false 
       });
       return updated;
     } catch (error) {
-      set({
+      set({ 
         error: error.response?.data?.message || error.message || "Error al rechazar solicitud",
-        loading: false
+        loading: false 
       });
       throw error;
     }
@@ -239,13 +238,13 @@ const useVacationStore = create((set, get) => ({
   updateRequestLocal: (id, updates) => {
     const { myRequests, allRequests, stats } = get();
     const updatedMy = myRequests.map(r => r.id === id ? { ...r, ...updates } : r);
-
+    
     // Recalcular pending
     const newPending = updatedMy
       .filter(r => r.status === 'pending')
       .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
-
-    set({
+    
+    set({ 
       myRequests: updatedMy,
       allRequests: allRequests.map(r => r.id === id ? { ...r, ...updates } : r),
       stats: { ...stats, pending: newPending }
@@ -258,13 +257,13 @@ const useVacationStore = create((set, get) => ({
   removeRequestLocal: (id) => {
     const { myRequests, allRequests, stats } = get();
     const updatedMy = myRequests.filter(r => r.id !== id);
-
+    
     // Recalcular pending
     const newPending = updatedMy
       .filter(r => r.status === 'pending')
       .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
-
-    set({
+    
+    set({ 
       myRequests: updatedMy,
       allRequests: allRequests.filter(r => r.id !== id),
       stats: { ...stats, pending: newPending }
