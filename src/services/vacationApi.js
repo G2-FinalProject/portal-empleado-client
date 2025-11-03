@@ -53,7 +53,7 @@ export const getAll = async () => {
 export const approve = async (id, comment = null) => {
   try {
     const response = await api.patch(`/vacations/${id}/review`, {
-      status: 'APPROVED',
+      status: 'approved',
       comment: comment
     });
     return response.data;
@@ -72,7 +72,7 @@ export const approve = async (id, comment = null) => {
 export const reject = async (id, data) => {
   try {
     const response = await api.patch(`/vacations/${id}/review`, {
-      status: 'REJECTED',
+      status: 'rejected',
       comment: data.reason
     });
     return response.data;
