@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom'; 
 
 /**
  * Modal - Componente modal reutilizable
@@ -11,7 +12,7 @@ import { useEffect } from 'react';
  * @param {React.ReactNode} props.children - Contenido del modal
  */
 export default function Modal({ isOpen, onClose, title, children }) {
-  // Cerrar con la tecla Escape
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();
@@ -19,7 +20,6 @@ export default function Modal({ isOpen, onClose, title, children }) {
 
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Prevenir scroll del body cuando el modal está abierto
       document.body.style.overflow = 'hidden';
     }
 
@@ -31,16 +31,15 @@ export default function Modal({ isOpen, onClose, title, children }) {
 
   if (!isOpen) return null;
 
-  return (
-    // Overlay (fondo con poca opacidad para ver el contenido debajo)
+  return createPortal(
     <div
       className="fixed inset-0 border-gray-stroke bg-opacity-90 backdrop-blur-xs z-50 flex items-center justify-center p-4"
-      onClick={onClose} // Cerrar al clicar fuera
+      onClick={onClose}
     >
       {/* Modal */}
       <div
         className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()} // No cerrar al clicar dentro
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-gray-stroke">
@@ -61,6 +60,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body 
   );
 }
