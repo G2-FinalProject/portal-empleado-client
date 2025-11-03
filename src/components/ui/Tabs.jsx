@@ -56,8 +56,8 @@ export default function Tabs({
               onClick={() => handleTabChange(tab.id)}
               className={`relative pb-4 px-1 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 isActive
-                  ? 'text-cohispania-blue font-semibold border-b-[3px] border-cohispania-blue'
-                  : 'text-gray-300 font-normal border-b-[3px] border-transparent'
+                  ? 'text-cohispania-blue font-semibold border-cohispania-blue'
+                  : 'text-gray-300 font-normal border-transparent'
               }`}
               style={{ marginBottom: '-1px' }}
             >
@@ -65,7 +65,7 @@ export default function Tabs({
 
               {/* Badge con el contador */}
               {tab.count !== undefined && tab.count > 0 && (
-                <Badge variant="purple" size="small">
+                <Badge variant="secondary" size="small">
                   {tab.count}
                 </Badge>
               )}
