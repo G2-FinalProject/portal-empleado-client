@@ -39,8 +39,11 @@ export default function Tabs({
 
   return (
     <div className={className}>
-      {/* Pestañas */}
-      <div className="flex gap-6 border-b border-gray-stroke" role="tablist">
+      {/* Pestañas con fondo gris */}
+      <div
+        className="bg-light-background rounded-lg p-1 flex gap-1"
+        role="tablist"
+      >
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
 
@@ -52,21 +55,24 @@ export default function Tabs({
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => handleTabChange(tab.id)}
               className={`
-                x-4 p-2.5 rounded-lg
-                flex items-center gap-2
+                flex-1 px-4 py-3 rounded-md
+                flex items-center justify-center gap-2
                 transition-all duration-200
-                focus:outline-none  ${
+                font-medium text-sm
+                focus:outline-none focus:ring-1 focus:ring-cohispania-orange focus:ring-offset-2
+                ${
                   isActive
-                    ? "bg-light-background text-cohispania-blue font-semibold"
-                    : "bg-transparent text-gray-300 font-normal hover:bg-gray-50"
-                }`}
-              style={{ marginBottom: "-1px" }}
+                    ? "bg-white text-cohispania-blue shadow-sm"
+                    : "bg-transparent text-gray-400 hover:text-cohispania-blue"
+                }
+              `}
+
             >
               <span className="text-base">{tab.label}</span>
 
               {/* Badge con el contador */}
               {tab.count !== undefined && tab.count > 0 && (
-                <Badge variant="secondary" size="small">
+                <Badge variant={isActive ? "secondary" : "neutral"} size="small">
                   {tab.count}
                 </Badge>
               )}

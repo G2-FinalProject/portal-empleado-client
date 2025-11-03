@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { Tabs, Badge, Card } from '../ui';
-import { Calendar } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Tabs, Badge, Card, Modal } from '../ui';
+import { Calendar, Eye } from 'lucide-react';
 import useVacationStore from '../../stores/useVacationStore';
 
 /**
@@ -104,7 +104,7 @@ function RequestsList({ requests, emptyMessage, loading }) {
           </thead>
           <tbody>
             {requests.map((request) => (
-              <RequestRow key={request.id} request={request} />
+              <RequestRow key={request.id} request={request} status={status} />
             ))}
           </tbody>
         </table>
@@ -113,7 +113,7 @@ function RequestsList({ requests, emptyMessage, loading }) {
       {/* Vista Mobile: Cards */}
       <div className="md:hidden space-y-4">
         {requests.map((request) => (
-          <RequestCard key={request.id} request={request} />
+          <RequestCard key={request.id} request={request} status={status} />
         ))}
       </div>
     </>
@@ -123,7 +123,9 @@ function RequestsList({ requests, emptyMessage, loading }) {
 /**
  * RequestRow - Fila de la tabla (desktop)
  */
-function RequestRow({ request }) {
+function RequestRow({ request, status }) {
+  const [showModal, setShowModal] = useState(false);
+
   const formatDate = (date) => {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -140,40 +142,103 @@ function RequestRow({ request }) {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  // Verificar si hay comentarios
+  const hasRequesterComment = request.reason && request.reason.trim() !== '';
+  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasAnyComment = hasRequesterComment || hasApproverComment;
+
+
   return (
-    <tr className="border-b border-gray-stroke hover:bg-light-background transition-colors">
-      <td className="py-4 px-4">
-        <div className="flex items-center gap-2 text-gray-400">
-          <Calendar className="h-4 w-4" />
-          <span className="text-cohispania-blue font-medium">
-            {formatDate(request.startDate)} - {formatDate(request.endDate)}
-          </span>
-        </div>
-      </td>
-      <td className="py-4 px-4">
-        <span className="text-cohispania-blue font-semibold">{request.requestedDays} días</span>
-      </td>
-      <td className="py-4 px-4">
-        <div className="max-w-xs">
-          {request.reason ? (
-            <p className="text-gray-300 text-sm truncate">{request.reason}</p>
+     <>
+      <tr className="border-b border-gray-stroke hover:bg-light-background transition-colors">
+        <td className="py-4 px-4">
+          <div className="flex items-center gap-2 text-gray-400">
+            <Calendar className="h-4 w-4" />
+            <span className="text-cohispania-blue font-medium">
+              {formatDate(request.startDate)} - {formatDate(request.endDate)}
+            </span>
+          </div>
+        </td>
+        <td className="py-4 px-4">
+          <span className="text-cohispania-blue font-semibold">{request.requestedDays} días</span>
+        </td>
+        <td className="py-4 px-4">
+          {hasAnyComment ? (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 text-cohispania-blue hover:text-cohispania-orange transition-colors"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="text-sm font-medium">Ver comentarios</span>
+            </button>
           ) : (
-            <span className="text-gray-300 text-sm">-</span>
+            <span className="text-gray-300 text-sm">Sin comentarios</span>
           )}
-          {request.comments && (
-            <p className="text-gray-400 text-xs mt-1 italic">Respuesta: {request.comments}</p>
+        </td>
+        <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
+      </tr>
+
+      {/* Modal de comentarios */}
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Comentarios de la solicitud"
+      >
+        <div className="space-y-4">
+          {/* Período de la solicitud */}
+          <div className="bg-light-background p-4 rounded-lg">
+            <p className="text-sm text-gray-400 font-semibold mb-1">Período solicitado</p>
+            <p className="text-sm text-cohispania-blue font-semibold">
+              {formatDate(request.startDate)} - {formatDate(request.endDate)} ({request.requestedDays} días)
+            </p>
+          </div>
+
+          {/* Comentario del empleado */}
+          {hasRequesterComment && (
+            <div>
+              <h3 className="text-base font-semibold text-cohispania-blue mb-2">
+                Tu comentario:
+              </h3>
+              <p className="text-base text-gray-300 bg-light-background p-4 rounded-lg">
+                {request.reason}
+              </p>
+            </div>
+          )}
+
+          {/* Comentario del manager (solo en aprobadas/rechazadas) */}
+          {status !== 'pending' && hasApproverComment && (
+            <div>
+              <h3 className="text-base font-semibold text-cohispania-blue mb-2">
+                Respuesta del responsable:
+              </h3>
+              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
+                {request.comments}
+              </p>
+            </div>
+          )}
+
+          {/* Si no hay comentarios del manager en aprobadas/rechazadas */}
+          {status !== 'pending' && !hasApproverComment && (
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-400 italic">
+                El responsable no añadió comentarios
+              </p>
+            </div>
           )}
         </div>
-      </td>
-      <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
-    </tr>
+      </Modal>
+    </>
   );
 }
+
+
 
 /**
  * RequestCard - Card para vista mobile
  */
-function RequestCard({ request }) {
+function RequestCard({ request, status }) {
+  const [showModal, setShowModal] = useState(false);
+
   const formatDate = (date) => {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -190,45 +255,92 @@ function RequestCard({ request }) {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const hasRequesterComment = request.reason && request.reason.trim() !== '';
+  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasAnyComment = hasRequesterComment || hasApproverComment;
+
   return (
-    <Card padding={true}>
-      <div className="space-y-3">
-        {/* Período */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-cohispania-orange" />
+    <>
+      <Card padding={true}>
+        <div className="space-y-3">
+          {/* Período */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-cohispania-orange" />
+              <div>
+                <p className="text-xs text-gray-400 font-semibold">Período</p>
+                <p className="text-sm text-cohispania-blue font-medium">
+                  {formatDate(request.startDate)} - {formatDate(request.endDate)}
+                </p>
+              </div>
+            </div>
+            {getStatusBadge(request.status)}
+          </div>
+
+          {/* Días solicitados */}
+          <div>
+            <p className="text-xs text-gray-400 font-semibold">Días solicitados</p>
+            <p className="text-sm text-cohispania-blue font-semibold">{request.requestedDays} días</p>
+          </div>
+
+          {/* Botón para ver comentarios */}
+          {hasAnyComment && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="text-sm font-medium">Ver comentarios</span>
+            </button>
+          )}
+        </div>
+      </Card>
+
+      {/* Modal de comentarios (mismo que en desktop) */}
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Comentarios de la solicitud"
+      >
+        <div className="space-y-4">
+          <div className="bg-light-background p-4 rounded-lg">
+            <p className="text-xs text-gray-400 font-semibold mb-1">Período solicitado</p>
+            <p className="text-sm text-cohispania-blue font-medium">
+              {formatDate(request.startDate)} - {formatDate(request.endDate)} ({request.requestedDays} días)
+            </p>
+          </div>
+
+          {hasRequesterComment && (
             <div>
-              <p className="text-xs text-gray-400 font-semibold">Período</p>
-              <p className="text-sm text-cohispania-blue font-medium">
-                {formatDate(request.startDate)} - {formatDate(request.endDate)}
+              <h3 className="text-sm font-semibold text-cohispania-blue mb-2">
+                Tu comentario:
+              </h3>
+              <p className="text-sm text-gray-300 bg-light-background p-4 rounded-lg">
+                {request.reason}
               </p>
             </div>
-          </div>
-          {getStatusBadge(request.status)}
+          )}
+
+          {status !== 'pending' && hasApproverComment && (
+            <div>
+              <h3 className="text-sm font-semibold text-cohispania-blue mb-2">
+                Respuesta del responsable:
+              </h3>
+              <p className="text-sm text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
+                {request.comments}
+              </p>
+            </div>
+          )}
+
+          {status !== 'pending' && !hasApproverComment && (
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-400 italic">
+                El responsable no añadió comentarios
+              </p>
+            </div>
+          )}
         </div>
-
-        {/* Días solicitados */}
-        <div>
-          <p className="text-xs text-gray-400 font-semibold">Días solicitados</p>
-          <p className="text-sm text-cohispania-blue font-semibold">{request.requestedDays} días</p>
-        </div>
-
-        {/* Comentarios del empleado */}
-        {request.reason && (
-          <div>
-            <p className="text-xs text-gray-400 font-semibold">Comentarios</p>
-            <p className="text-sm text-gray-300">{request.reason}</p>
-          </div>
-        )}
-
-        {/* Comentarios del manager */}
-        {request.comments && (
-          <div className="bg-light-background rounded p-3">
-            <p className="text-xs text-gray-400 font-semibold mb-1">Respuesta del responsable</p>
-            <p className="text-sm text-cohispania-blue italic">{request.comments}</p>
-          </div>
-        )}
-      </div>
-    </Card>
+      </Modal>
+    </>
   );
 }
