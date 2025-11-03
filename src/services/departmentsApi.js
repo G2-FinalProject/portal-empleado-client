@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import api from '../api/client';
 /**
  * @returns {Promise}
@@ -34,7 +35,8 @@ export const create = async (depData) => {
  * @param {string|number} id -ID del departamento a actualizar
  * @param {Object} deptData - datos del departamento a actualizar
  * @returns {Promise} -datos del departamento actualizado
- */export const update = async (id, depData) => {
+ */
+export const update = async (id, depData) => {
     try {
         const response = await api.put (`/departments/${id}`, deptData);
         return response.data;
@@ -47,7 +49,7 @@ export const create = async (depData) => {
    * @param  {string|number} id - ide del departamento que se quiere eliminar
    *@returns {Promise} -Confirmacion de que se ha eliminado el departamento
    */
-  
+
    export const deleteDepartment = async (id ) => {
     try {
         const response = await api.delete (`/departments/${id}`);

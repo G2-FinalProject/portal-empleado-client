@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import api from '../api/client.js';
 
 /**
