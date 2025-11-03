@@ -24,7 +24,7 @@ export const create = async (requestData) => {
  */
 export const getMyRequests = async () => {
   try {
-    const response = await api.get('/vacations');
+    const response = await api.get('/vacations/my-requests');
     return response.data;
   } catch (error) {
     throw error;
