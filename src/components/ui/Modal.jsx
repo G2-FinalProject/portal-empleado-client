@@ -1,10 +1,10 @@
-import { X } from 'lucide-react';
-import { useEffect } from 'react';
-import { createPortal } from 'react-dom'; 
+import { X } from "lucide-react";
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 /**
  * Modal - Componente modal reutilizable
- * 
+ *
  * @param {Object} props
  * @param {boolean} props.isOpen - Si el modal está abierto
  * @param {Function} props.onClose - Función para cerrar el modal
@@ -12,20 +12,19 @@ import { createPortal } from 'react-dom';
  * @param {React.ReactNode} props.children - Contenido del modal
  */
 export default function Modal({ isOpen, onClose, title, children }) {
-
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -38,14 +37,12 @@ export default function Modal({ isOpen, onClose, title, children }) {
     >
       {/* Modal */}
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-gray-stroke">
-          <h2 className="text-xl font-bold text-cohispania-blue">
-            {title}
-          </h2>
+          <h2 className="text-xl font-bold text-cohispania-blue">{title}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-cohispania-blue transition-colors"
@@ -56,11 +53,9 @@ export default function Modal({ isOpen, onClose, title, children }) {
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
     </div>,
-    document.body 
+    document.body
   );
 }
