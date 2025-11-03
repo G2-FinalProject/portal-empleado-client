@@ -9,6 +9,7 @@ export const getAll = async () => {
     const response =await api.get('/locations');
     return response.data;
   } catch (error) {
+     console.error('Error fetching locations:', error);
     throw error;
   }
 };
