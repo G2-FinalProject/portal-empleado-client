@@ -31,7 +31,7 @@ export default function MainLayout() {
       {/* Contenedor principal */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-stroke flex items-center justify-between px-4 md:px-6">
+        <header className="h-12 bg-white border-b border-gray-stroke flex items-center justify-between px-4 md:px-6">
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg hover:bg-cohispania-orange transition-colors text-cohispania-blue"

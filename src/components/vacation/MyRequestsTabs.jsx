@@ -56,7 +56,7 @@ export default function MyRequestsTabs() {
   return (
     <div className="bg-white rounded-lg border border-gray-stroke p-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-cohispania-blue">
+        <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
           Solicitudes
         </h2>
         <p className="text-gray-300 mt-1">
