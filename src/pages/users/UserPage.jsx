@@ -1,28 +1,28 @@
 import { useEffect } from 'react';
-import VacationRequestCalendar from '../../components/vacation/VacationRequestCalendar';
-import VacationSummaryCards from '../../components/vacation/VacationSummaryCard';
+import useAuthStore from '../../stores/authStore';
 import useVacationStore from '../../stores/useVacationStore';
+import MyRequestsTabs from '../../components/vacation/MyRequestsTabs.jsx'; // ← Aquí
 
 export default function UserPage() {
-
+  const user = useAuthStore((state) => state.user);
   const fetchMyRequests = useVacationStore((state) => state.fetchMyRequests);
+
   useEffect(() => {
     fetchMyRequests();
-  }, []); 
+  }, [fetchMyRequests]);
+
   return (
-    <div className="p-4">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-cohispania-blue">Mi Portal</h1>
-        <p className="text-gray-600 mt-2">Bienvenido al Portal del Empleado</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-cohispania-blue">
+          Bienvenido {user?.firstName || 'Usuario'}
+        </h1>
+        <p className="text-gray-300 mt-2">
+          Gestiona tus vacaciones y consulta el estado de tus solicitudes
+        </p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-        <div>
-          <VacationRequestCalendar />
-        </div>
-        <div>
-          <VacationSummaryCards />
-        </div>
-      </div>
+
+      <MyRequestsTabs />
     </div>
   );
 }
