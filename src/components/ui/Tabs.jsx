@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import Badge from './Badge';
+import { useState } from "react";
+import Badge from "./Badge";
 
 /**
  * Tabs - Sistema de pestañas reutilizable
@@ -24,7 +24,7 @@ export default function Tabs({
   tabs = [],
   defaultTab,
   onChange,
-  className = ''
+  className = "",
 }) {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
 
@@ -35,15 +35,12 @@ export default function Tabs({
     }
   };
 
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
+  const activeTabData = tabs.find((tab) => tab.id === activeTab);
 
   return (
     <div className={className}>
       {/* Pestañas */}
-      <div
-        className="flex gap-6 border-b border-gray-stroke"
-        role="tablist"
-      >
+      <div className="flex gap-6 border-b border-gray-stroke" role="tablist">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
 
@@ -54,12 +51,16 @@ export default function Tabs({
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => handleTabChange(tab.id)}
-              className={`relative pb-4 px-1 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                isActive
-                  ? 'text-cohispania-blue font-semibold border-cohispania-blue'
-                  : 'text-gray-300 font-normal border-transparent'
-              }`}
-              style={{ marginBottom: '-1px' }}
+              className={`
+                x-4 p-2.5 rounded-lg
+                flex items-center gap-2
+                transition-all duration-200
+                focus:outline-none  ${
+                  isActive
+                    ? "bg-light-background text-cohispania-blue font-semibold"
+                    : "bg-transparent text-gray-300 font-normal hover:bg-gray-50"
+                }`}
+              style={{ marginBottom: "-1px" }}
             >
               <span className="text-base">{tab.label}</span>
 
