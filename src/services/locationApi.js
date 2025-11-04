@@ -52,7 +52,7 @@ export const create = async (locationData) => {
  */
 export const update = async (id, locationData) => {
   try {
-    const response = await api.put(`/locations/${id}`, locationData);
+    const response = await api.patch(`/locations/${id}`, locationData);
     return response.data;
   } catch (error) {
     throw error;
