@@ -66,6 +66,9 @@ export { default as Tabs } from './Tabs';
 // Input: Campo de input integrado con React Hook Form
 export { default as Input } from './Input';
 
+// Modal: Ventana modal reutilizable
+export { default as Modal } from './Modal';
+
 // TODO: Añadir más componentes aquí según se vayan creando
 // Ejemplos futuros:
 // export { default as Textarea } from './Textarea';

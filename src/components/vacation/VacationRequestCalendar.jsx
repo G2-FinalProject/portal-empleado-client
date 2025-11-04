@@ -205,158 +205,178 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-
-      <div
-        className={`
-          flex flex-col gap-4 lg:gap-6 p-2 sm:p-4
-          ${selectedRange ? "lg:grid lg:grid-cols-2" : ""}
-        `}
-      >
-        {/* COLUMNA IZQUIERDA: Calendario */}
-        <div
-          className={`
-            border border-gray-stroke rounded-lg p-2 sm:p-2 bg-white overflow-x-auto
-            transition-all duration-300
-            ${selectedRange ? "" : "lg:max-w-3xl lg:mx-auto"}
-          `}
-        >
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            locale={esLocale}
-            selectable={true}
-            selectMirror={true}
-            events={holidays}
-            select={handleDateSelect}
-            selectAllow={isDateSelectable}
-            headerToolbar={{
-              left: "prev,next",
-              center: "title",
-              right: "today",
-            }}
-            buttonText={{
-              today: "Hoy",
-            }}
-            height="auto"
-            aspectRatio={1.35}
-            handleWindowResize={true}
-            windowResizeDelay={100}
-            dayHeaderFormat={{ weekday: "short" }}
-            dayCellClassNames="text-xs sm:text-sm"
-            eventClassNames="text-xs"
-          />
-          
-          {/* ✅ Mensaje informativo cuando no hay selección */}
-          {!selectedRange && (
-            <div className="mt-4 p-4 bg-blue-50 border border-indigo-400 rounded-md">
-              <p className="text-sm text-indigo-500 text-center">
-                Selecciona un rango de fechas en el calendario para crear una solicitud de vacaciones
-              </p>
-            </div>
-          )}
+    <div className="w-full">
+      {/* Card contenedor principal */}
+      <div className="bg-white rounded-lg border border-gray-stroke overflow-hidden">
+        {/* Header de la card */}
+        <div className="px-4 sm:px-6 py-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
+            Solicitar Vacaciones
+          </h2>
+          <p className="text-gray-300 mt-1 text-sm sm:text-base">
+            Selecciona un rango de fechas en el calendario
+          </p>
         </div>
 
-        {/* COLUMNA DERECHA: Resumen y formulario de selección */}
-        {selectedRange && (
-          <div className="border border-gray-stroke rounded-lg p-4 sm:p-6 bg-white animate-fadeIn">
-            <h3 className="text-base sm:text-lg font-bold mb-4 sm:mb-6 text-cohispania-blue">
-              Resumen de Solicitud
-            </h3>
+        {/* Contenido */}
+        <div className="p-4 sm:p-6">
+          {/* Layout: Calendario solo o Calendario + Formulario */}
+          <div
+            className={`
+              ${selectedRange ? "space-y-6" : ""}
+            `}
+          >
+            {/* Calendario */}
+            <div className="w-full">
+              <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                locale={esLocale}
+                selectable={true}
+                selectMirror={true}
+                events={holidays}
+                select={handleDateSelect}
+                selectAllow={isDateSelectable}
+                headerToolbar={{
+                  left: "prev,next",
+                  center: "title",
+                  right: "today",
+                }}
+                buttonText={{
+                  today: "Hoy",
+                }}
+                height="auto"
+                aspectRatio={1.35}
+                handleWindowResize={true}
+                windowResizeDelay={100}
+                dayHeaderFormat={{ weekday: "short" }}
+                dayCellClassNames="text-xs sm:text-sm"
+                eventClassNames="text-xs"
+              />
 
-            <div className="flex flex-col gap-4 sm:gap-6">
-              {/* Información de las fechas */}
-              <div className="flex flex-col gap-2 sm:gap-3">
-                <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">
-                    Desde:
-                  </span>
-                  <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
-                    {formatDate(selectedRange.start)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">
-                    Hasta:
-                  </span>
-                  <span className="font-medium text-xs sm:text-base text-cohispania-blue text-right">
-                    {formatDate(selectedRange.end)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">
-                    Total días laborables:
-                  </span>
-                  <span className="font-semibold text-sm sm:text-base text-cohispania-orange">
-                    {selectedRange.workingDays} días
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
-                  <span className="text-xs sm:text-sm text-gray-300">
-                    Días disponibles:
-                  </span>
-                  <span className="font-medium text-sm sm:text-base text-cohispania-blue">
-                    {vacationSummary.remaining_days} días
-                  </span>
-                </div>
-              </div>
-
-              {/* Campo de comentarios */}
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="comments"
-                  className="text-xs sm:text-sm font-medium text-gray-400"
-                >
-                  Comentarios (opcional)
-                </label>
-                <textarea
-                  id="comments"
-                  className="w-full px-3 py-2 border border-gray-stroke rounded-md text-xs sm:text-sm resize-y focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent"
-                  placeholder="Añade algún comentario sobre tu solicitud..."
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              {/* Mensaje de advertencia */}
-              {selectedRange.workingDays > vacationSummary.remaining_days && (
-                <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-xs sm:text-sm">
-                  ⚠️ No tienes suficientes días disponibles
+              {/* Mensaje informativo cuando no hay selección */}
+              {!selectedRange && (
+                <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                  <p className="text-sm sm:text-base text-indigo-500 text-center">
+                    Selecciona o arrastra sobre el calendario para seleccionar tus fechas
+                  </p>
                 </div>
               )}
-
-              {/* Botones */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  variant="primary"
-                  size="medium"
-                  loading={isSubmitting}
-                  disabled={
-                    selectedRange.workingDays > vacationSummary.remaining_days
-                  }
-                  onClick={handleSubmitRequest}
-                  fullWidth
-                >
-                  Enviar Solicitud
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="medium"
-                  disabled={isSubmitting}
-                  onClick={handleCancelSelection}
-                  fullWidth
-                >
-                  Cancelar
-                </Button>
-              </div>
             </div>
+
+            {/* Formulario de solicitud (aparece cuando hay selección) */}
+            {selectedRange && (
+              <div className="bg-light-background rounded-lg p-4 sm:p-6 border-2 border-cohispania-orange animate-fadeIn">
+                <h3 className="text-lg sm:text-xl font-bold mb-4 text-cohispania-blue flex items-center gap-2">
+                  Resumen de Solicitud
+                </h3>
+
+                <div className="space-y-4">
+                  {/* Información de las fechas */}
+                  <div className="bg-white rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
+                      <span className="text-sm text-gray-300 font-medium">
+                        Desde:
+                      </span>
+                      <span className="font-semibold text-sm sm:text-base text-cohispania-blue">
+                        {formatDate(selectedRange.start)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
+                      <span className="text-sm text-gray-300 font-medium">
+                        Hasta:
+                      </span>
+                      <span className="font-semibold text-sm sm:text-base text-cohispania-blue">
+                        {formatDate(selectedRange.end)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-2 border-b border-gray-stroke">
+                      <span className="text-sm text-gray-300 font-medium">
+                        Días laborables:
+                      </span>
+                      <span className="font-bold text-base sm:text-lg text-cohispania-orange">
+                        {selectedRange.workingDays} días
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-300 font-medium">
+                        Días disponibles:
+                      </span>
+                      <span className="font-semibold text-sm sm:text-base text-cohispania-blue">
+                        {vacationSummary.remaining_days} días
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Campo de comentarios */}
+                  <div>
+                    <label
+                      htmlFor="comments"
+                      className="block text-sm font-semibold mb-2 text-cohispania-blue"
+                    >
+                      Comentarios (opcional)
+                    </label>
+                    <textarea
+                      id="comments"
+                      className="w-full px-4 py-3 border border-gray-stroke rounded-lg text-sm sm:text-base resize-none focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent transition-all"
+                      placeholder="Añade algún comentario sobre tu solicitud..."
+                      value={comments}
+                      onChange={(e) => setComments(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  {/* Mensaje de advertencia */}
+                  {selectedRange.workingDays >
+                    vacationSummary.remaining_days && (
+                    <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <span className="text-xl">⚠️</span>
+                      <div className="flex-1">
+                        <p className="text-red-700 font-semibold text-sm sm:text-base">
+                          No tienes suficientes días disponibles
+                        </p>
+                        <p className="text-red-600 text-xs sm:text-sm mt-1">
+                          Solicitaste {selectedRange.workingDays} días pero solo
+                          tienes {vacationSummary.remaining_days} disponibles
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Botones */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      variant="primary"
+                      size="medium"
+                      loading={isSubmitting}
+                      disabled={
+                        selectedRange.workingDays >
+                        vacationSummary.remaining_days
+                      }
+                      onClick={handleSubmitRequest}
+                      fullWidth
+                    >
+                      Enviar Solicitud
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="medium"
+                      disabled={isSubmitting}
+                      onClick={handleCancelSelection}
+                      fullWidth
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
