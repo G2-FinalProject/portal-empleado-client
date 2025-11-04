@@ -73,7 +73,7 @@ export const create = async (holidayData) => {
  */
 export const update = async (id, holidayData) => {
   try {
-    const response = await api.put(`/holidays/${id}`, holidayData);
+    const response = await api.patch(`/holidays/${id}`, holidayData);
     return response.data;
   } catch (error) {
     console.error('Error updating holiday:', error);

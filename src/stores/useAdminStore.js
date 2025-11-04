@@ -288,26 +288,26 @@ const useAdminStore = create((set, get) => ({
   // ACCIONES: FESTIVOS (por localización)
   // ============================================
 
-  fetchHolidaysByLocation: async (locationId) => {
-    get().setLoading('holidays', true);
-    set({ error: null });
-    try {
-      const response = await holidayApi.getByLocation(locationId);
-      const holidays = response.data || response;
-      set((state) => ({
-        holidays: {
-          ...state.holidays,
-          [locationId]: holidays,
-        },
-      }));
-      return holidays;
-    } catch (error) {
-      get().setError(error);
-      throw error;
-    } finally {
-      get().setLoading('holidays', false);
-    }
-  },
+  // fetchHolidaysByLocation: async (locationId) => {
+  //   get().setLoading('holidays', true);
+  //   set({ error: null });
+  //   try {
+  //     const response = await holidayApi.getByLocation(locationId);
+  //     const holidays = response.data || response;
+  //     set((state) => ({
+  //       holidays: {
+  //         ...state.holidays,
+  //         [locationId]: holidays,
+  //       },
+  //     }));
+  //     return holidays;
+  //   } catch (error) {
+  //     get().setError(error);
+  //     throw error;
+  //   } finally {
+  //     get().setLoading('holidays', false);
+  //   }
+  // },
 
   createHoliday: async (data) => {
     get().setLoading('holidays', true);

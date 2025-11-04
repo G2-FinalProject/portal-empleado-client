@@ -51,7 +51,7 @@ export const create = async (roleData) => {
  */
 export const update = async (id, roleData) => {
   try {
-    const response = await api.put(`/roles/${id}`, roleData);
+    const response = await api.patch(`/roles/${id}`, roleData);
     return response.data;
   } catch (error) {
     throw error;
