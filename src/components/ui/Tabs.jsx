@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import Badge from './Badge';
+import { useState } from "react";
+import Badge from "./Badge";
 
 /**
  * Tabs - Sistema de pestañas reutilizable
@@ -24,7 +24,7 @@ export default function Tabs({
   tabs = [],
   defaultTab,
   onChange,
-  className = ''
+  className = "",
 }) {
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.id);
 
@@ -35,13 +35,13 @@ export default function Tabs({
     }
   };
 
-  const activeTabData = tabs.find(tab => tab.id === activeTab);
+  const activeTabData = tabs.find((tab) => tab.id === activeTab);
 
   return (
     <div className={className}>
-      {/* Pestañas */}
+      {/* Pestañas con fondo gris */}
       <div
-        className="flex gap-6 border-b border-gray-stroke"
+        className="bg-light-background rounded-lg p-1 flex gap-1"
         role="tablist"
       >
         {tabs.map((tab) => {
@@ -54,18 +54,25 @@ export default function Tabs({
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => handleTabChange(tab.id)}
-              className={`relative pb-4 px-1 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                isActive
-                  ? 'text-cohispania-blue font-semibold border-b-[3px] border-cohispania-blue'
-                  : 'text-gray-300 font-normal border-b-[3px] border-transparent'
-              }`}
-              style={{ marginBottom: '-1px' }}
+              className={`
+                flex-1 px-4 py-3 rounded-md
+                flex items-center justify-center gap-2
+                transition-all duration-200
+                font-medium text-sm
+                focus:outline-none focus:ring-1 focus:ring-cohispania-orange focus:ring-offset-2
+                ${
+                  isActive
+                    ? "bg-white text-cohispania-blue shadow-sm"
+                    : "bg-transparent text-gray-400 hover:text-cohispania-blue"
+                }
+              `}
+
             >
               <span className="text-base">{tab.label}</span>
 
               {/* Badge con el contador */}
               {tab.count !== undefined && tab.count > 0 && (
-                <Badge variant="purple" size="small">
+                <Badge variant={isActive ? "secondary" : "neutral"} size="small">
                   {tab.count}
                 </Badge>
               )}
