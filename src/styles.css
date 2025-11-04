@@ -7,6 +7,7 @@
   --color-light-background: #F4F6FA;
   --color-gray-stroke: #E0E4EA;
   --color-blue-stroke: #273758;
+
   --color-red-400: #EC5B59;
   --color-light-green-400: #9CCC65;
   --color-light-green-600: #7CB342;
@@ -14,28 +15,31 @@
   --color-indigo-400: #6171C9;
   --color-indigo-500: #3F51B5;
   --color-purple-400: #AB47BC;
+
   --color-gray-100:#C9C9CE;
   --color-gray-200:#A5A6AE;
   --color-gray-300: #80828E;
   --color-gray-400: #656775;
 
-
-
   /* Tipografía */
   --font-family-sans: 'Open Sans', system-ui, sans-serif;
   --font-sans: "Open Sans", sans-serif;
 
+  /* Animaciones */
   --animate-fade-in: fade-in 0.3s ease-out;
   --animate-slide-in: slide-in 0.3s ease-out;
 }
 
-
+/* Estilos Globales */
 :root {
   line-height: 1.5;
   font-weight: 400;
+
   color-scheme: light dark;
-  color:  --color-cohispania-blue;
-  background-color: --color-light-background;
+
+  color: var(--color-cohispania-blue);
+  background-color: var(--color-light-background);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -49,21 +53,21 @@
   .fc .fc-toolbar-title {
     font-size: 1rem !important;
   }
-  
+
   .fc .fc-button {
     padding: 0.25rem 0.5rem !important;
     font-size: 0.75rem !important;
   }
-  
+
   .fc .fc-daygrid-day-number {
     font-size: 0.75rem !important;
   }
-  
+
   .fc .fc-col-header-cell-cushion {
     padding: 0.25rem !important;
     font-size: 0.75rem !important;
   }
-  
+
   /* Reducir altura de las celdas */
   .fc .fc-daygrid-day {
     min-height: 2.5rem !important;
