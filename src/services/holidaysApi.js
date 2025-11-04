@@ -70,7 +70,7 @@ export const create = async (holidayData) => {
  */
 export const update = async (id, holidayData) => {
   try {
-    const response = await api.put(`/holidays/${id}`, holidayData);
+    const response = await api.patch(`/holidays/${id}`, holidayData);
     return response.data;
   } catch (error) {
     throw error;
@@ -85,6 +85,21 @@ export const update = async (id, holidayData) => {
 export const deleteHoliday = async (id) => {
   try {
     const response = await api.delete(`/holidays/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+/**
+ * Obtiene los festivos por ID de localización
+ * @param {string|number} locationId - ID de la localización
+ * @returns {Promise} Lista de festivos para esa localización
+ */
+export const getByLocation = async (locationId) => {
+  try {
+    // Nota: Esta ruta no existe actualmente en tu holidayRoutes.ts, 
+    // pero tu store la espera. Asumimos la ruta lógica:
+    const response = await api.get(`/holidays/location/${locationId}`); 
     return response.data;
   } catch (error) {
     throw error;
