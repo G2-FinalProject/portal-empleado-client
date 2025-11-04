@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, UserPlus, ChevronLeft, ChevronRight } from 'lucide-react';
 import useAdminStore from '../../stores/useAdminStore';
 import { Card, Modal, Button } from '../../components/ui';
+import useAuthStore from '../../stores/authStore';
 
 export default function EmployeeListPage() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function EmployeeListPage() {
 
   const departments = useAdminStore((state) => state.departments);
   const fetchDepartments = useAdminStore((state) => state.fetchDepartments);
+  const { user, isAdmin, isManager } = useAuthStore();
 
   // ============================================
   // ESTADO LOCAL
@@ -45,6 +47,13 @@ export default function EmployeeListPage() {
   const filteredUsers = useMemo(() => {
     let result = users || [];
 
+    // 1. FILTRADO POR ROL (Manager solo ve su departamento) 💡
+    if (isManager() && user?.departmentId) { // user.departmentId ahora tiene valor
+      const managerDeptId = parseInt(user.departmentId);
+      // Restringir la lista SÓLO a usuarios de ese departamento
+      result = result.filter(user => user.department_id === managerDeptId);
+    }
+
     // Filtrar por búsqueda (nombre o email)
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
@@ -63,7 +72,7 @@ export default function EmployeeListPage() {
     }
 
     return result;
-  }, [users, searchQuery, selectedDepartmentId]);
+  }, [users, searchQuery, selectedDepartmentId, isManager, user]);
 
   // ============================================
   // PAGINACIÓN - cálculo
