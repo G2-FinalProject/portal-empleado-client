@@ -23,7 +23,7 @@ const useAdminStore = create((set, get) => ({
   departments: [],
   locations: [],
   roles: [],
-  holidays: {}, // { locationId: [holidays] }
+  holidays: [], // { locationId: [holidays] }
 
   // Loading granular por entidad
   loading: {
