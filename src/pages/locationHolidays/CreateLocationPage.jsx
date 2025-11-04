@@ -2,10 +2,10 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
-
+import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Trash2, Calendar as CalendarIcon, Plus } from 'lucide-react';
+import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
 import { Modal, Button, Card } from '../../components/ui';
 import { create as createLocation } from '../../services/locationApi';
 import { create as createHoliday } from '../../services/holidaysApi';
@@ -132,9 +132,9 @@ export default function CreateLocationPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-cohispania-blue">Nueva Población</h1>
+        <h1 className="text-3xl font-bold text-cohispania-blue">Añade una nueva población</h1>
         <p className="text-gray-300 mt-1">
-          Crea una población y asigna sus festivos
+          Selecciona los festivos de la nueva población
         </p>
       </div>
 
@@ -169,88 +169,92 @@ export default function CreateLocationPage() {
             <div className="bg-white border border-gray-stroke rounded-lg p-4">
               <FullCalendar
                 ref={calendarRef}
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridYear"
+                plugins={[dayGridPlugin, multiMonthPlugin, interactionPlugin]}
+                initialView="multiMonthYear"
                 locale={esLocale}
                 dateClick={handleDateClick}
                 events={calendarEvents}
                 headerToolbar={{
-                  left: 'prev,next today',
+                  left: 'prev,next',
                   center: 'title',
-                  right: '',
+                  right: 'today',
                 }}
                 buttonText={{
                   today: 'Hoy',
                 }}
                 height="auto"
-                dayMaxEvents={2}
+                dayMaxEvents={3}
                 fixedWeekCount={false}
               />
             </div>
           </div>
-
-          {/* Lista de festivos añadidos */}
-          {holidays.length > 0 && (
-            <div>
-              <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5" />
-                Festivos añadidos ({holidays.length})
-              </h3>
-
-              <div className="space-y-2">
-                {holidays
-                  .sort((a, b) => new Date(a.date) - new Date(b.date))
-                  .map((holiday) => (
-                    <div
-                      key={holiday.tempId}
-                      className="flex items-center justify-between bg-light-background p-4 rounded-lg border border-gray-stroke"
-                    >
-                      <div>
-                        <p className="font-semibold text-cohispania-blue">{holiday.name}</p>
-                        <p className="text-sm text-gray-300">{formatDate(holiday.date)}</p>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteHoliday(holiday.tempId)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition"
-                        disabled={isSubmitting}
-                        aria-label={`Eliminar ${holiday.name}`}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-stroke">
-            <Button
-              variant="primary"
-              size="medium"
-              onClick={handleSubmit}
-              disabled={isSubmitting || !locationName.trim() || holidays.length === 0}
-              loading={isSubmitting}
-              fullWidth
-            >
-              Crear Población
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="medium"
-              onClick={() => navigate('/locations')}
-              disabled={isSubmitting}
-              fullWidth
-            >
-              Cancelar
-            </Button>
-          </div>
+          {/* Contador de días seleccionados */}
+          <p className="text-sm text-gray-300 mt-2">
+            Días seleccionados: {holidays.length}
+          </p>
         </div>
-      </Card>
+
+        {/* Lista de festivos añadidos */}
+        {holidays.length > 0 && (
+          <div>
+            <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5" />
+              Festivos añadidos ({holidays.length})
+            </h3>
+
+            <div className="space-y-2">
+              {holidays
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map((holiday) => (
+                  <div
+                    key={holiday.tempId}
+                    className="flex items-center justify-between bg-light-background p-4 rounded-lg border border-gray-stroke"
+                  >
+                    <div>
+                      <p className="font-semibold text-cohispania-blue">{holiday.name}</p>
+                      <p className="text-sm text-gray-300">{formatDate(holiday.date)}</p>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteHoliday(holiday.tempId)}
+                      className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                      disabled={isSubmitting}
+                      aria-label={`Eliminar ${holiday.name}`}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Botones de acción */}
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-stroke">
+          <Button
+            variant="primary"
+            size="medium"
+            onClick={handleSubmit}
+            disabled={isSubmitting || !locationName.trim() || holidays.length === 0}
+            loading={isSubmitting}
+            fullWidth
+          >
+            <Save className="w-5 h-5 mr-2" />
+            Guardar Festivos
+          </Button>
+
+          <button
+            onClick={() => navigate('/locations')}
+            disabled={isSubmitting}
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-medium disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+          >
+            <X className="w-5 h-5" />
+            Cancelar
+          </button>
+        </div>
+      </Card >
 
       {/* Modal para añadir festivo */}
-      <Modal
+      < Modal
         isOpen={isModalOpen}
         onClose={handleCancelModal}
         title="Añadir Festivo"
@@ -293,21 +297,20 @@ export default function CreateLocationPage() {
               onClick={handleAddHoliday}
               fullWidth
             >
-              <Plus className="w-5 h-5 mr-2" />
+              <Save className="w-5 h-5 mr-2" />
               Añadir Festivo
             </Button>
 
-            <Button
-              variant="ghost"
-              size="medium"
+            <button
               onClick={handleCancelModal}
-              fullWidth
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-medium w-full"
             >
+              <X className="w-5 h-5" />
               Cancelar
-            </Button>
+            </button>
           </div>
         </div>
-      </Modal>
-    </div>
+      </Modal >
+    </div >
   );
 }
