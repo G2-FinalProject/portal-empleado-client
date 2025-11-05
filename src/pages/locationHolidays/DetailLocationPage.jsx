@@ -1,11 +1,3 @@
-// LocationController.ts línea 25-40
-// export const getLocationById = async (req: Request, res: Response) => {
-//   const location = await Location.findByPk(id, {
-//     include: [
-//       { model: User, attributes: ["id", "first_name", "last_name", "email"] },
-//       { model: Holiday, attributes: ["id", "holiday_name", "holiday_date"] }, // ← ¡AQUÍ ESTÁN!
-//     ],
-//   });
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
@@ -116,7 +108,7 @@ export default function DetailLocationPage() {
         <div className="flex gap-3">
           <button
             onClick={() => navigate('/locations')}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
             Volver
@@ -124,7 +116,7 @@ export default function DetailLocationPage() {
 
           <button
             onClick={() => navigate(`/locations/${id}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold cursor-pointer"
           >
             <Edit className="w-5 h-5" />
             Editar

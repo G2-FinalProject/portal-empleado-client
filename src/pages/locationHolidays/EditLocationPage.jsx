@@ -6,7 +6,7 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
-import { Modal, Card } from '../../components/ui';
+import { Modal, Card, Button } from '../../components/ui';
 import { getById as getLocationById, update as updateLocation } from '../../services/locationApi';
 import { create as createHoliday, deleteHoliday } from '../../services/holidaysApi';
 import toast from 'react-hot-toast';
@@ -270,7 +270,7 @@ export default function EditLocationPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      <div className="animate-fadeIn">
         <h1 className="text-3xl font-bold text-cohispania-blue">Editar población</h1>
         <p className="text-gray-300 mt-1">
           Modifica el nombre y gestiona los festivos de la población
@@ -278,11 +278,11 @@ export default function EditLocationPage() {
       </div>
 
       {/* Formulario */}
-      <Card padding={true}>
+      <Card className="animate-fadeIn" padding={true}>
         <div className="space-y-6">
           {/* Nombre de la población */}
           <div>
-            <label htmlFor="locationName" className="block text-lg font-bold mb-2 text-cohispania-blue">
+            <label htmlFor="locationName" className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Nombre de la población <span className="text-red-400">*</span>
             </label>
             <input
@@ -291,7 +291,7 @@ export default function EditLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border-2 border-cohispania-blue text-cohispania-blue placeholder-gray-300 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition text-lg"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
               disabled={isSubmitting}
               autoFocus
             />
@@ -373,7 +373,7 @@ export default function EditLocationPage() {
                             toast.success('Festivo marcado para eliminar');
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.holiday_name}`}
                       >
@@ -402,7 +402,7 @@ export default function EditLocationPage() {
                             toast.success('Festivo eliminado');
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.name}`}
                       >
@@ -428,7 +428,7 @@ export default function EditLocationPage() {
             <button
               onClick={() => navigate(`/locations/${id}`)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <X className="w-5 h-5" />
               Cancelar
@@ -437,7 +437,7 @@ export default function EditLocationPage() {
             <button
               onClick={handleSaveChanges}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -455,7 +455,7 @@ export default function EditLocationPage() {
         </div>
       </Card>
 
-      {/* Modal para añadir festivo */}
+      {/* Modal para añadir festivo - ✅ ESTILO UNIFICADO CON LOCATIONLISTPAGE */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCancelModal}
@@ -493,7 +493,7 @@ export default function EditLocationPage() {
                   handleAddHoliday();
                 }
               }}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-2 focus:ring-cohispania-blue focus:border-cohispania-blue outline-none transition"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
               autoFocus
             />
             {selectedDates.length > 1 && (
@@ -503,23 +503,22 @@ export default function EditLocationPage() {
             )}
           </div>
 
-          {/* Botones del modal */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleAddHoliday}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold"
-            >
-              <Save className="w-5 h-5" />
-              Añadir
-            </button>
-
-            <button
+          {/* Botones del modal - ✅ USANDO COMPONENTE BUTTON COMO LOCATIONLISTPAGE */}
+          <div className="flex gap-3 mt-6">
+            <Button
+              variant="ghost"
               onClick={handleCancelModal}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold"
+              className="flex-1 cursor-pointer"
             >
-              <X className="w-5 h-5" />
               Cancelar
-            </button>
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleAddHoliday}
+              className="flex-1 cursor-pointer"
+            >
+              Añadir
+            </Button>
           </div>
         </div>
       </Modal>
