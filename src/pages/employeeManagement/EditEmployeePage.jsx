@@ -58,15 +58,34 @@ export default function EditEmployeePage() {
    * Maneja la actualización del empleado
    * @param {Object} formData - Datos del formulario
    */
-  const handleUpdateEmployee = async (formData) => {
+
+    const handleUpdateEmployee = async (formData) => {
     try {
-      await updateUser(id, formData);
-      toast.success("Empleado actualizado correctamente ✅");
+      const { password, ...dataWithoutPassword } = formData;
+      
+      const dataToSend = {
+        first_name: dataWithoutPassword.first_name,
+        last_name: dataWithoutPassword.last_name,
+        email: dataWithoutPassword.email,
+        role_id: Number(dataWithoutPassword.role_id),
+        department_id: Number(dataWithoutPassword.department_id),
+        location_id: Number(dataWithoutPassword.location_id),
+        available_days: Number(dataWithoutPassword.available_days),
+      };
+      await updateUser(id, dataToSend);
+      toast.success("Empleado actualizado correctamente");
       navigate(`/employees/${id}`);
+      
     } catch (error) {
       console.error("Error al actualizar empleado:", error);
-      toast.error("Error al actualizar el empleado 😞");
-      throw error; 
+      console.log("Respuesta del backend:", error.response?.data);
+
+      const errorMessage = error.response?.data?.errors?.[0]?.msg 
+        || error.response?.data?.message
+        || "Error al actualizar el empleado";
+      
+      toast.error(errorMessage);
+      throw error;
     }
   };
 
