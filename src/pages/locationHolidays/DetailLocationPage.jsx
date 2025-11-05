@@ -8,10 +8,14 @@
 //   });
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
+import esLocale from '@fullcalendar/core/locales/es';
 import { Card } from '../../components/ui';
 import { getById as getLocationById } from '../../services/locationApi';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft, Edit, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function DetailLocationPage() {
   const { id } = useParams();
@@ -21,6 +25,25 @@ export default function DetailLocationPage() {
   const [location, setLocation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+   // Formatear fecha para mostrar
+  const formatDate = (dateStr) => {
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  };
+
+  // Crear eventos para FullCalendar desde los festivos
+  const calendarEvents = location?.holidays?.map(holiday => ({
+    title: holiday.holiday_name,
+    start: holiday.holiday_date,
+    backgroundColor: '#F68D2E', // cohispania-orange
+    borderColor: '#F68D2E',
+    textColor: '#1F2A44', // cohispania-blue
+    display: 'block',
+  })) || [];
 
   // Cargar datos de la población
   useEffect(() => {
@@ -117,12 +140,80 @@ export default function DetailLocationPage() {
             📅 Calendario (próximamente)
           </div>
 
-          {/* TODO: Añadir lista de festivos aquí */}
-          <div className="text-center py-8 text-gray-400">
-            📋 Lista de festivos (próximamente)
+           {/* Calendario de festivos (solo lectura) */}
+          <div>
+            <h2 className="text-xl font-bold text-cohispania-blue mb-4 flex items-center gap-2">
+              <CalendarIcon className="w-6 h-6" />
+              Calendario de Festivos
+            </h2>
+            <p className="text-sm text-gray-300 mb-4">
+              Vista anual de todos los festivos configurados para {location.location_name}
+            </p>
+         <div className="bg-white border border-gray-stroke rounded-lg p-4">
+              <FullCalendar
+                plugins={[dayGridPlugin, multiMonthPlugin]}
+                initialView="multiMonthYear"
+                locale={esLocale}
+                events={calendarEvents}
+                headerToolbar={{
+                  left: 'prev,next',
+                  center: 'title',
+                  right: 'today',
+                }}
+                buttonText={{
+                  today: 'Hoy',
+                }}
+                height="auto"
+                dayMaxEvents={3}
+                fixedWeekCount={false}
+                selectable={false} // Solo lectura
+                editable={false}   // Solo lectura
+                eventClick={false} // Deshabilitar clicks en eventos
+              />
+            </div>
+          </div>
+
+{/* Lista de festivos */}
+          <div>
+            <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
+              📋 Lista de Festivos ({location.holidays?.length || 0})
+            </h3>
+
+            {location.holidays && location.holidays.length > 0 ? (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {location.holidays
+                  .sort((a, b) => new Date(a.holiday_date) - new Date(b.holiday_date))
+                  .map((holiday) => (
+                    <div
+                      key={holiday.id}
+                      className="flex items-center justify-between bg-light-background p-4 rounded-lg border border-gray-stroke"
+                    >
+                      <div>
+                        <p className="font-semibold text-cohispania-blue">{holiday.holiday_name}</p>
+                        <p className="text-sm text-gray-300">{formatDate(holiday.holiday_date)}</p>
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        ID: {holiday.id}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No hay festivos configurados para esta población</p>
+                <button
+                  onClick={() => navigate(`/locations/${id}/edit`)}
+                  className="mt-2 text-cohispania-blue hover:underline"
+                >
+                  Añadir festivos
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </Card>
     </div>
   );
 }
+
