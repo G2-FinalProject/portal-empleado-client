@@ -73,11 +73,9 @@ export default function EmployeeForm({
     try {
       await onSubmit(data);
       if (!isEditMode) {
-        toast.success("Empleado creado correctamente");
         reset();
-      } else {
-        toast.success("Empleado actualizado correctamente");
-      }
+      } 
+      
     } catch (error) {
       console.error("Error en el formulario:", error);
       const errorMessage = isEditMode
