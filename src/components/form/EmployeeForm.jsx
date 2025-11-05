@@ -55,7 +55,7 @@ export default function EmployeeForm({
           <Input
             label="Nombre"
             name="first_name"
-            placeholder="Juan"
+            placeholder="Introduce el nombre del empleado"
             register={register}
             validation={{ required: "El nombre es obligatorio" }}
             errors={errors}
@@ -66,7 +66,7 @@ export default function EmployeeForm({
           <Input
             label="Apellidos"
             name="last_name"
-            placeholder="García López"
+            placeholder="Introduce los apellidos del empleado"
             register={register}
             validation={{ required: "Los apellidos son obligatorios" }}
             errors={errors}
@@ -79,7 +79,7 @@ export default function EmployeeForm({
               label="Email"
               name="email"
               type="email"
-              placeholder="juan.garcia@cohispania.com"
+              placeholder="Introduce el correo corporativo"
               register={register}
               validation={{
                 required: "El email es obligatorio",
@@ -99,7 +99,7 @@ export default function EmployeeForm({
               label="Contraseña"
               name="password"
               type="password"
-              placeholder="********"
+              placeholder="Crea una contraseña segura"
               register={register}
               validation={{
                 required: "La contraseña es obligatoria",
@@ -192,7 +192,7 @@ export default function EmployeeForm({
               label="Días de Vacaciones Disponibles"
               name="available_days"
               type="number"
-              placeholder="23"
+              placeholder="Introduce los días disponibles"
               register={register}
               validation={{
                 required: true,
