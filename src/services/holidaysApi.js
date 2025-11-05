@@ -9,6 +9,7 @@ export const getAll = async () => {
     const response = await api.get('/holidays');
     return response.data;
   } catch (error) {
+    console.error('Error fetching holidays:', error);
     throw error;
   }
 };
@@ -35,11 +36,12 @@ export const getMyHolidays = async () => {
   try {
     // Por ahora, obtenemos todos los festivos
     const response = await api.get('/holidays');
-    
+
     // TODO: Filtrar por location_id del usuario cuando tengamos el endpoint
     // Por ahora devolvemos todos
     return response.data;
   } catch (error) {
+    console.error('Error fetching holiday:', error);
     throw error;
   }
 };
@@ -58,6 +60,7 @@ export const create = async (holidayData) => {
     const response = await api.post('/holidays', holidayData);
     return response.data;
   } catch (error) {
+    console.error('Error creating holiday:', error);
     throw error;
   }
 };
@@ -70,9 +73,10 @@ export const create = async (holidayData) => {
  */
 export const update = async (id, holidayData) => {
   try {
-    const response = await api.put(`/holidays/${id}`, holidayData);
+    const response = await api.patch(`/holidays/${id}`, holidayData);
     return response.data;
   } catch (error) {
+    console.error('Error updating holiday:', error);
     throw error;
   }
 };
@@ -87,6 +91,7 @@ export const deleteHoliday = async (id) => {
     const response = await api.delete(`/holidays/${id}`);
     return response.data;
   } catch (error) {
+    console.error('Error deleting holiday:', error);
     throw error;
   }
 };

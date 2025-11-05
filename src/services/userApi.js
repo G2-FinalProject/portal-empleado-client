@@ -81,3 +81,19 @@ export const deleteUser = async (id) => {
     throw error;
   }
 };
+ /**
+ * Asigna un rol a un usuario (Admin only)
+ * @param {Object} data
+ * @param {number} data.userId - ID del usuario
+ * @param {number} data.roleId - ID del nuevo rol
+ * @returns {Promise} Datos de la respuesta (message + user)
+ */
+export const assignRole = async (data) => {
+  try {
+    // Usamos la ruta /roles/assign
+    const response = await api.post('/roles/assign', data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
