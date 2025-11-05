@@ -1,38 +1,95 @@
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { useEffect } from "react";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 
 /**
- * 🎯 EmployeeForm - Alta de nuevo empleado
- * Igual al Figma (sin calendario, botones azul y gris)
+ * Formulario reutilizable para crear/editar empleados
+ *
+ * @param {Object} props
+ * @param {Array} props.roles - Lista de roles disponibles
+ * @param {Array} props.departments - Lista de departamentos
+ * @param {Array} props.locations - Lista de poblaciones
+ * @param {Function} props.onSubmit - Función que se ejecuta al enviar
+ * @param {Object} props.initialData - Datos iniciales para pre-rellenar (modo edición)
+ * @param {boolean} props.isEditMode - Si está en modo edición (oculta contraseña)
+ * @param {Function} props.onCancel - Función para cancelar (opcional)
  */
+
+const getRoleDisplayName = (roleName) => {
+  const roleTranslations = {
+    employee: "Empleado",
+    manager: "Responsable",
+    admin: "Administrador",
+  };
+
+  return roleTranslations[roleName.toLowerCase()] || roleName;
+};
+
 export default function EmployeeForm({
   roles = [],
   departments = [],
   locations = [],
   onSubmit,
+  initialData = null,
+  isEditMode = false,
+  onCancel,
 }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm({
     defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      role_id: "",
+      department_id: "",
+      location_id: "",
       available_days: 23,
     },
   });
 
+  //Pre-rellenar formulario en modo edición
+  useEffect(() => {
+    if (initialData && isEditMode) {
+      setValue("first_name", initialData.first_name || "");
+      setValue("last_name", initialData.last_name || "");
+      setValue("email", initialData.email || "");
+      setValue("role_id", initialData.role_id || "");
+      setValue("department_id", initialData.department_id || "");
+      setValue("location_id", initialData.location_id || "");
+      setValue("available_days", initialData.available_days || 23);
+    }
+  }, [initialData, isEditMode, setValue]);
+
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
-      toast.success("Empleado creado correctamente 🎉");
-      reset();
+      if (!isEditMode) {
+        reset();
+      } 
+      
     } catch (error) {
-      console.error("Error al crear empleado:", error);
-      toast.error("Hubo un problema al crear el empleado");
+      console.error("Error en el formulario:", error);
+      const errorMessage = isEditMode
+        ? "Hubo un problema al actualizar el empleado"
+        : "Hubo un problema al crear el empleado";
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      reset();
     }
   };
 
@@ -41,10 +98,12 @@ export default function EmployeeForm({
       {/* 🧾 Formulario de empleado */}
       <Card>
         <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
-          Información del Empleado
+          {isEditMode ? "Editar Información" : "Información del Empleado"}
         </h2>
         <p className="text-sm text-gray-300 mb-6">
-          Completa los datos del nuevo empleado
+          {isEditMode
+            ? "Modifica los datos del empleado"
+            : "Completa los datos del nuevo empleado"}
         </p>
 
         <form
@@ -94,24 +153,26 @@ export default function EmployeeForm({
           </div>
 
           {/* Contraseña */}
-          <div className="md:col-span-2">
-            <Input
-              label="Contraseña"
-              name="password"
-              type="password"
-              placeholder="********"
-              register={register}
-              validation={{
-                required: "La contraseña es obligatoria",
-                minLength: {
-                  value: 8,
-                  message: "Debe tener al menos 8 caracteres",
-                },
-              }}
-              errors={errors}
-              required
-            />
-          </div>
+          {!isEditMode && (
+            <div className="md:col-span-2">
+              <Input
+                label="Contraseña"
+                name="password"
+                type="password"
+                placeholder="********"
+                register={register}
+                validation={{
+                  required: "La contraseña es obligatoria",
+                  minLength: {
+                    value: 8,
+                    message: "Debe tener al menos 8 caracteres",
+                  },
+                }}
+                errors={errors}
+                required
+              />
+            </div>
+          )}
 
           {/* Rol */}
           <div>
@@ -119,13 +180,16 @@ export default function EmployeeForm({
               Rol <span className="text-red-400">*</span>
             </label>
             <select
-              {...register("role_id", { required: "Selecciona un rol" })}
+              {...register("role_id", {
+                required: "Selecciona un rol",
+                valueAsNumber: true,
+              })}
               className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
             >
               <option value="">Selecciona un rol</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
-                  {role.role_name}
+                  {getRoleDisplayName(role.role_name)}
                 </option>
               ))}
             </select>
@@ -195,8 +259,11 @@ export default function EmployeeForm({
               placeholder="23"
               register={register}
               validation={{
-                required: true,
-                min: 0,
+                required: "Los días disponibles son obligatorios",
+                min: {
+                  value: 0,
+                  message: "Debe ser un número positivo",
+                },
                 valueAsNumber: true,
               }}
               errors={errors}
@@ -209,7 +276,8 @@ export default function EmployeeForm({
               type="button"
               variant="ghost"
               className="border border-gray-stroke text-cohispania-blue bg-white hover:bg-gray-100"
-              onClick={() => reset()}
+              onClick={handleCancel}
+              disabled={isSubmitting}
             >
               Cancelar
             </Button>
@@ -217,8 +285,9 @@ export default function EmployeeForm({
               type="submit"
               variant="secondary"
               className="bg-cohispania-blue text-white hover:opacity-90"
+              loading={isSubmitting}
             >
-              Guardar Empleado
+              {isEditMode ? "Guardar Cambios" : "Guardar Empleado"}
             </Button>
           </div>
         </form>
