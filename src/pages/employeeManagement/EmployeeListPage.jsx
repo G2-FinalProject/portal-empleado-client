@@ -13,12 +13,18 @@ import useAdminStore from "../../stores/useAdminStore";
 import { Card, Modal, Button } from "../../components/ui";
 import useAuthStore from "../../stores/authStore";
 
+const getRoleDisplayName = (roleName) => {
+  const roleTranslations = {
+    employee: "Empleado",
+    manager: "Responsable",
+    admin: "Administrador",
+  };
+  return roleTranslations[roleName?.toLowerCase()] || roleName;
+};
+
 export default function EmployeeListPage() {
   const navigate = useNavigate();
 
-  // ============================================
-  // ESTADO DE ZUSTAND
-  // ============================================
   const users = useAdminStore((state) => state.users);
   const fetchUsers = useAdminStore((state) => state.fetchUsers);
   const deleteUser = useAdminStore((state) => state.deleteUser);
@@ -29,9 +35,6 @@ export default function EmployeeListPage() {
   const fetchDepartments = useAdminStore((state) => state.fetchDepartments);
   const { user, isAdmin, isManager } = useAuthStore();
 
-  // ============================================
-  // ESTADO LOCAL
-  // ============================================
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -39,31 +42,20 @@ export default function EmployeeListPage() {
 
   // ESTADO PARA PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 15; // 15 empleados por página
+  const ITEMS_PER_PAGE = 10;
 
-  // ============================================
-  // EFECTOS
-  // ============================================
   useEffect(() => {
     fetchUsers();
     fetchDepartments();
   }, [fetchUsers, fetchDepartments]);
 
-  // ============================================
-  // FILTRADO
-  // ============================================
   const filteredUsers = useMemo(() => {
     let result = users || [];
-
-    // 1. FILTRADO POR ROL (Manager solo ve su departamento) 💡
     if (isManager() && user?.departmentId) {
-      // user.departmentId ahora tiene valor
       const managerDeptId = parseInt(user.departmentId);
-      // Restringir la lista SÓLO a usuarios de ese departamento
       result = result.filter((user) => user.department_id === managerDeptId);
     }
 
-    // Filtrar por búsqueda (nombre o email)
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
       result = result.filter((user) => {
@@ -73,7 +65,6 @@ export default function EmployeeListPage() {
       });
     }
 
-    // Filtrar por departamento
     if (selectedDepartmentId) {
       result = result.filter(
         (user) => user.department_id === parseInt(selectedDepartmentId)
@@ -83,18 +74,10 @@ export default function EmployeeListPage() {
     return result;
   }, [users, searchQuery, selectedDepartmentId, isManager, user]);
 
-  // ============================================
-  // PAGINACIÓN - cálculo
-  // ============================================
-
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = currentPage * ITEMS_PER_PAGE;
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  // ============================================
-  // FUNCIONES DE PAGINACIÓN
-  // ============================================
 
   const goToPreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -112,9 +95,6 @@ export default function EmployeeListPage() {
     setCurrentPage(1);
   }, [searchQuery, selectedDepartmentId]);
 
-  // ============================================
-  // FUNCIONES DE ELIMINACIÓN
-  // ============================================
   const handleDeleteClick = (employee) => {
     setEmployeeToDelete(employee);
     setShowDeleteModal(true);
@@ -139,9 +119,6 @@ export default function EmployeeListPage() {
     setEmployeeToDelete(null);
   };
 
-  // ============================================
-  // RENDERIZADO
-  // ============================================
   return (
     <main className="space-y-6">
       {/* Botón Nuevo Empleado */}
@@ -290,8 +267,8 @@ export default function EmployeeListPage() {
                           {user.email}
                         </td>
                         <td className="py-4 px-6">
-                          <span className="capitalize text-cohispania-blue">
-                            {user.role?.role_name || "-"}
+                          <span className="text-cohispania-blue">
+                            {getRoleDisplayName(user.role?.role_name) || "-"}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-gray-400">
@@ -372,8 +349,8 @@ export default function EmployeeListPage() {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <span className="text-gray-400">Rol:</span>
-                          <p className="font-medium text-cohispania-blue capitalize">
-                            {user.role?.role_name || "-"}
+                          <p className="font-medium text-cohispania-blue">
+                            {getRoleDisplayName(user.role?.role_name) || "-"}
                           </p>
                         </div>
                         <div>
