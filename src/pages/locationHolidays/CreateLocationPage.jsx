@@ -190,7 +190,7 @@ export default function CreateLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-2 focus:ring-cohispania-blue focus:border-cohispania-blue outline-none transition"
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
               disabled={isSubmitting}
             />
             {/* Alerta cuando calendario está deshabilitado */}
@@ -308,7 +308,7 @@ export default function CreateLocationPage() {
       </Card>
 
       {/* Modal para añadir festivo */}
-       <Modal
+      <Modal
         isOpen={isModalOpen}
         onClose={handleCancelModal}
         title={selectedDates.length > 1 ? "Añadir festivos" : "Añadir festivo"}
@@ -356,7 +356,7 @@ export default function CreateLocationPage() {
             )}
           </div>
 
- {/* Botones del modal */}
+          {/* Botones del modal */}
           <div className="flex gap-3">
             <button
               onClick={handleAddHoliday}

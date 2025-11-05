@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, Search, UserPlus } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, UserPlus } from 'lucide-react';
 import useAdminStore from '../../stores/useAdminStore';
-import { Card } from '../../components/ui';
+import { Card, Modal, Button } from '../../components/ui';
 
 export default function LocationListPage() {
   const navigate = useNavigate();
@@ -13,8 +13,12 @@ export default function LocationListPage() {
   const loading = useAdminStore((state) => state.loading);
   const error = useAdminStore((state) => state.error);
 
+  // Estado local
   const [query, setQuery] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [locationToDelete, setLocationToDelete] = useState(null);
 
+  // Efectos
   useEffect(() => {
     fetchLocations();
   }, [fetchLocations]);
@@ -28,12 +32,34 @@ export default function LocationListPage() {
     );
   }, [locations, query]);
 
+  // Funciones de eliminación
+  const handleDeleteClick = (location) => {
+    setLocationToDelete(location);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteLocation(locationToDelete.id);
+      setShowDeleteModal(false);
+      setLocationToDelete(null);
+    } catch (error) {
+      console.error('Error al eliminar población:', error);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setLocationToDelete(null);
+  };
+
+  // Renderizado
   return (
     <main className="space-y-6">
       {/* Botón de nueva población */}
-      <div className="flex justify-end">
-        <Link to="/locations/create">
-          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium">
+      <div className="flex justify-end animate-fadeIn">
+        <Link to="/locations/create" className="cursor-pointer">
+          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium cursor-pointer">
             <UserPlus className="w-6 h-6" />
             Nueva Población
           </button>
@@ -41,11 +67,11 @@ export default function LocationListPage() {
       </div>
 
       {/* TÍTULO Y SUBTÍTULO */}
-      <div>
+      <div className="animate-fadeIn">
         <h1 className="text-3xl font-bold text-cohispania-blue">
-          Festivos Poblaciones
+          Lista de poblaciones
         </h1>
-        <p className="text-sm text-gray-300 mt-2">
+        <p className="text-sm text-gray-300 mt-2 sm:text-base">
           Gestiona las poblaciones y sus festivos configurados
         </p>
       </div>
@@ -53,9 +79,8 @@ export default function LocationListPage() {
       {/* Card principal con el contenido */}
       <Card padding={true}>
         <div className='space-y-4 mb-6'>
-
           {/* Search Bar con icono de lupa */}
-          <div className='relative w-full'>
+          <div className='relative w-full animate-fadeIn'>
             <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-300' />
             <input
               type="text"
@@ -63,7 +88,8 @@ export default function LocationListPage() {
               placeholder="Buscar por nombre de población..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-2 focus:ring-cohispania-blue focus:border-cohispania-blue outline-none transition" />
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
+            />
           </div>
         </div>
 
