@@ -4,10 +4,7 @@ import * as departmentApi from '../services/departmentsApi';
 import * as locationApi from '../services/locationApi';
 import * as roleApi from '../services/roleApi';
 import * as holidayApi from '../services/holidaysApi';
-
-/**
- * useAdminStore - Store centralizado simplificado para eliminar la duplicación con servicios API.
- */
+import { showError, showLoading, updateToastSuccess, updateToastError } from '../utils/notifications';
 
 const useAdminStore = create((set, get) => ({
   // ============================================
@@ -17,9 +14,7 @@ const useAdminStore = create((set, get) => ({
   departments: [],
   locations: [],
   roles: [],
-  holidays: [], // Array simple para todos los festivos
-
-  // Loading granular por entidad
+  holidays: [],
   loading: {
     users: false,
     departments: false,
@@ -27,13 +22,11 @@ const useAdminStore = create((set, get) => ({
     roles: false,
     holidays: false,
   },
-
   error: null,
 
   // ============================================
   // HELPERS INTERNOS
   // ============================================
-
   setLoading: (entity, value) => {
     set((state) => ({
       loading: { ...state.loading, [entity]: value },
@@ -41,7 +34,10 @@ const useAdminStore = create((set, get) => ({
   },
 
   setError: (error) => {
-    set({ error: error?.response?.data?.message || error?.message || 'Error desconocido' });
+    const errorMessage = error?.response?.data?.message || error?.message || 'Error desconocido';
+    set({ error: errorMessage });
+    // Mostrar toast de error automáticamente
+    showError(errorMessage);
   },
 
   clearError: () => set({ error: null }),
@@ -49,12 +45,11 @@ const useAdminStore = create((set, get) => ({
   // ============================================
   // ACCIONES: USUARIOS
   // ============================================
-
   fetchUsers: async () => {
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const users = await userApi.getAll(); //=> El servicio ya devuelve data
+      const users = await userApi.getAll();
       set({ users });
     } catch (error) {
       get().setError(error);
@@ -65,13 +60,17 @@ const useAdminStore = create((set, get) => ({
   },
 
   createUser: async (data) => {
+    const loadingToast = showLoading('Creando empleado...');
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const newUser = await userApi.create(data); //=> El servicio ya devuelve data
+      const newUser = await userApi.create(data);
       set((state) => ({ users: [...state.users, newUser] }));
+      updateToastSuccess(loadingToast, '¡Empleado creado exitosamente!'); // ✅ CORREGIDO
       return newUser;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al crear el empleado';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -80,16 +79,21 @@ const useAdminStore = create((set, get) => ({
   },
 
   updateUser: async (id, data) => {
+    const loadingToast = showLoading('Actualizando empleado...');
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const updatedUser = await userApi.update(id, data); set((state) => ({ // Servicio ya devuelve data
+      const updatedUser = await userApi.update(id, data);
+      set((state) => ({
         users: state.users.map((user) =>
           user.id === id ? updatedUser : user
         ),
       }));
+      updateToastSuccess(loadingToast, '¡Empleado actualizado exitosamente!');
       return updatedUser;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al actualizar el empleado';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -98,6 +102,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   deleteUser: async (id) => {
+    const loadingToast = showLoading('Eliminando empleado...');
     get().setLoading('users', true);
     set({ error: null });
     try {
@@ -105,7 +110,10 @@ const useAdminStore = create((set, get) => ({
       set((state) => ({
         users: state.users.filter((user) => user.id !== id),
       }));
+      updateToastSuccess(loadingToast, 'Empleado eliminado exitosamente');
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al eliminar el empleado';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -116,7 +124,6 @@ const useAdminStore = create((set, get) => ({
   // ============================================
   // ACCIONES: DEPARTAMENTOS
   // ============================================
-
   fetchDepartments: async () => {
     get().setLoading('departments', true);
     set({ error: null });
@@ -132,14 +139,19 @@ const useAdminStore = create((set, get) => ({
   },
 
   createDepartment: async (data) => {
+    const loadingToast = showLoading('Creando departamento...');
     get().setLoading('departments', true);
     set({ error: null });
     try {
-      const newDepartment = await departmentApi.create(data); set((state) => ({
+      const newDepartment = await departmentApi.create(data);
+      set((state) => ({
         departments: [...state.departments, newDepartment]
       }));
+      updateToastSuccess(loadingToast, '¡Departamento creado exitosamente!');
       return newDepartment;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al crear el departamento';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -148,6 +160,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   updateDepartment: async (id, data) => {
+    const loadingToast = showLoading('Actualizando departamento...');
     get().setLoading('departments', true);
     set({ error: null });
     try {
@@ -157,8 +170,11 @@ const useAdminStore = create((set, get) => ({
           dept.id === id ? updatedDepartment : dept
         ),
       }));
+      updateToastSuccess(loadingToast, '¡Departamento actualizado exitosamente!');
       return updatedDepartment;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al actualizar el departamento';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -167,6 +183,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   deleteDepartment: async (id) => {
+    const loadingToast = showLoading('Eliminando departamento...');
     get().setLoading('departments', true);
     set({ error: null });
     try {
@@ -174,17 +191,20 @@ const useAdminStore = create((set, get) => ({
       set((state) => ({
         departments: state.departments.filter((dept) => dept.id !== id),
       }));
+      updateToastSuccess(loadingToast, 'Departamento eliminado exitosamente');
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al eliminar el departamento';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
       get().setLoading('departments', false);
     }
   },
+
   // ============================================
   // ACCIONES: LOCALIZACIONES
   // ============================================
-
   fetchLocations: async () => {
     get().setLoading('locations', true);
     set({ error: null });
@@ -200,6 +220,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   createLocation: async (data) => {
+    const loadingToast = showLoading('Creando población...');
     get().setLoading('locations', true);
     set({ error: null });
     try {
@@ -207,8 +228,11 @@ const useAdminStore = create((set, get) => ({
       set((state) => ({
         locations: [...state.locations, newLocation]
       }));
+      updateToastSuccess(loadingToast, '¡Población creada exitosamente!'); // ✅ CORREGIDO
       return newLocation;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al crear la población';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -217,6 +241,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   updateLocation: async (id, data) => {
+    const loadingToast = showLoading('Actualizando población...');
     get().setLoading('locations', true);
     set({ error: null });
     try {
@@ -226,8 +251,11 @@ const useAdminStore = create((set, get) => ({
           loc.id === id ? updatedLocation : loc
         ),
       }));
+      updateToastSuccess(loadingToast, '¡Población actualizada exitosamente!');
       return updatedLocation;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al actualizar la población';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -236,6 +264,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   deleteLocation: async (id) => {
+    const loadingToast = showLoading('Eliminando población...');
     get().setLoading('locations', true);
     set({ error: null });
     try {
@@ -243,7 +272,10 @@ const useAdminStore = create((set, get) => ({
       set((state) => ({
         locations: state.locations.filter((loc) => loc.id !== id),
       }));
+      updateToastSuccess(loadingToast, 'Población eliminada exitosamente');
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al eliminar la población';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -254,7 +286,6 @@ const useAdminStore = create((set, get) => ({
   // ============================================
   // ACCIONES: ROLES
   // ============================================
-
   fetchRoles: async () => {
     get().setLoading('roles', true);
     set({ error: null });
@@ -272,7 +303,6 @@ const useAdminStore = create((set, get) => ({
   // ============================================
   // ACCIONES: FESTIVOS
   // ============================================
-
   fetchHolidays: async () => {
     get().setLoading('holidays', true);
     set({ error: null });
@@ -296,6 +326,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   createHoliday: async (data) => {
+    const loadingToast = showLoading('Creando festivo...');
     get().setLoading('holidays', true);
     set({ error: null });
     try {
@@ -303,8 +334,11 @@ const useAdminStore = create((set, get) => ({
       set((state) => ({
         holidays: [...state.holidays, newHoliday]
       }));
+      updateToastSuccess(loadingToast, '¡Festivo creado exitosamente!');
       return newHoliday;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al crear el festivo';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -313,17 +347,21 @@ const useAdminStore = create((set, get) => ({
   },
 
   updateHoliday: async (id, data) => {
+    const loadingToast = showLoading('Actualizando festivo...'); // ✅ CORREGIDO
     get().setLoading('holidays', true);
     set({ error: null });
     try {
-      const updatedHoliday = await holidayApi.update(id, data); // 🔧 Simplificado
+      const updatedHoliday = await holidayApi.update(id, data);
       set((state) => ({
         holidays: state.holidays.map((holiday) =>
           holiday.id === parseInt(id) ? updatedHoliday : holiday
         ),
       }));
+      updateToastSuccess(loadingToast, '¡Festivo actualizado exitosamente!');
       return updatedHoliday;
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al actualizar el festivo';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
@@ -332,6 +370,7 @@ const useAdminStore = create((set, get) => ({
   },
 
   deleteHoliday: async (id) => {
+    const loadingToast = showLoading('Eliminando festivo...');
     get().setLoading('holidays', true);
     set({ error: null });
     try {
@@ -341,7 +380,10 @@ const useAdminStore = create((set, get) => ({
           holiday.id !== parseInt(id)
         ),
       }));
+      updateToastSuccess(loadingToast, 'Festivo eliminado exitosamente');
     } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Error al eliminar el festivo';
+      updateToastError(loadingToast, errorMessage);
       get().setError(error);
       throw error;
     } finally {
