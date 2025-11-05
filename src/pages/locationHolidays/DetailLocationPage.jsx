@@ -135,12 +135,7 @@ export default function DetailLocationPage() {
       {/* Contenido principal */}
       <Card padding={true}>
         <div className="space-y-6">
-          {/* TODO: Añadir FullCalendar aquí */}
-          <div className="text-center py-8 text-gray-400">
-            📅 Calendario (próximamente)
-          </div>
-
-           {/* Calendario de festivos (solo lectura) */}
+          {/* Calendario de festivos (solo lectura) */}
           <div>
             <h2 className="text-xl font-bold text-cohispania-blue mb-4 flex items-center gap-2">
               <CalendarIcon className="w-6 h-6" />
