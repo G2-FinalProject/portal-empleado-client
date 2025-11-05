@@ -6,13 +6,7 @@ import * as roleApi from '../services/roleApi';
 import * as holidayApi from '../services/holidaysApi';
 
 /**
- * useAdminStore - Store centralizado para gestión de administración
- * Maneja:
- * - Usuarios
- * - Departamentos
- * - Localizaciones
- * - Roles
- * - Festivos (por localización)
+ * useAdminStore - Store centralizado simplificado para eliminar la duplicación con servicios API.
  */
 
 const useAdminStore = create((set, get) => ({
@@ -23,7 +17,7 @@ const useAdminStore = create((set, get) => ({
   departments: [],
   locations: [],
   roles: [],
-  holidays: {}, // { locationId: [holidays] }
+  holidays: [], // Array simple para todos los festivos
 
   // Loading granular por entidad
   loading: {
@@ -60,8 +54,8 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const response = await userApi.getAll();
-      set({ users: response.data || response });
+      const users = await userApi.getAll(); //=> El servicio ya devuelve data
+      set({ users });
     } catch (error) {
       get().setError(error);
       throw error;
@@ -74,8 +68,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const response = await userApi.create(data);
-      const newUser = response.data || response;
+      const newUser = await userApi.create(data); //=> El servicio ya devuelve data
       set((state) => ({ users: [...state.users, newUser] }));
       return newUser;
     } catch (error) {
@@ -90,9 +83,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('users', true);
     set({ error: null });
     try {
-      const response = await userApi.update(id, data);
-      const updatedUser = response.data || response;
-      set((state) => ({
+      const updatedUser = await userApi.update(id, data); set((state) => ({ // Servicio ya devuelve data
         users: state.users.map((user) =>
           user.id === id ? updatedUser : user
         ),
@@ -130,8 +121,8 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('departments', true);
     set({ error: null });
     try {
-      const response = await departmentApi.getAll();
-      set({ departments: response.data || response });
+      const departments = await departmentApi.getAll();
+      set({ departments });
     } catch (error) {
       get().setError(error);
       throw error;
@@ -144,9 +135,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('departments', true);
     set({ error: null });
     try {
-      const response = await departmentApi.create(data);
-      const newDepartment = response.data || response;
-      set((state) => ({
+      const newDepartment = await departmentApi.create(data); set((state) => ({
         departments: [...state.departments, newDepartment]
       }));
       return newDepartment;
@@ -162,8 +151,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('departments', true);
     set({ error: null });
     try {
-      const response = await departmentApi.update(id, data);
-      const updatedDepartment = response.data || response;
+      const updatedDepartment = await departmentApi.update(id, data);
       set((state) => ({
         departments: state.departments.map((dept) =>
           dept.id === id ? updatedDepartment : dept
@@ -193,7 +181,6 @@ const useAdminStore = create((set, get) => ({
       get().setLoading('departments', false);
     }
   },
-
   // ============================================
   // ACCIONES: LOCALIZACIONES
   // ============================================
@@ -202,8 +189,8 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('locations', true);
     set({ error: null });
     try {
-      const response = await locationApi.getAll();
-      set({ locations: response.data || response });
+      const locations = await locationApi.getAll();
+      set({ locations });
     } catch (error) {
       get().setError(error);
       throw error;
@@ -216,8 +203,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('locations', true);
     set({ error: null });
     try {
-      const response = await locationApi.create(data);
-      const newLocation = response.data || response;
+      const newLocation = await locationApi.create(data);
       set((state) => ({
         locations: [...state.locations, newLocation]
       }));
@@ -234,8 +220,7 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('locations', true);
     set({ error: null });
     try {
-      const response = await locationApi.update(id, data);
-      const updatedLocation = response.data || response;
+      const updatedLocation = await locationApi.update(id, data);
       set((state) => ({
         locations: state.locations.map((loc) =>
           loc.id === id ? updatedLocation : loc
@@ -274,8 +259,8 @@ const useAdminStore = create((set, get) => ({
     get().setLoading('roles', true);
     set({ error: null });
     try {
-      const response = await roleApi.getAll();
-      set({ roles: response.data || response });
+      const roles = await roleApi.getAll();
+      set({ roles });
     } catch (error) {
       get().setError(error);
       throw error;
@@ -285,49 +270,39 @@ const useAdminStore = create((set, get) => ({
   },
 
   // ============================================
-  // ACCIONES: FESTIVOS (por localización)
+  // ACCIONES: FESTIVOS
   // ============================================
 
-  // fetchHolidaysByLocation: async (locationId) => {
-  //   get().setLoading('holidays', true);
-  //   set({ error: null });
-  //   try {
-  //     const response = await holidayApi.getByLocation(locationId);
-  //     const holidays = response.data || response;
-  //     set((state) => ({
-  //       holidays: {
-  //         ...state.holidays,
-  //         [locationId]: holidays,
-  //       },
-  //     }));
-  //     return holidays;
-  //   } catch (error) {
-  //     get().setError(error);
-  //     throw error;
-  //   } finally {
-  //     get().setLoading('holidays', false);
-  //   }
-  // },
+  fetchHolidays: async () => {
+    get().setLoading('holidays', true);
+    set({ error: null });
+    try {
+      const holidays = await holidayApi.getAll();
+      set({ holidays });
+    } catch (error) {
+      get().setError(error);
+      throw error;
+    } finally {
+      get().setLoading('holidays', false);
+    }
+  },
+
+  // Helper para filtrar festivos por localización
+  getHolidaysByLocation: (locationId) => {
+    const state = get();
+    return state.holidays.filter(holiday =>
+      holiday.location_id === parseInt(locationId)
+    );
+  },
 
   createHoliday: async (data) => {
     get().setLoading('holidays', true);
     set({ error: null });
     try {
-      const response = await holidayApi.create(data);
-      const newHoliday = response.data || response;
-      const locationId = newHoliday.location_id || newHoliday.locationId;
-
-      // Actualizar los festivos de esa localización
+      const newHoliday = await holidayApi.create(data);
       set((state) => ({
-        holidays: {
-          ...state.holidays,
-          [locationId]: [
-            ...(state.holidays[locationId] || []),
-            newHoliday,
-          ],
-        },
+        holidays: [...state.holidays, newHoliday]
       }));
-
       return newHoliday;
     } catch (error) {
       get().setError(error);
@@ -337,23 +312,35 @@ const useAdminStore = create((set, get) => ({
     }
   },
 
-  deleteHoliday: async (id, locationId) => {
+  updateHoliday: async (id, data) => {
+    get().setLoading('holidays', true);
+    set({ error: null });
+    try {
+      const updatedHoliday = await holidayApi.update(id, data); // 🔧 Simplificado
+      set((state) => ({
+        holidays: state.holidays.map((holiday) =>
+          holiday.id === parseInt(id) ? updatedHoliday : holiday
+        ),
+      }));
+      return updatedHoliday;
+    } catch (error) {
+      get().setError(error);
+      throw error;
+    } finally {
+      get().setLoading('holidays', false);
+    }
+  },
+
+  deleteHoliday: async (id) => {
     get().setLoading('holidays', true);
     set({ error: null });
     try {
       await holidayApi.deleteHoliday(id);
-
-      // Eliminar el festivo de la localización correspondiente
-      if (locationId) {
-        set((state) => ({
-          holidays: {
-            ...state.holidays,
-            [locationId]: (state.holidays[locationId] || []).filter(
-              (holiday) => holiday.id !== id
-            ),
-          },
-        }));
-      }
+      set((state) => ({
+        holidays: state.holidays.filter((holiday) =>
+          holiday.id !== parseInt(id)
+        ),
+      }));
     } catch (error) {
       get().setError(error);
       throw error;
@@ -372,7 +359,7 @@ const useAdminStore = create((set, get) => ({
       departments: [],
       locations: [],
       roles: [],
-      holidays: {},
+      holidays: [],
       loading: {
         users: false,
         departments: false,
