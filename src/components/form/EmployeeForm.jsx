@@ -18,6 +18,16 @@ import Button from "../ui/Button";
  * @param {Function} props.onCancel - Función para cancelar (opcional)
  */
 
+const getRoleDisplayName = (roleName) => {
+  const roleTranslations = {
+    employee: "Empleado",
+    manager: "Responsable",
+    admin: "Administrador",
+  };
+
+  return roleTranslations[roleName.toLowerCase()] || roleName;
+};
+
 export default function EmployeeForm({
   roles = [],
   departments = [],
@@ -90,7 +100,7 @@ export default function EmployeeForm({
       {/* 🧾 Formulario de empleado */}
       <Card>
         <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
-          Información del Empleado
+          {isEditMode ? "Editar Información" : "Información del Empleado"}
         </h2>
         <p className="text-sm text-gray-300 mb-6">
           {isEditMode
@@ -172,13 +182,16 @@ export default function EmployeeForm({
               Rol <span className="text-red-400">*</span>
             </label>
             <select
-              {...register("role_id", { required: "Selecciona un rol" })}
+              {...register("role_id", {
+                required: "Selecciona un rol",
+                valueAsNumber: true,
+              })}
               className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
             >
               <option value="">Selecciona un rol</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
-                  {role.role_name}
+                  {getRoleDisplayName(role.role_name)}
                 </option>
               ))}
             </select>
@@ -248,8 +261,11 @@ export default function EmployeeForm({
               placeholder="23"
               register={register}
               validation={{
-                required: true,
-                min: 0,
+                required: "Los días disponibles son obligatorios",
+                min: {
+                  value: 0,
+                  message: "Debe ser un número positivo",
+                },
                 valueAsNumber: true,
               }}
               errors={errors}
@@ -262,7 +278,8 @@ export default function EmployeeForm({
               type="button"
               variant="ghost"
               className="border border-gray-stroke text-cohispania-blue bg-white hover:bg-gray-100"
-              onClick={() => reset()}
+              onClick={handleCancel}
+              disabled={isSubmitting}
             >
               Cancelar
             </Button>
@@ -270,6 +287,7 @@ export default function EmployeeForm({
               type="submit"
               variant="secondary"
               className="bg-cohispania-blue text-white hover:opacity-90"
+              loading={isSubmitting}
             >
               {isEditMode ? "Guardar Cambios" : "Guardar Empleado"}
             </Button>
