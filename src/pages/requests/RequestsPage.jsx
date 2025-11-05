@@ -16,7 +16,7 @@ import { toast } from 'react-hot-toast';
  */
 export default function RequestsPage() {
   const { allRequests, fetchAllRequests, loading } = useVacationStore();
-  const { user, isAdmin } = useAuthStore();
+  const { user, isAdmin, isManager } = useAuthStore();
 
   useEffect(() => {
     fetchAllRequests();
@@ -49,8 +49,12 @@ export default function RequestsPage() {
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
     [filteredRequests]
   );
-
-  // Configuración de las pestañas
+  // LÓGICA DEL TEXTO CONDICIONAL
+  const subtitleText = isManager()
+    ? 'Gestiona las solicitudes de vacaciones de tu equipo'
+    : 'Gestiona las solicitudes de vacaciones de toda la empresa';
+  
+    // Configuración de las pestañas
   const tabs = [
     {
       id: 'pending',
@@ -94,7 +98,7 @@ export default function RequestsPage() {
           Todas las solicitudes
         </h1>
         <p className="text-gray-300 mt-1">
-          Gestiona las solicitudes de vacaciones de toda la empresa
+        {subtitleText}
         </p>
       </div>
 
