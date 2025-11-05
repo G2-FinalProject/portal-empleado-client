@@ -97,11 +97,11 @@ const router = createBrowserRouter([
         ),
       },
 
-      // Gestión de empleados (solo admin)
+      // Gestión de empleados (solo admin)y maa¡nager para ver empleados de su departamento
       {
         path: "employees",
         element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={["admin","manager",]}>
             <EmployeeListPage />
           </ProtectedRoute>
         ),

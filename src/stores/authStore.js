@@ -78,20 +78,23 @@ const useAuthStore = create((set, get) => ({
     }
     
     const userData = {
-      id: decoded.id,                    // Del JWT
-      firstName: sesionData.first_name,  // De sesionData
-      roleId: sesionData.role_id,        // De sesionData
-      exp: decoded.exp,                  // Del JWT - fecha expiración
-      iat: decoded.iat                   // Del JWT - fecha creación
+      id: decoded.id,                          // Del JWT
+      firstName: sesionData.first_name,        // De sesionData
+      roleId: sesionData.role_id,              // De sesionData
+      departmentId: sesionData.department_id,  // De sesionData
+      exp: decoded.exp,                       // Del JWT - fecha expiración
+      iat: decoded.iat                        // Del JWT - fecha creación
     };
     
     console.log("   - Usuario:", userData.firstName);
     console.log("   - Role ID:", userData.roleId);
     console.log("   - User ID:", userData.id);
+    console.log("   - Department ID:", userData.departmentId);
     
     //  Guardar en localStorage (persiste aunque cierres el navegador)
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
+
     
     // Actualizar estado de Zustand (reactivo, actualiza componentes)
     set({

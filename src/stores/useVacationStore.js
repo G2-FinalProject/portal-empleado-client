@@ -28,6 +28,7 @@ const mapRequest = (req) => ({
       : ""),
   requesterEmail: req.requester_email || req.user_email || req.requester?.email,
   departmentName: req.department_name,
+  departmentId: req.requester?.department_id,
 });
 
 /**
