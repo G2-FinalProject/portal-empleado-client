@@ -1,18 +1,13 @@
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import Card from "../ui/Card";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
 
 /**
- * 🎯 EmployeeForm
- * 
- * Formulario para crear un nuevo empleado.
- * 
- * Props esperadas:
- * - roles: lista de roles (array)
- * - departments: lista de departamentos (array)
- * - locations: lista de localizaciones (array)
- * - onSubmit: función que se ejecuta al crear empleado
+ * 🎯 EmployeeForm - Alta de nuevo empleado
+ * Igual al Figma (sin calendario, botones azul y gris)
  */
-
 export default function EmployeeForm({
   roles = [],
   departments = [],
@@ -26,13 +21,10 @@ export default function EmployeeForm({
     reset,
   } = useForm({
     defaultValues: {
-      available_days: 23, // Valor por defecto
+      available_days: 23,
     },
   });
 
-  /**
-   * ✅ Maneja el envío del formulario
-   */
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
@@ -45,182 +37,192 @@ export default function EmployeeForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(handleFormSubmit)}
-      className="grid grid-cols-1 md:grid-cols-2 gap-6"
-    >
-      {/* Nombre */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Nombre *
-        </label>
-        <input
-          type="text"
-          {...register("first_name", { required: "El nombre es obligatorio" })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
-          placeholder="Juan"
-        />
-        {errors.first_name && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.first_name.message}
-          </p>
-        )}
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
+      {/* 🧾 Formulario de empleado */}
+      <Card>
+        <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
+          Información del Empleado
+        </h2>
+        <p className="text-sm text-gray-300 mb-6">
+          Completa los datos del nuevo empleado
+        </p>
 
-      {/* Apellidos */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Apellidos *
-        </label>
-        <input
-          type="text"
-          {...register("last_name", { required: "Los apellidos son obligatorios" })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          placeholder="García López"
-        />
-        {errors.last_name && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.last_name.message}
-          </p>
-        )}
-      </div>
-
-      {/* Email */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Email *</label>
-        <input
-          type="email"
-          {...register("email", {
-            required: "El email es obligatorio",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "El email no es válido",
-            },
-          })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          placeholder="juan.garcia@empresa.com"
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-        )}
-      </div>
-
-      {/* Contraseña */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Contraseña *
-        </label>
-        <input
-          type="password"
-          {...register("password", {
-            required: "La contraseña es obligatoria",
-            minLength: {
-              value: 8,
-              message: "La contraseña debe tener al menos 8 caracteres",
-            },
-          })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          placeholder="********"
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-        )}
-      </div>
-
-      {/* Rol */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Rol *</label>
-        <select
-          {...register("role_id", { required: "Selecciona un rol" })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          <option value="">Selecciona un rol</option>
-          {roles.map((role) => (
-            <option key={role.id} value={role.id}>
-              {role.name}
-            </option>
-          ))}
-        </select>
-        {errors.role_id && (
-          <p className="text-red-500 text-sm mt-1">{errors.role_id.message}</p>
-        )}
-      </div>
+          {/* Nombre */}
+          <Input
+            label="Nombre"
+            name="first_name"
+            placeholder="Juan"
+            register={register}
+            validation={{ required: "El nombre es obligatorio" }}
+            errors={errors}
+            required
+          />
 
-      {/* Departamento */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Departamento *
-        </label>
-        <select
-          {...register("department_id", { required: "Selecciona un departamento" })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-        >
-          <option value="">Selecciona departamento</option>
-          {departments.map((dept) => (
-            <option key={dept.id} value={dept.id}>
-              {dept.department_name}
-            </option>
-          ))}
-        </select>
-        {errors.department_id && (
-          <p className="text-red-500 text-sm mt-1">{errors.department_id.message}</p>
-        )}
-      </div>
+          {/* Apellidos */}
+          <Input
+            label="Apellidos"
+            name="last_name"
+            placeholder="García López"
+            register={register}
+            validation={{ required: "Los apellidos son obligatorios" }}
+            errors={errors}
+            required
+          />
 
-      {/* Localización */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Población *
-        </label>
-        <select
-          {...register("location_id", { required: "Selecciona una localización" })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-        >
-          <option value="">Selecciona una localización</option>
-          {locations.map((loc) => (
-            <option key={loc.id} value={loc.id}>
-              {loc.location_name}
-            </option>
-          ))}
-        </select>
-        {errors.location_id && (
-          <p className="text-red-500 text-sm mt-1">{errors.location_id.message}</p>
-        )}
-      </div>
+          {/* Email */}
+          <div className="md:col-span-2">
+            <Input
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="juan.garcia@cohispania.com"
+              register={register}
+              validation={{
+                required: "El email es obligatorio",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "El email no es válido",
+                },
+              }}
+              errors={errors}
+              required
+            />
+          </div>
 
-      {/* Días disponibles */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Días de Vacaciones Disponibles
-        </label>
-        <input
-          type="number"
-          {...register("available_days", {
-            required: true,
-            min: 0,
-            valueAsNumber: true,
-          })}
-          className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-          placeholder="23"
-        />
-      </div>
+          {/* Contraseña */}
+          <div className="md:col-span-2">
+            <Input
+              label="Contraseña"
+              name="password"
+              type="password"
+              placeholder="********"
+              register={register}
+              validation={{
+                required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 8,
+                  message: "Debe tener al menos 8 caracteres",
+                },
+              }}
+              errors={errors}
+              required
+            />
+          </div>
 
-      {/* Botones */}
-      <div className="col-span-2 flex justify-end gap-4 mt-4">
-        <button
-          type="button"
-          onClick={() => reset()}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-        >
-          Crear Empleado
-        </button>
-      </div>
-    </form>
+          {/* Rol */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+              Rol <span className="text-red-400">*</span>
+            </label>
+            <select
+              {...register("role_id", { required: "Selecciona un rol" })}
+              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+            >
+              <option value="">Selecciona un rol</option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.id}>
+                  {role.role_name}
+                </option>
+              ))}
+            </select>
+            {errors.role_id && (
+              <p className="mt-2 text-sm text-red-400">
+                {errors.role_id.message}
+              </p>
+            )}
+          </div>
+
+          {/* Departamento */}
+          <div>
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+              Departamento <span className="text-red-400">*</span>
+            </label>
+            <select
+              {...register("department_id", {
+                required: "Selecciona un departamento",
+              })}
+              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+            >
+              <option value="">Selecciona departamento</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.department_name}
+                </option>
+              ))}
+            </select>
+            {errors.department_id && (
+              <p className="mt-2 text-sm text-red-400">
+                {errors.department_id.message}
+              </p>
+            )}
+          </div>
+
+          {/* Población */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+              Población <span className="text-red-400">*</span>
+            </label>
+            <select
+              {...register("location_id", {
+                required: "Selecciona una localización",
+              })}
+              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+            >
+              <option value="">Selecciona una localización</option>
+              {locations.map((loc) => (
+                <option key={loc.id} value={loc.id}>
+                  {loc.location_name}
+                </option>
+              ))}
+            </select>
+            {errors.location_id && (
+              <p className="mt-2 text-sm text-red-400">
+                {errors.location_id.message}
+              </p>
+            )}
+          </div>
+
+          {/* Días disponibles */}
+          <div className="md:col-span-2">
+            <Input
+              label="Días de Vacaciones Disponibles"
+              name="available_days"
+              type="number"
+              placeholder="23"
+              register={register}
+              validation={{
+                required: true,
+                min: 0,
+                valueAsNumber: true,
+              }}
+              errors={errors}
+            />
+          </div>
+
+          {/* Botones */}
+          <div className="col-span-2 flex justify-end gap-4 mt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              className="border border-gray-stroke text-cohispania-blue bg-white hover:bg-gray-100"
+              onClick={() => reset()}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="bg-cohispania-blue text-white hover:opacity-90"
+            >
+              Guardar Empleado
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
   );
 }
