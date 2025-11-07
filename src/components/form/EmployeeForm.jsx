@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { useEffect } from "react";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -9,79 +8,31 @@ import Button from "../ui/Button";
  * 🎯 EmployeeForm - Alta de nuevo empleado
  * Bordes finos y discretos, al estilo del resto de la interfaz.
  */
-
-const getRoleDisplayName = (roleName) => {
-  const roleTranslations = {
-    employee: "Empleado",
-    manager: "Responsable",
-    admin: "Administrador",
-  };
-
-  return roleTranslations[roleName.toLowerCase()] || roleName;
-};
-
 export default function EmployeeForm({
   roles = [],
   departments = [],
   locations = [],
   onSubmit,
-  initialData = null,
-  isEditMode = false,
-  onCancel,
 }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
-    setValue,
   } = useForm({
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      email: "",
-      password: "",
-      role_id: "",
-      department_id: "",
-      location_id: "",
       available_days: 23,
     },
   });
 
-  //Pre-rellenar formulario en modo edición
-  useEffect(() => {
-    if (initialData && isEditMode) {
-      setValue("first_name", initialData.first_name || "");
-      setValue("last_name", initialData.last_name || "");
-      setValue("email", initialData.email || "");
-      setValue("role_id", initialData.role_id || "");
-      setValue("department_id", initialData.department_id || "");
-      setValue("location_id", initialData.location_id || "");
-      setValue("available_days", initialData.available_days || 23);
-    }
-  }, [initialData, isEditMode, setValue]);
-
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
-      if (!isEditMode) {
-        reset();
-      } 
-      
-    } catch (error) {
-      console.error("Error en el formulario:", error);
-      const errorMessage = isEditMode
-        ? "Hubo un problema al actualizar el empleado"
-        : "Hubo un problema al crear el empleado";
-      toast.error(errorMessage);
-    }
-  };
-
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
+      toast.success("Empleado creado correctamente 🎉");
       reset();
+    } catch (error) {
+      console.error("Error al crear empleado:", error);
+      toast.error("Hubo un problema al crear el empleado");
     }
   };
 
@@ -93,7 +44,7 @@ export default function EmployeeForm({
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
       <Card>
         <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
-          {isEditMode ? "Editar Información" : "Información del Empleado"}
+          Información del Empleado
         </h2>
         <p className="text-sm text-gray-400 mb-6">
           Completa los datos del nuevo empleado
@@ -101,17 +52,18 @@ export default function EmployeeForm({
 
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           {/* Nombre */}
-<Input
-  label="Nombre"
-  name="first_name"
-  placeholder="Introduce el nombre del empleado"
-  register={register}
-  validation={{ required: "El nombre es obligatorio" }}
-  errors={errors}
-  required
-/>
+          <Input
+            label="Nombre"
+            name="first_name"
+            placeholder="Introduce el nombre del empleado"
+            register={register}
+            validation={{ required: "El nombre es obligatorio" }}
+            errors={errors}
+            required
+          />
 
           {/* Apellidos */}
           <Input
@@ -176,7 +128,7 @@ export default function EmployeeForm({
               <option value="">Selecciona un rol</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
-                  {getRoleDisplayName(role.role_name)}
+                  {role.role_name}
                 </option>
               ))}
             </select>
@@ -246,11 +198,8 @@ export default function EmployeeForm({
               placeholder="Introduce los días disponibles"
               register={register}
               validation={{
-                required: "Los días disponibles son obligatorios",
-                min: {
-                  value: 0,
-                  message: "Debe ser un número positivo",
-                },
+                required: true,
+                min: 0,
                 valueAsNumber: true,
               }}
               errors={errors}
@@ -271,9 +220,8 @@ export default function EmployeeForm({
               type="submit"
               variant="secondary"
               className="bg-cohispania-blue text-white hover:opacity-90"
-              loading={isSubmitting}
             >
-              {isEditMode ? "Guardar Cambios" : "Guardar Empleado"}
+              Guardar Empleado
             </Button>
           </div>
         </form>
