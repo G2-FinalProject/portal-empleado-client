@@ -1,18 +1,10 @@
-// src/components/ui/Button.jsx
 import { Loader2 } from 'lucide-react';
 
 /**
- * Botón reutilizable con variantes y estados
- * @param {Object} props
- * @param {'primary' | 'secondary' | 'danger' | 'ghost'} props.variant - Estilo del botón
- * @param {'small' | 'medium' | 'large'} props.size - Tamaño del botón
- * @param {boolean} props.loading - Muestra spinner y deshabilita el botón
- * @param {boolean} props.disabled - Deshabilita el botón
- * @param {boolean} props.fullWidth - Ocupa todo el ancho disponible
- * @param {React.ReactNode} props.children - Contenido del botón
- * @param {string} props.className - Clases CSS adicionales
- * @param {Function} props.onClick - Función al hacer click
- * @param {'button' | 'submit' | 'reset'} props.type - Tipo de botón HTML
+ * 🧩 Reusable Button Component
+ * - Variants: primary | secondary | danger | ghost
+ * - Sizes: small | medium | large
+ * - States: loading | disabled
  */
 export default function Button({
   variant = 'primary',
@@ -26,52 +18,57 @@ export default function Button({
   type = 'button',
   ...props
 }) {
-  // Estilos base
-  const baseStyles = 'font-semibold rounded-lg transition duration-200 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+  // 🔹 Base styles
+  const baseStyles =
+    'font-semibold rounded-md transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none';
 
-  // Estilos por variante
+  // 🔹 Variants (hover styles)
   const variantStyles = {
     primary: 'hover:opacity-90',
-    secondary: 'hover:opacity-80',
+    secondary: 'hover:opacity-85',
     danger: 'hover:opacity-90',
-    ghost: 'hover:bg-gray-100',
+    ghost: 'hover:bg-gray-50',
   };
 
-  // Estilos inline por variante (colores de marca)
+  // 🔹 Inline variant styles (brand colors + subtle shadows)
   const variantInlineStyles = {
     primary: {
       backgroundColor: '#F68D2E',
       color: '#1F2A44',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+      border: '0.5px solid transparent',
     },
     secondary: {
       backgroundColor: '#1F2A44',
       color: '#FFFFFF',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+      border: '0.5px solid transparent',
     },
     danger: {
       backgroundColor: '#ef4444',
       color: '#FFFFFF',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
+      border: '0.5px solid transparent',
     },
     ghost: {
       backgroundColor: 'transparent',
       color: '#1F2A44',
-      border: '1px solid #E0E4EA',
+      border: '1px solid #E5E7EB', // 👈 más fino y claro
+      boxShadow: 'none',
     },
   };
 
-  // Estilos por tamaño
+  // 🔹 Sizes
   const sizeStyles = {
     small: 'py-2 px-3 text-sm',
-    medium: 'py-3.5 px-4 text-base',
-    large: 'py-4 px-6 text-lg',
+    medium: 'py-2.5 px-4 text-base',
+    large: 'py-3 px-6 text-lg',
   };
 
-  // Ancho completo
+  // 🔹 Full width support
   const widthStyle = fullWidth ? 'w-full' : '';
 
-  // Combinar estilos
+  // 🔹 Combine styles
   const combinedClassName = `
     ${baseStyles}
     ${variantStyles[variant]}
@@ -92,7 +89,7 @@ export default function Button({
       {loading ? (
         <>
           <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Cargando...</span>
+          <span>Loading...</span>
         </>
       ) : (
         children

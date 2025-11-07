@@ -6,7 +6,7 @@ import Button from "../ui/Button";
 
 /**
  * 🎯 EmployeeForm - Alta de nuevo empleado
- * Igual al Figma (sin calendario, botones azul y gris)
+ * Bordes finos y discretos, al estilo del resto de la interfaz.
  */
 export default function EmployeeForm({
   roles = [],
@@ -36,14 +36,17 @@ export default function EmployeeForm({
     }
   };
 
+  // 🎨 Clase base para inputs/selects: borde fino y elegante
+  const inputBase =
+    "w-full px-4 py-3 rounded-md bg-white text-cohispania-blue border border-gray-300 focus:border-[#F68D2E] focus:ring-0 outline-none transition-all duration-150";
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-      {/* 🧾 Formulario de empleado */}
       <Card>
         <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
           Información del Empleado
         </h2>
-        <p className="text-sm text-gray-300 mb-6">
+        <p className="text-sm text-gray-400 mb-6">
           Completa los datos del nuevo empleado
         </p>
 
@@ -120,7 +123,7 @@ export default function EmployeeForm({
             </label>
             <select
               {...register("role_id", { required: "Selecciona un rol" })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              className={inputBase}
             >
               <option value="">Selecciona un rol</option>
               {roles.map((role) => (
@@ -145,7 +148,7 @@ export default function EmployeeForm({
               {...register("department_id", {
                 required: "Selecciona un departamento",
               })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              className={inputBase}
             >
               <option value="">Selecciona departamento</option>
               {departments.map((dept) => (
@@ -170,7 +173,7 @@ export default function EmployeeForm({
               {...register("location_id", {
                 required: "Selecciona una localización",
               })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              className={inputBase}
             >
               <option value="">Selecciona una localización</option>
               {locations.map((loc) => (
@@ -208,7 +211,7 @@ export default function EmployeeForm({
             <Button
               type="button"
               variant="ghost"
-              className="border border-gray-stroke text-cohispania-blue bg-white hover:bg-gray-100"
+              className="border border-gray-300 text-cohispania-blue bg-white hover:bg-gray-100"
               onClick={() => reset()}
             >
               Cancelar
