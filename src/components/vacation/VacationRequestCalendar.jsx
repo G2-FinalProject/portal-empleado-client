@@ -79,19 +79,27 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   };
 
   const handleDateSelect = (selectInfo) => {
-    const start = selectInfo.start;
-    const end = new Date(selectInfo.end);
-    end.setDate(end.getDate() - 1);
+  const startStr = selectInfo.startStr; 
+  const endStr = selectInfo.endStr; 
+  
+  const endDate = new Date(endStr);
+  endDate.setDate(endDate.getDate() - 1);
+  const actualEndStr = endDate.toISOString().split("T")[0];
+  
+  const start = new Date(startStr + "T00:00:00");
+  const end = new Date(actualEndStr + "T00:00:00");
 
-    const workingDays = calculateWorkingDays(start, end);
+  const workingDays = calculateWorkingDays(start, end);
 
-    setSelectedRange({
-      start: start,
-      end: end,
-      workingDays: workingDays,
-      calendarApi: selectInfo.view.calendar,
-    });
-  };
+  setSelectedRange({
+    start: start,
+    end: end,
+    startStr: startStr,
+    endStr: actualEndStr,
+    workingDays: workingDays,
+    calendarApi: selectInfo.view.calendar,
+  });
+};
 
   const calculateWorkingDays = (startDate, endDate) => {
     let count = 0;
@@ -158,11 +166,11 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
     try {
       const requestData = {
-        start_date: selectedRange.start.toISOString().split("T")[0],
-        end_date: selectedRange.end.toISOString().split("T")[0],
-        requested_days: selectedRange.workingDays,
-        requester_comment: comments || null,
-      };
+      start_date: selectedRange.startStr,
+      end_date: selectedRange.endStr,
+      requested_days: selectedRange.workingDays,
+      requester_comment: comments || null,
+    };
 
       await createVacationRequest(requestData);
 
