@@ -7,14 +7,20 @@ import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
 import { Modal, Card, Button } from '../../components/ui';
-import { getById as getLocationById, update as updateLocation } from '../../services/locationApi';
-import { create as createHoliday, deleteHoliday } from '../../services/holidaysApi';
-import toast from 'react-hot-toast';
+import { getById as getLocationById, } from '../../services/locationApi';
+import useAdminStore from '../../stores/useAdminStore';
+//  update as updateLocation
+// import { create as createHoliday, deleteHoliday } from '../../services/holidaysApi';
+// import toast from 'react-hot-toast';
+// import { showSuccess, showError, showLoading, updateToastSuccess, updateToastError } from '../../utils/notifications.js';
 
 export default function EditLocationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const calendarRef = useRef(null);
+
+  // Store (maneja toasts automátocamente)
+  const { updateLocation, createHoliday, deleteHoliday } = useAdminStore();
 
   // Estado
   const [locationName, setLocationName] = useState('');
@@ -32,7 +38,8 @@ export default function EditLocationPage() {
   useEffect(() => {
     const loadLocationData = async () => {
       if (!id || isNaN(parseInt(id))) {
-        toast.error('ID de población no válido');
+        // showError ('ID de población no válido');
+        // toast.error('ID de población no válido');
         navigate('/locations');
         return;
       }
@@ -52,14 +59,12 @@ export default function EditLocationPage() {
       } catch (error) {
         console.error('Error loading location:', error);
 
-        let errorMessage = 'Error al cargar la población';
-        if (error.response?.status === 404) {
-          errorMessage = 'Población no encontrada';
-        } else if (error.response?.status === 403) {
-          errorMessage = 'No tienes permisos para editar esta población';
-        }
+        // const errorMessage = error.response?.status === 404
+        //   ? 'Población no encontrada'
+        //   : 'Error al cargar la población';
+        // showError(errorMessage);
 
-        toast.error(errorMessage);
+        // toast.error(errorMessage);
         navigate('/locations');
       } finally {
         setIsLoading(false);
@@ -117,13 +122,14 @@ export default function EditLocationPage() {
       // Es un festivo existente - añadir a lista de eliminados
       if (window.confirm(`¿Eliminar el festivo "${existingHoliday.holiday_name}"?`)) {
         setDeletedHolidayIds(prev => [...prev, existingHoliday.id]);
-        toast.success('Festivo marcado para eliminar');
+        // showSuccess('Festivo marcado para eliminar');
       }
     } else if (newHoliday) {
       // Es un festivo nuevo - eliminar directamente
       if (window.confirm(`¿Eliminar el festivo "${newHoliday.name}"?`)) {
         setNewHolidays(prev => prev.filter(h => h.tempId !== newHoliday.tempId));
-        toast.success('Festivo eliminado');
+        // toast.success('Festivo eliminado');
+        // showSuccess('Festivo eliminado');
       }
     }
   };
@@ -131,7 +137,7 @@ export default function EditLocationPage() {
   // Añadir nuevo festivo temporal
   const handleAddHoliday = () => {
     if (!holidayName.trim()) {
-      toast.error('El nombre del festivo es obligatorio');
+      // showError('El nombre del festivo es obligatorio');
       return;
     }
 
@@ -146,7 +152,7 @@ export default function EditLocationPage() {
     const duplicates = selectedDates.filter(date => allCurrentDates.includes(date));
 
     if (duplicates.length > 0) {
-      toast.error('Ya hay festivos en algunas de las fechas seleccionadas');
+      // showError('Ya hay festivos en algunas de las fechas seleccionadas');
       return;
     }
 
@@ -162,9 +168,10 @@ export default function EditLocationPage() {
     setSelectedDates([]);
     setIsModalOpen(false);
 
-    const count = newHolidaysToAdd.length;
-    toast.success(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
+    // const count = newHolidaysToAdd.length;
+    // showSuccess(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
   };
+
 
   // Cancelar modal
   const handleCancelModal = () => {
@@ -177,15 +184,10 @@ export default function EditLocationPage() {
     }
   };
 
-  // Lógica de guardado completa
+  // Lógica de guardado - VERSIÓN STORE
   const handleSaveChanges = async () => {
-    if (!locationName.trim()) {
-      toast.error('El nombre de la población es obligatorio');
-      return;
-    }
-
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Guardando cambios...');
+    // const loadingToast = toast.loading('Guardando cambios...');
 
     try {
       // 1. Actualizar nombre de población si cambió
@@ -213,18 +215,67 @@ export default function EditLocationPage() {
         await Promise.all(createPromises);
       }
 
-      toast.success('¡Cambios guardados exitosamente!', { id: loadingToast });
-
+      // El store maneja todos los toasts automáticamente
+      // toast.success('¡Cambios guardados exitosamente!', { id: loadingToast });
       // Redirigir a DetailLocationPage
       navigate(`/locations/${id}`);
     } catch (error) {
+      // El store ya mostró el error
       console.error('Error saving changes:', error);
-      const errorMessage = error.response?.data?.message || 'Error al guardar los cambios';
-      toast.error(errorMessage, { id: loadingToast });
+      // const errorMessage = error.response?.data?.message || 'Error al guardar los cambios';
+      // toast.error(errorMessage, { id: loadingToast });
     } finally {
       setIsSubmitting(false);
     }
   };
+  // VERSIÓN MANUAL (fallback si no gusta el store)
+  /*
+  const handleSaveChanges = async () => {
+    if (!locationName.trim()) {
+      showError('El nombre de la población es obligatorio');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const loadingToast = showLoading('Guardando cambios...');
+
+    try {
+      // 1. Actualizar nombre de población si cambió
+      if (locationName.trim() !== originalLocationName) {
+        await updateLocation(id, { location_name: locationName.trim() });
+      }
+
+      // 2. Eliminar festivos marcados para eliminar
+      if (deletedHolidayIds.length > 0) {
+        const deletePromises = deletedHolidayIds.map(holidayId =>
+          deleteHoliday(holidayId)
+        );
+        await Promise.all(deletePromises);
+      }
+
+      // 3. Crear nuevos festivos
+      if (newHolidays.length > 0) {
+        const createPromises = newHolidays.map(holiday =>
+          createHoliday({
+            holiday_name: holiday.name,
+            holiday_date: holiday.date,
+            location_id: parseInt(id),
+          })
+        );
+        await Promise.all(createPromises);
+      }
+
+      updateToastSuccess(loadingToast, '¡Cambios guardados exitosamente!');
+      navigate(`/locations/${id}`);
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      const errorMessage = error.response?.data?.message || 'Error al guardar los cambios';
+      updateToastError(loadingToast, errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  */
 
   // Combinar festivos existentes (no eliminados) + nuevos para mostrar en calendario
   const allDisplayHolidays = [
@@ -370,7 +421,7 @@ export default function EditLocationPage() {
                         onClick={() => {
                           if (window.confirm(`¿Eliminar el festivo "${holiday.holiday_name}"?`)) {
                             setDeletedHolidayIds(prev => [...prev, holiday.id]);
-                            toast.success('Festivo marcado para eliminar');
+                            // toast.success('Festivo marcado para eliminar');
                           }
                         }}
                         className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
@@ -399,7 +450,7 @@ export default function EditLocationPage() {
                         onClick={() => {
                           if (window.confirm(`¿Eliminar el festivo "${holiday.name}"?`)) {
                             setNewHolidays(prev => prev.filter(h => h.tempId !== holiday.tempId));
-                            toast.success('Festivo eliminado');
+                            // toast.success('Festivo eliminado');
                           }
                         }}
                         className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
@@ -455,7 +506,7 @@ export default function EditLocationPage() {
         </div>
       </Card>
 
-      {/* Modal para añadir festivo - ✅ ESTILO UNIFICADO CON LOCATIONLISTPAGE */}
+      {/* Modal para añadir festivo */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCancelModal}
@@ -503,7 +554,7 @@ export default function EditLocationPage() {
             )}
           </div>
 
-          {/* Botones del modal - ✅ USANDO COMPONENTE BUTTON COMO LOCATIONLISTPAGE */}
+          {/* Botones del modal */}
           <div className="flex gap-3 mt-6">
             <Button
               variant="ghost"
