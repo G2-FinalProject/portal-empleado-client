@@ -53,10 +53,11 @@ export const getAll = async () => {
  */
 export const approve = async (id, comment = null) => {
   try {
-    const response = await api.patch(`/vacations/${id}/review`, {
-      status: 'approved',
-      comment: comment
-    });
+    const payload = { status: 'approved' };
+    if (comment && comment.trim() !== '') {
+      payload.comment = comment;
+    }
+    const response = await api.patch(`/vacations/${id}/review`, payload);
     return response.data;
   } catch (error) {
     throw error;
@@ -70,11 +71,11 @@ export const approve = async (id, comment = null) => {
  * @param {string} data.reason - Motivo del rechazo (opcional)
  * @returns {Promise} Datos de la solicitud rechazada
  */
-export const reject = async (id, data) => {
+export const reject = async (id, comment) => {
   try {
     const response = await api.patch(`/vacations/${id}/review`, {
       status: 'rejected',
-      comment: data.reason
+      comment: comment
     });
     return response.data;
   } catch (error) {
@@ -83,7 +84,7 @@ export const reject = async (id, data) => {
 };
 
 /**
- * 🆕 Obtiene el resumen de vacaciones del usuario
+ * Obtiene el resumen de vacaciones del usuario
  * Incluye: allowance_days, remaining_days, used_days
  * @param {string|number} userId - ID del usuario
  * @returns {Promise} { allowance_days, remaining_days, used_days }
