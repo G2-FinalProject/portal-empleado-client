@@ -286,15 +286,6 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
                 eventClassNames="text-xs"
               />
 
-              {!selectedRange && (
-                <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-                  <p className="text-sm sm:text-base text-indigo-500 text-center">
-                    Selecciona o arrastra sobre el calendario para seleccionar tus fechas
-                  </p>
-                </div>
-              )}
-            </div>
-
               {/* Mensaje informativo cuando no hay selección */}
               {!selectedRange && (
                 <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
