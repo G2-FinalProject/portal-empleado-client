@@ -137,7 +137,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         start_date: selectedRange.start.toISOString().split("T")[0],
         end_date: selectedRange.end.toISOString().split("T")[0],
         requested_days: selectedRange.workingDays,
-        comments: comments || null,
+        requester_comment: comments || null,
       };
 
       await createVacationRequest(requestData);
