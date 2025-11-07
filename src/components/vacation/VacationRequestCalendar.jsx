@@ -23,7 +23,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [myRequests]);
 
   const fetchInitialData = async () => {
     setIsLoading(true);
@@ -245,7 +245,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         </div>
 
         {/* Contenido */}
-       <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6">
           <div className={`${selectedRange ? "space-y-6" : ""}`}>
             {/* ✅ Leyenda del calendario */}
             <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
@@ -411,6 +411,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
