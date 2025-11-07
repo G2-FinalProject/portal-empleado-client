@@ -1,16 +1,30 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Eye, Pencil, Trash2, Search, UserPlus, ChevronLeft, ChevronRight } from 'lucide-react';
-import useAdminStore from '../../stores/useAdminStore';
-import { Card, Modal, Button } from '../../components/ui';
-import useAuthStore from '../../stores/authStore';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  Search,
+  UserPlus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import useAdminStore from "../../stores/useAdminStore";
+import { Card, Modal, Button } from "../../components/ui";
+import useAuthStore from "../../stores/authStore";
+
+const getRoleDisplayName = (roleName) => {
+  const roleTranslations = {
+    employee: "Empleado",
+    manager: "Responsable",
+    admin: "Administrador",
+  };
+  return roleTranslations[roleName?.toLowerCase()] || roleName;
+};
 
 export default function EmployeeListPage() {
   const navigate = useNavigate();
 
-  // ============================================
-  // ESTADO DE ZUSTAND
-  // ============================================
   const users = useAdminStore((state) => state.users);
   const fetchUsers = useAdminStore((state) => state.fetchUsers);
   const deleteUser = useAdminStore((state) => state.deleteUser);
@@ -21,50 +35,36 @@ export default function EmployeeListPage() {
   const fetchDepartments = useAdminStore((state) => state.fetchDepartments);
   const { user, isAdmin, isManager } = useAuthStore();
 
-  // ============================================
-  // ESTADO LOCAL
-  // ============================================
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartmentId, setSelectedDepartmentId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
 
   // ESTADO PARA PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 15; // 15 empleados por página
+  const ITEMS_PER_PAGE = 10;
 
-  // ============================================
-  // EFECTOS
-  // ============================================
   useEffect(() => {
     fetchUsers();
     fetchDepartments();
   }, [fetchUsers, fetchDepartments]);
 
-  // ============================================
-  // FILTRADO
-  // ============================================
   const filteredUsers = useMemo(() => {
     let result = users || [];
-
-    // 1. FILTRADO POR ROL (Manager solo ve su departamento) 💡
-    if (isManager() && user?.departmentId) { // user.departmentId ahora tiene valor
+    if (isManager() && user?.departmentId) {
       const managerDeptId = parseInt(user.departmentId);
-      // Restringir la lista SÓLO a usuarios de ese departamento
-      result = result.filter(user => user.department_id === managerDeptId);
+      result = result.filter((user) => user.department_id === managerDeptId);
     }
 
-    // Filtrar por búsqueda (nombre o email)
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
       result = result.filter((user) => {
         const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
-        const email = (user.email || '').toLowerCase();
+        const email = (user.email || "").toLowerCase();
         return fullName.includes(query) || email.includes(query);
       });
     }
 
-    // Filtrar por departamento
     if (selectedDepartmentId) {
       result = result.filter(
         (user) => user.department_id === parseInt(selectedDepartmentId)
@@ -74,19 +74,11 @@ export default function EmployeeListPage() {
     return result;
   }, [users, searchQuery, selectedDepartmentId, isManager, user]);
 
-  // ============================================
-  // PAGINACIÓN - cálculo
-  // ============================================
-
   const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = currentPage * ITEMS_PER_PAGE;
   const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
-  // ============================================
-  // FUNCIONES DE PAGINACIÓN
-  // ============================================
-  
   const goToPreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
@@ -103,9 +95,6 @@ export default function EmployeeListPage() {
     setCurrentPage(1);
   }, [searchQuery, selectedDepartmentId]);
 
-  // ============================================
-  // FUNCIONES DE ELIMINACIÓN
-  // ============================================
   const handleDeleteClick = (employee) => {
     setEmployeeToDelete(employee);
     setShowDeleteModal(true);
@@ -116,13 +105,12 @@ export default function EmployeeListPage() {
       await deleteUser(employeeToDelete.id);
       setShowDeleteModal(false);
       setEmployeeToDelete(null);
-      
 
       if (paginatedUsers.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (error) {
-      console.error('Error al eliminar empleado:', error);
+      console.error("Error al eliminar empleado:", error);
     }
   };
 
@@ -131,9 +119,6 @@ export default function EmployeeListPage() {
     setEmployeeToDelete(null);
   };
 
-  // ============================================
-  // RENDERIZADO
-  // ============================================
   return (
     <main className="space-y-6">
       {/* Botón Nuevo Empleado */}
@@ -148,10 +133,10 @@ export default function EmployeeListPage() {
 
       {/* Título */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
+        <h1 className="text-3xl font-bold text-cohispania-blue">
           Gestión de Empleados
         </h1>
-        <p className="text-gray-300 mt-2 text-sm sm:text-base">
+        <p className="text-sm text-gray-300 mt-2 sm:text-base">
           Administra la información de todos los empleados
         </p>
       </div>
@@ -183,10 +168,8 @@ export default function EmployeeListPage() {
             </label>
             <select
               id="department-filter"
-              value={selectedDepartmentId || ''}
-              onChange={(e) =>
-                setSelectedDepartmentId(e.target.value || null)
-              }
+              value={selectedDepartmentId || ""}
+              onChange={(e) => setSelectedDepartmentId(e.target.value || null)}
               className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue focus:ring-1 focus:ring-cohispania-orange  outline-none transition"
             >
               <option value="">Todos los departamentos</option>
@@ -201,7 +184,9 @@ export default function EmployeeListPage() {
           {/* Información de resultados */}
           {filteredUsers.length > 0 && (
             <div className="text-sm text-gray-400">
-              Mostrando {startIndex + 1} - {Math.min(endIndex, filteredUsers.length)} de {filteredUsers.length} empleados
+              Mostrando {startIndex + 1} -{" "}
+              {Math.min(endIndex, filteredUsers.length)} de{" "}
+              {filteredUsers.length} empleados
             </div>
           )}
         </div>
@@ -221,13 +206,14 @@ export default function EmployeeListPage() {
         )}
 
         {/* Empty State o Tabla */}
-        {!loading?.users && !error && (
-          filteredUsers.length === 0 ? (
+        {!loading?.users &&
+          !error &&
+          (filteredUsers.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-300 text-lg">
                 {searchQuery || selectedDepartmentId
-                  ? 'No se encontraron empleados con esos criterios'
-                  : 'No hay empleados registrados todavía'}
+                  ? "No se encontraron empleados con esos criterios"
+                  : "No hay empleados registrados todavía"}
               </p>
               {!searchQuery && !selectedDepartmentId && (
                 <Link to="/employees/create" className="mt-4 inline-block">
@@ -245,25 +231,22 @@ export default function EmployeeListPage() {
                 <table className="w-full">
                   <thead className="border-b border-gray-stroke">
                     <tr>
-                      <th className="text-left py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
                         Nombre Completo
                       </th>
-                      <th className="text-left py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
                         Email
                       </th>
-                      <th className="text-left py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
                         Rol
                       </th>
-                      <th className="text-left py-3 px-6 text-xs font-semibold text-gray-400">
-                        Departamento
-                      </th>
-                      <th className="text-left py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
                         Población
                       </th>
-                      <th className="text-center py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-center py-3 px-6 text-sm font-medium text-gray-300">
                         Días Disponibles
                       </th>
-                      <th className="text-right py-3 px-6 text-xs font-semibold text-gray-400">
+                      <th className="text-right py-3 px-6 text-sm font-medium text-gray-300">
                         Acciones
                       </th>
                     </tr>
@@ -272,7 +255,8 @@ export default function EmployeeListPage() {
                     {paginatedUsers.map((user) => (
                       <tr
                         key={user.id}
-                        className="hover:bg-light-background transition-colors"
+                        className="hover:bg-light-background transition-colors cursor-pointer"
+                        onClick={() => navigate(`/employees/${user.id}`)}
                       >
                         <td className="py-4 px-6">
                           <span className="font-medium text-cohispania-blue">
@@ -283,15 +267,12 @@ export default function EmployeeListPage() {
                           {user.email}
                         </td>
                         <td className="py-4 px-6">
-                          <span className="capitalize text-cohispania-blue">
-                            {user.role?.role_name || '-'}
+                          <span className="text-cohispania-blue">
+                            {getRoleDisplayName(user.role?.role_name) || "-"}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-gray-400">
-                          {user.department?.department_name || '-'}
-                        </td>
-                        <td className="py-4 px-6 text-gray-400">
-                          {user.location?.location_name || '-'}
+                          {user.location?.location_name || "-"}
                         </td>
                         <td className="py-4 px-6 text-center">
                           <span className="font-semibold text-cohispania-orange">
@@ -304,8 +285,11 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Ver detalles de ${user.first_name}`}
-                              onClick={() => navigate(`/employees/${user.id}`)}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/employees/${user.id}`);
+                              }}
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
                             >
                               <Eye className="w-5 h-5 text-gray-400" />
                             </button>
@@ -313,10 +297,11 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Editar ${user.first_name}`}
-                              onClick={() =>
-                                navigate(`/employees/${user.id}/edit`)
-                              }
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/employees/${user.id}/edit`);
+                              }}
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
                             >
                               <Pencil className="w-5 h-5 text-gray-400" />
                             </button>
@@ -324,8 +309,11 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Eliminar ${user.first_name}`}
-                              onClick={() => handleDeleteClick(user)}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(user);
+                              }}
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer"
                             >
                               <Trash2 className="w-5 h-5 text-red-400" />
                             </button>
@@ -342,7 +330,8 @@ export default function EmployeeListPage() {
                 {paginatedUsers.map((user) => (
                   <Card
                     key={user.id}
-                    className="p-4 border border-gray-stroke"
+                    className="p-4 border border-gray-stroke cursor-pointer"
+                    onClick={() => navigate(`/employees/${user.id}`)}
                   >
                     <div className="space-y-3">
                       <div className="flex justify-between items-start">
@@ -360,23 +349,16 @@ export default function EmployeeListPage() {
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <span className="text-gray-400">Rol:</span>
-                          <p className="font-medium text-cohispania-blue capitalize">
-                            {user.role?.role_name || '-'}
+                          <p className="font-medium text-cohispania-blue">
+                            {getRoleDisplayName(user.role?.role_name) || "-"}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-400">Departamento:</span>
+                          <span className="text-gray-400">Población:</span>
                           <p className="font-medium text-cohispania-blue">
-                            {user.department?.department_name || '-'}
+                            {user.location?.location_name || "-"}
                           </p>
                         </div>
-                      </div>
-
-                      <div className="text-sm">
-                        <span className="text-gray-400">Población:</span>
-                        <p className="font-medium text-cohispania-blue">
-                          {user.location?.location_name || '-'}
-                        </p>
                       </div>
 
                       {/* Botones de acción en mobile */}
@@ -384,8 +366,11 @@ export default function EmployeeListPage() {
                         <Button
                           variant="ghost"
                           size="small"
-                          onClick={() => navigate(`/employees/${user.id}`)}
-                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/employees/${user.id}`);
+                          }}
+                          className="flex-1 cursor-pointer"
                         >
                           <Eye className="w-4 h-4 mr-2" />
                           Ver
@@ -393,8 +378,11 @@ export default function EmployeeListPage() {
                         <Button
                           variant="ghost"
                           size="small"
-                          onClick={() => navigate(`/employees/${user.id}/edit`)}
-                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/employees/${user.id}/edit`);
+                          }}
+                          className="flex-1 cursor-pointer"
                         >
                           <Pencil className="w-4 h-4 mr-2" />
                           Editar
@@ -402,8 +390,11 @@ export default function EmployeeListPage() {
                         <Button
                           variant="danger"
                           size="small"
-                          onClick={() => handleDeleteClick(user)}
-                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(user);
+                          }}
+                          className="flex-1 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Eliminar
@@ -431,7 +422,7 @@ export default function EmployeeListPage() {
                   <div className="flex items-center gap-2">
                     {Array.from({ length: totalPages }, (_, index) => {
                       const pageNumber = index + 1;
-                      
+
                       // Mostrar solo algunas páginas para no saturar
                       // Lógica: mostrar primera, última, actual y 2 alrededor
                       const showPage =
@@ -441,9 +432,15 @@ export default function EmployeeListPage() {
 
                       if (!showPage) {
                         // Mostrar "..." solo una vez entre rangos
-                        if (pageNumber === currentPage - 2 || pageNumber === currentPage + 2) {
+                        if (
+                          pageNumber === currentPage - 2 ||
+                          pageNumber === currentPage + 2
+                        ) {
                           return (
-                            <span key={pageNumber} className="px-2 text-gray-400">
+                            <span
+                              key={pageNumber}
+                              className="px-2 text-gray-400"
+                            >
                               ...
                             </span>
                           );
@@ -457,8 +454,8 @@ export default function EmployeeListPage() {
                           onClick={() => goToPage(pageNumber)}
                           className={`w-10 h-10 rounded-lg font-medium transition ${
                             currentPage === pageNumber
-                              ? 'bg-cohispania-blue text-white'
-                              : 'bg-light-background text-cohispania-blue hover:bg-gray-stroke'
+                              ? "bg-cohispania-blue text-white"
+                              : "bg-light-background text-cohispania-blue hover:bg-gray-stroke"
                           }`}
                         >
                           {pageNumber}
@@ -479,8 +476,7 @@ export default function EmployeeListPage() {
                 </div>
               )}
             </>
-          )
-        )}
+          ))}
       </Card>
 
       {/* Modal de confirmación de eliminación */}
@@ -491,14 +487,15 @@ export default function EmployeeListPage() {
       >
         <div className="space-y-4">
           <p className="text-gray-400">
-            ¿Estás seguro de que deseas eliminar al empleado{' '}
+            ¿Estás seguro de que deseas eliminar al empleado{" "}
             <span className="font-bold text-cohispania-blue">
               {employeeToDelete?.first_name} {employeeToDelete?.last_name}
             </span>
             ?
           </p>
           <p className="text-sm text-red-400">
-            ⚠️ Esta acción no se puede deshacer. El empleado será eliminado permanentemente del sistema.
+            ⚠️ Esta acción no se puede deshacer. El empleado será eliminado
+            permanentemente del sistema.
           </p>
 
           <div className="flex gap-3 mt-6">

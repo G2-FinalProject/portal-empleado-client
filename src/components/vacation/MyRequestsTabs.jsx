@@ -1,55 +1,83 @@
-import { useMemo, useState } from 'react';
-import { Tabs, Badge, Card, Modal } from '../ui';
-import { Calendar, Eye } from 'lucide-react';
-import useVacationStore from '../../stores/useVacationStore';
+import { useMemo, useState } from "react";
+import { Tabs, Badge, Card, Modal } from "../ui";
+import { Calendar, Eye, ArrowDown, ArrowUp } from "lucide-react";
+import useVacationStore from "../../stores/useVacationStore";
 
-/**
- * MyRequestsTabs - Componente con pestañas para visualizar solicitudes del usuario
- *
- * Muestra las solicitudes filtradas por estado:
- * - Pendientes
- * - Aprobadas
- * - Denegadas
- */
 export default function MyRequestsTabs() {
   const myRequests = useVacationStore((state) => state.myRequests);
   const loading = useVacationStore((state) => state.loading);
 
-  // Filtrar solicitudes por estado
-  const pendingRequests = useMemo(
-    () => myRequests.filter((req) => req.status === 'pending').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [myRequests]
-  );
+  const [sortOrder, setSortOrder] = useState("desc");
 
-  const approvedRequests = useMemo(
-    () => myRequests.filter((req) => req.status === 'approved').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [myRequests]
-  );
+  const pendingRequests = useMemo(() => {
+    const filtered = myRequests.filter((req) => req.status === "pending");
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+  }, [myRequests, sortOrder]);
 
-  const rejectedRequests = useMemo(
-    () => myRequests.filter((req) => req.status === 'rejected').sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [myRequests]
-  );
+  const approvedRequests = useMemo(() => {
+    const filtered = myRequests.filter((req) => req.status === "approved");
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+  }, [myRequests, sortOrder]);
 
-  // Configuración de las pestañas
+  const rejectedRequests = useMemo(() => {
+    const filtered = myRequests.filter((req) => req.status === "rejected");
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+  }, [myRequests, sortOrder]);
+
   const tabs = [
     {
-      id: 'pending',
-      label: 'Pendientes',
+      id: "pending",
+      label: "Pendientes",
       count: pendingRequests.length,
-      content: <RequestsList requests={pendingRequests} emptyMessage="No tienes solicitudes pendientes" loading={loading} />,
+      content: (
+        <RequestsList
+          requests={pendingRequests}
+          emptyMessage="No tienes solicitudes pendientes"
+          loading={loading}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
     {
-      id: 'approved',
-      label: 'Aprobadas',
+      id: "approved",
+      label: "Aprobadas",
       count: approvedRequests.length,
-      content: <RequestsList requests={approvedRequests} emptyMessage="No tienes solicitudes aprobadas" loading={loading} />,
+      content: (
+        <RequestsList
+          requests={approvedRequests}
+          emptyMessage="No tienes solicitudes aprobadas"
+          loading={loading}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
     {
-      id: 'rejected',
-      label: 'Denegadas',
+      id: "rejected",
+      label: "Denegadas",
       count: rejectedRequests.length,
-      content: <RequestsList requests={rejectedRequests} emptyMessage="No tienes solicitudes denegadas" loading={loading} />,
+      content: (
+        <RequestsList
+          requests={rejectedRequests}
+          emptyMessage="No tienes solicitudes denegadas"
+          loading={loading}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
   ];
 
@@ -71,7 +99,13 @@ export default function MyRequestsTabs() {
 /**
  * RequestsList - Lista de solicitudes (tabla en desktop, cards en mobile)
  */
-function RequestsList({ requests, emptyMessage, loading }) {
+function RequestsList({
+  requests,
+  emptyMessage,
+  loading,
+  sortOrder,
+  onSortChange,
+}) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -96,15 +130,43 @@ function RequestsList({ requests, emptyMessage, loading }) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-stroke">
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Período</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Días solicitados</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Comentarios</th>
-              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Estado</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                <button
+                  onClick={() =>
+                    onSortChange(sortOrder === "desc" ? "asc" : "desc")
+                  }
+                  className="flex items-center gap-2 hover:text-cohispania-blue transition-colors"
+                  title={
+                    sortOrder === "desc"
+                      ? "Ordenar ascendente"
+                      : "Ordenar descendente"
+                  }
+                >
+                  Fecha de solicitud
+                  {sortOrder === "desc" ? (
+                    <ArrowDown className="h-4 w-4" />
+                  ) : (
+                    <ArrowUp className="h-4 w-4" />
+                  )}
+                </button>
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                Período
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                Días solicitados
+              </th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                Estado
+              </th>
+              <th className="text-center py-3 px-4 text-sm font-semibold text-gray-400">
+                Comentarios
+              </th>
             </tr>
           </thead>
           <tbody>
             {requests.map((request) => (
-              <RequestRow key={request.id} request={request} status={status} />
+              <RequestRow key={request.id} request={request} />
             ))}
           </tbody>
         </table>
@@ -112,8 +174,29 @@ function RequestsList({ requests, emptyMessage, loading }) {
 
       {/* Vista Mobile: Cards */}
       <div className="md:hidden space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-gray-400 font-semibold">
+            {requests.length}{" "}
+            {requests.length === 1 ? "solicitud" : "solicitudes"}
+          </p>
+          <button
+            onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
+            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+            title={
+              sortOrder === "desc"
+                ? "Ordenar ascendente"
+                : "Ordenar descendente"
+            }
+          >
+            {sortOrder === "desc" ? (
+              <ArrowDown className="h-4 w-4" />
+            ) : (
+              <ArrowUp className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {requests.map((request) => (
-          <RequestCard key={request.id} request={request} status={status} />
+          <RequestCard key={request.id} request={request} />
         ))}
       </div>
     </>
@@ -123,34 +206,44 @@ function RequestsList({ requests, emptyMessage, loading }) {
 /**
  * RequestRow - Fila de la tabla (desktop)
  */
-function RequestRow({ request, status }) {
+function RequestRow({ request }) {
   const [showModal, setShowModal] = useState(false);
 
   const formatDate = (date) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (!date) return "-";
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { variant: 'purple', label: 'Pendiente' },
-      approved: { variant: 'success', label: 'Aprobado' },
-      rejected: { variant: 'info', label: 'Rechazado' },
+      pending: { variant: "purple", label: "Pendiente" },
+      approved: { variant: "success", label: "Aprobado" },
+      rejected: { variant: "info", label: "Rechazado" },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  // Verificar si hay comentarios
-  const hasRequesterComment = request.reason && request.reason.trim() !== '';
-  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasRequesterComment = request.reason && request.reason.trim() !== "";
+  const hasApproverComment = request.comments && request.comments.trim() !== "";
   const hasAnyComment = hasRequesterComment || hasApproverComment;
 
-
   return (
-     <>
+    <>
       <tr className="border-b border-gray-stroke hover:bg-light-background transition-colors">
+        {/* Fecha de solicitud */}
+        <td className="py-4 px-4">
+          <span className="text-gray-400 text-sm">
+            {formatDate(request.createdAt)}
+          </span>
+        </td>
+
+        {/* Período */}
         <td className="py-4 px-4">
           <div className="flex items-center gap-2 text-gray-400">
             <Calendar className="h-4 w-4" />
@@ -159,23 +252,33 @@ function RequestRow({ request, status }) {
             </span>
           </div>
         </td>
+
+        {/* Días solicitados */}
         <td className="py-4 px-4">
-          <span className="text-cohispania-blue font-semibold">{request.requestedDays} días</span>
+          <span className="text-cohispania-blue font-semibold">
+            {request.requestedDays} días
+          </span>
         </td>
-        <td className="py-4 px-4">
-          {hasAnyComment ? (
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 text-cohispania-blue hover:text-cohispania-orange transition-colors"
-            >
-              <Eye className="h-4 w-4" />
-              <span className="text-sm font-medium">Ver comentarios</span>
-            </button>
-          ) : (
-            <span className="text-gray-300 text-sm">Sin comentarios</span>
-          )}
-        </td>
+
+        {/* Estado */}
         <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
+
+        {/* Comentarios - Solo icono centrado */}
+        <td className="py-4 px-4">
+          <div className="flex items-center justify-center">
+            {hasAnyComment ? (
+              <button
+                onClick={() => setShowModal(true)}
+                className="text-cohispania-blue hover:text-cohispania-orange transition-colors"
+                title="Ver más info"
+              >
+                <Eye className="h-5 w-5" />
+              </button>
+            ) : (
+              <span className="text-gray-300 text-sm">-</span>
+            )}
+          </div>
+        </td>
       </tr>
 
       {/* Modal de comentarios */}
@@ -187,9 +290,12 @@ function RequestRow({ request, status }) {
         <div className="space-y-4">
           {/* Período de la solicitud */}
           <div className="bg-light-background p-4 rounded-lg">
-            <p className="text-sm text-gray-400 font-semibold mb-1">Período solicitado</p>
+            <p className="text-sm text-gray-400 font-semibold mb-1">
+              Período solicitado
+            </p>
             <p className="text-sm text-cohispania-blue font-semibold">
-              {formatDate(request.startDate)} - {formatDate(request.endDate)} ({request.requestedDays} días)
+              {formatDate(request.startDate)} - {formatDate(request.endDate)} (
+              {request.requestedDays} días)
             </p>
           </div>
 
@@ -205,8 +311,8 @@ function RequestRow({ request, status }) {
             </div>
           )}
 
-          {/* Comentario del manager (solo en aprobadas/rechazadas) */}
-          {status !== 'pending' && hasApproverComment && (
+          {/* Comentario del responsable */}
+          {hasApproverComment && (
             <div>
               <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Respuesta del responsable:
@@ -217,11 +323,11 @@ function RequestRow({ request, status }) {
             </div>
           )}
 
-          {/* Si no hay comentarios del manager en aprobadas/rechazadas */}
-          {status !== 'pending' && !hasApproverComment && (
+          {/* Si no hay comentarios */}
+          {!hasRequesterComment && !hasApproverComment && (
             <div className="text-center py-4">
               <p className="text-sm text-gray-400 italic">
-                El responsable no añadió comentarios
+                No hay comentarios en esta solicitud
               </p>
             </div>
           )}
@@ -231,56 +337,72 @@ function RequestRow({ request, status }) {
   );
 }
 
-
-
 /**
  * RequestCard - Card para vista mobile
  */
-function RequestCard({ request, status }) {
+function RequestCard({ request }) {
   const [showModal, setShowModal] = useState(false);
 
   const formatDate = (date) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+    if (!date) return "-";
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { variant: 'purple', label: 'Pendiente' },
-      approved: { variant: 'success', label: 'Aprobado' },
-      rejected: { variant: 'info', label: 'Rechazado' },
+      pending: { variant: "purple", label: "Pendiente" },
+      approved: { variant: "success", label: "Aprobado" },
+      rejected: { variant: "info", label: "Rechazado" },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const hasRequesterComment = request.reason && request.reason.trim() !== '';
-  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasRequesterComment = request.reason && request.reason.trim() !== "";
+  const hasApproverComment = request.comments && request.comments.trim() !== "";
   const hasAnyComment = hasRequesterComment || hasApproverComment;
 
   return (
     <>
       <Card padding={true}>
         <div className="space-y-3">
-          {/* Período */}
+          {/* Header con fecha de solicitud y estado */}
           <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-cohispania-orange" />
-              <div>
-                <p className="text-xs text-gray-400 font-semibold">Período</p>
-                <p className="text-sm text-cohispania-blue font-medium">
-                  {formatDate(request.startDate)} - {formatDate(request.endDate)}
-                </p>
-              </div>
+            <div>
+              <p className="text-xs text-gray-400 font-semibold">
+                Fecha de solicitud
+              </p>
+              <p className="text-sm text-cohispania-blue font-medium">
+                {formatDate(request.createdAt)}
+              </p>
             </div>
             {getStatusBadge(request.status)}
           </div>
 
+          {/* Período */}
+          <div className="flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-cohispania-orange" />
+            <div>
+              <p className="text-xs text-gray-400 font-semibold">Período</p>
+              <p className="text-sm text-cohispania-blue font-medium">
+                {formatDate(request.startDate)} - {formatDate(request.endDate)}
+              </p>
+            </div>
+          </div>
+
           {/* Días solicitados */}
           <div>
-            <p className="text-xs text-gray-400 font-semibold">Días solicitados</p>
-            <p className="text-sm text-cohispania-blue font-semibold">{request.requestedDays} días</p>
+            <p className="text-xs text-gray-400 font-semibold">
+              Días solicitados
+            </p>
+            <p className="text-sm text-cohispania-blue font-semibold">
+              {request.requestedDays} días
+            </p>
           </div>
 
           {/* Botón para ver comentarios */}
@@ -296,7 +418,7 @@ function RequestCard({ request, status }) {
         </div>
       </Card>
 
-      {/* Modal de comentarios (mismo que en desktop) */}
+      {/* Modal de comentarios */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -304,38 +426,41 @@ function RequestCard({ request, status }) {
       >
         <div className="space-y-4">
           <div className="bg-light-background p-4 rounded-lg">
-            <p className="text-xs text-gray-400 font-semibold mb-1">Período solicitado</p>
-            <p className="text-sm text-cohispania-blue font-medium">
-              {formatDate(request.startDate)} - {formatDate(request.endDate)} ({request.requestedDays} días)
+            <p className="text-sm text-gray-400 font-semibold mb-1">
+              Período solicitado
+            </p>
+            <p className="text-sm text-cohispania-blue font-semibold">
+              {formatDate(request.startDate)} - {formatDate(request.endDate)} (
+              {request.requestedDays} días)
             </p>
           </div>
 
           {hasRequesterComment && (
             <div>
-              <h3 className="text-sm font-semibold text-cohispania-blue mb-2">
+              <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Tu comentario:
               </h3>
-              <p className="text-sm text-gray-300 bg-light-background p-4 rounded-lg">
+              <p className="text-base text-gray-300 bg-light-background p-4 rounded-lg">
                 {request.reason}
               </p>
             </div>
           )}
 
-          {status !== 'pending' && hasApproverComment && (
+          {hasApproverComment && (
             <div>
-              <h3 className="text-sm font-semibold text-cohispania-blue mb-2">
+              <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Respuesta del responsable:
               </h3>
-              <p className="text-sm text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
+              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
                 {request.comments}
               </p>
             </div>
           )}
 
-          {status !== 'pending' && !hasApproverComment && (
+          {!hasRequesterComment && !hasApproverComment && (
             <div className="text-center py-4">
               <p className="text-sm text-gray-400 italic">
-                El responsable no añadió comentarios
+                No hay comentarios en esta solicitud
               </p>
             </div>
           )}

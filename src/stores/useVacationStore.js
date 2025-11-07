@@ -18,8 +18,8 @@ const mapRequest = (req) => ({
   approvedAt: req.approved_at,
   rejectedBy: req.rejected_by,
   rejectedAt: req.rejected_at,
-  createdAt: req.created_at,
-  updatedAt: req.updated_at,
+  createdAt: req.createdAt || req.created_at || req.updatedAt || req.updated_at,
+  updatedAt: req.updatedAt || req.updated_at,
   requesterName:
     req.requester_name ||
     req.user_name ||
