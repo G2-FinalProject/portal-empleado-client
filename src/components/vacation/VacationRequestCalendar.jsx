@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -7,8 +6,10 @@ import esLocale from "@fullcalendar/core/locales/es";
 import { getMyHolidays } from "../../services/holidaysApi";
 import { create as createVacationRequest } from "../../services/vacationApi";
 import { getVacationSummary } from "../../services/authApi";
+import useVacationStore from "../../stores/useVacationStore";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
+import { eachDayOfInterval } from "date-fns";
 
 const VacationRequestCalendar = ({ onRequestCreated }) => {
   const [holidays, setHolidays] = useState([]);
@@ -18,9 +19,11 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const myRequests = useVacationStore((state) => state.myRequests);
+
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [myRequests]);
 
   const fetchInitialData = async () => {
     setIsLoading(true);
@@ -45,7 +48,28 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         },
       }));
 
-      setHolidays(holidayEvents);
+      const approvedVacations = myRequests
+        .filter((req) => req.status === "approved")
+        .flatMap((req) => {
+          // Generar todos los días del rango aprobado
+          const start = new Date(req.startDate);
+          const end = new Date(req.endDate);
+          const days = eachDayOfInterval({ start, end });
+
+          return days.map((day) => ({
+            title: isMobileDevice ? "✈️" : "Vacaciones",
+            start: day.toISOString().split("T")[0],
+            display: "background",
+            backgroundColor: "#d1fae5", // Verde claro
+            borderColor: "#10b981", // Verde
+            extendedProps: {
+              isApprovedVacation: true,
+              requestId: req.id,
+            },
+          }));
+        });
+
+      setHolidays([...holidayEvents, ...approvedVacations]);
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
       toast.error("Error al cargar los datos. Por favor, recarga la página.");
@@ -78,9 +102,9 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       const dateString = current.toISOString().split("T")[0];
 
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      const isHoliday = holidays.some((h) => h.start === dateString);
+      const isUnavailable = holidays.some((h) => h.start === dateString);
 
-      if (!isWeekend && !isHoliday) {
+      if (!isWeekend && !isUnavailable) {
         count++;
       }
 
@@ -99,8 +123,8 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       return false;
     }
 
-    const isHoliday = holidays.some((h) => h.start === dateString);
-    if (isHoliday) {
+    const isUnavailable = holidays.some((h) => h.start === dateString);
+    if (isUnavailable) {
       return false;
     }
 
@@ -137,7 +161,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
         start_date: selectedRange.start.toISOString().split("T")[0],
         end_date: selectedRange.end.toISOString().split("T")[0],
         requested_days: selectedRange.workingDays,
-        comments: comments || null,
+        requester_comment: comments || null,
       };
 
       await createVacationRequest(requestData);
@@ -155,6 +179,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       if (onRequestCreated) {
         onRequestCreated();
       }
+      fetchInitialData();
 
       toast.success("¡Solicitud enviada correctamente!", {
         id: loadingToast,
@@ -163,6 +188,7 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
       console.error("Error al crear solicitud:", error);
       const errorMessage =
         error.response?.data?.message ||
+        error.response?.data?.errors?.[0]?.msg ||
         "Error al enviar la solicitud. Por favor, inténtalo de nuevo.";
 
       toast.error(errorMessage, {
@@ -220,13 +246,19 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
 
         {/* Contenido */}
         <div className="p-4 sm:p-6">
-          {/* Layout: Calendario solo o Calendario + Formulario */}
-          <div
-            className={`
-              ${selectedRange ? "space-y-6" : ""}
-            `}
-          >
-            {/* Calendario */}
+          <div className={`${selectedRange ? "space-y-6" : ""}`}>
+            {/* ✅ Leyenda del calendario */}
+            <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+                <span className="text-gray-400">Festivos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-100 border border-green-500 rounded"></div>
+                <span className="text-gray-400">Vacaciones aprobadas</span>
+              </div>
+            </div>
+
             <div className="w-full">
               <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
@@ -258,7 +290,8 @@ const VacationRequestCalendar = ({ onRequestCreated }) => {
               {!selectedRange && (
                 <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                   <p className="text-sm sm:text-base text-indigo-500 text-center">
-                    Selecciona o arrastra sobre el calendario para seleccionar tus fechas
+                    Selecciona o arrastra sobre el calendario para seleccionar
+                    tus fechas
                   </p>
                 </div>
               )}
