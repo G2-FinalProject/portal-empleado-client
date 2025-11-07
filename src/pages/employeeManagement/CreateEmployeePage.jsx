@@ -17,37 +17,58 @@ export default function CreateEmployeePage() {
     createUser,
   } = useAdminStore();
 
-  // 📡 Cargar datos iniciales (roles, departamentos, localizaciones)
+
   useEffect(() => {
     fetchRoles();
     fetchDepartments();
     fetchLocations();
   }, [fetchRoles, fetchDepartments, fetchLocations]);
 
-  // 🧩 Manejar el envío del formulario
+
   const handleCreateUser = async (data) => {
     try {
       await createUser(data);
-      toast.success("Empleado creado correctamente 🎉");
-      navigate("/employees"); // Redirige al listado tras éxito
+      toast.success("Empleado creado correctamente");
+      navigate("/employees");
     } catch (error) {
-      toast.error("Error al crear empleado 😞");
+      const errorMessage =
+        error.response?.data?.errors?.[0]?.msg ||
+        error.response?.data?.message ||
+        "Error al crear el empleado";
+        toast.error(errorMessage);
+        throw error;
     }
   };
 
+  const handleCancel = () => {
+    navigate("/employees");
+  };
+
   return (
-    <div className="p-8 min-h-screen bg-gray-50 flex justify-center">
-      <div className="max-w-5xl w-full bg-white shadow-lg rounded-lg p-8">
-        <h1 className="text-2xl font-bold text-cohispania-blue mb-4">
+    <div className="space-y-6">
+      <div>
+        <button
+          onClick={handleCancel} 
+          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2"
+        >
+          ← Volver al listado
+        </button>
+        <h1 className="text-3xl font-bold text-cohispania-blue">
           Alta de Nuevo Empleado
         </h1>
-        <EmployeeForm
-          roles={roles}
-          departments={departments}
-          locations={locations}
-          onSubmit={handleCreateUser}
-        />
+        <p className="text-sm text-gray-300 mt-2">
+          Completa los datos para registrar un nuevo empleado en el sistema.
+        </p>
       </div>
+      
+      <EmployeeForm
+        roles={roles}
+        departments={departments}
+        locations={locations}
+        onSubmit={handleCreateUser}
+        onCancel={handleCancel} 
+        isEditMode={false} 
+      />
     </div>
   );
 }
