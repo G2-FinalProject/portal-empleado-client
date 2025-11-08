@@ -5,11 +5,13 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle } from 'lucide-react';
+import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
 import { Modal, Button, Card } from '../../components/ui';
-import { create as createLocation } from '../../services/locationApi';
-import { create as createHoliday } from '../../services/holidaysApi';
-import toast from 'react-hot-toast';
+import useAdminStore from '../../stores/useAdminStore';
+// import { create as createLocation } from '../../services/locationApi';
+// import { showSuccess, showError, showLoading, updateToastSuccess, updateToastError } from '../../utils/notifications';
+// import { create as createHoliday } from '../../services/holidaysApi';
+// import toast from 'react-hot-toast';
 
 export default function CreateLocationPage() {
   const navigate = useNavigate();
@@ -26,6 +28,7 @@ export default function CreateLocationPage() {
   // Deshabilitar el calendario si no se ha introducido el nombre de la población a añadir
   const isCalendarDisabled = !locationName.trim();
 
+  
   // Meanejar selección de rango de fechas (tipo drag para que sea como en el general)
   const handleDateSelect = (selectInfo) => {
     if (isCalendarDisabled) return;
