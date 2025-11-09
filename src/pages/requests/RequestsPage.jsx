@@ -1,93 +1,111 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Tabs, Badge, Card, Modal, Button } from '../../components/ui';
-import { Calendar, Eye, Check, X } from 'lucide-react';
-import useVacationStore from '../../stores/useVacationStore';
-import useAuthStore from '../../stores/authStore';
-import { toast } from 'react-hot-toast';
+import { useEffect, useMemo, useState } from "react";
+import { Tabs, Badge, Card, Modal, Button } from "../../components/ui";
+import {
+  Calendar,
+  Eye,
+  Check,
+  X,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+import useVacationStore from "../../stores/useVacationStore";
+import useAuthStore from "../../stores/authStore";
+import { toast } from "react-hot-toast";
 
-/**
- * RequestsPage - Página de gestión de solicitudes para managers y admins
- * 
- * Funcionalidades:
- * - Los managers solo ven solicitudes de su departamento
- * - Los admins ven todas las solicitudes
- * - Sistema de pestañas: Pendientes, Aprobadas, Denegadas
- * - Aprobar/Denegar solicitudes con comentarios
- */
 export default function RequestsPage() {
   const { allRequests, fetchAllRequests, loading } = useVacationStore();
   const { user, isAdmin, isManager } = useAuthStore();
+
+  const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
     fetchAllRequests();
   }, [fetchAllRequests]);
 
-  // Filtrar solicitudes según el rol
   const filteredRequests = useMemo(() => {
     if (isAdmin()) {
-      return allRequests; // Admin ve todas
+      return allRequests;
     }
-    // Manager solo ve las de su departamento
-    return allRequests.filter(req => req.departmentId === user?.departmentId);
+
+    return allRequests.filter((req) => req.departmentId === user?.departmentId);
   }, [allRequests, user, isAdmin]);
 
-  // Filtrar por estado
+  const sortByDate = (requests) => {
+    return [...requests].sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+  };
+
   const pendingRequests = useMemo(
-    () => filteredRequests.filter(req => req.status === 'pending')
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [filteredRequests]
+    () =>
+      sortByDate(filteredRequests.filter((req) => req.status === "pending")),
+    [filteredRequests, sortOrder]
   );
 
   const approvedRequests = useMemo(
-    () => filteredRequests.filter(req => req.status === 'approved')
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [filteredRequests]
+    () =>
+      sortByDate(filteredRequests.filter((req) => req.status === "approved")),
+    [filteredRequests, sortOrder]
   );
 
   const rejectedRequests = useMemo(
-    () => filteredRequests.filter(req => req.status === 'rejected')
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-    [filteredRequests]
+    () =>
+      sortByDate(filteredRequests.filter((req) => req.status === "rejected")),
+    [filteredRequests, sortOrder]
   );
-  // LÓGICA DEL TEXTO CONDICIONAL
+
   const subtitleText = isManager()
-    ? 'Gestiona las solicitudes de vacaciones de tu equipo'
-    : 'Gestiona las solicitudes de vacaciones de toda la empresa';
-  
-    // Configuración de las pestañas
+    ? "Gestiona las solicitudes de vacaciones de tu equipo"
+    : "Gestiona las solicitudes de vacaciones de toda la empresa";
+
   const tabs = [
     {
-      id: 'pending',
-      label: 'Pendientes',
+      id: "pending",
+      label: "Pendientes",
       count: pendingRequests.length,
-      content: <RequestsList 
-        requests={pendingRequests} 
-        emptyMessage="No hay solicitudes pendientes" 
-        loading={loading}
-        showActions={true}
-      />,
+      content: (
+        <RequestsList
+          requests={pendingRequests}
+          emptyMessage="No hay solicitudes pendientes"
+          loading={loading}
+          showActions={true}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
     {
-      id: 'approved',
-      label: 'Aprobadas',
+      id: "approved",
+      label: "Aprobadas",
       count: approvedRequests.length,
-      content: <RequestsList 
-        requests={approvedRequests} 
-        emptyMessage="No hay solicitudes aprobadas" 
-        loading={loading}
-        showActions={false}
-      />,
+      content: (
+        <RequestsList
+          requests={approvedRequests}
+          emptyMessage="No hay solicitudes aprobadas"
+          loading={loading}
+          showActions={false}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
     {
-      id: 'rejected',
-      label: 'Denegadas',
+      id: "rejected",
+      label: "Denegadas",
       count: rejectedRequests.length,
-      content: <RequestsList 
-        requests={rejectedRequests} 
-        emptyMessage="No hay solicitudes denegadas" 
-        loading={loading}
-        showActions={false}
-      />,
+      content: (
+        <RequestsList
+          requests={rejectedRequests}
+          emptyMessage="No hay solicitudes denegadas"
+          loading={loading}
+          showActions={false}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
+      ),
     },
   ];
 
@@ -97,9 +115,7 @@ export default function RequestsPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
           Todas las solicitudes
         </h1>
-        <p className="text-gray-300 mt-1">
-        {subtitleText}
-        </p>
+        <p className="text-gray-300 mt-1">{subtitleText}</p>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-stroke p-6">
@@ -110,9 +126,16 @@ export default function RequestsPage() {
 }
 
 /**
- * RequestsList - Lista de solicitudes 
+ * RequestsList - Lista de solicitudes
  */
-function RequestsList({ requests, emptyMessage, loading, showActions }) {
+function RequestsList({
+  requests,
+  emptyMessage,
+  loading,
+  showActions,
+  sortOrder,
+  onSortChange,
+}) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -136,31 +159,67 @@ function RequestsList({ requests, emptyMessage, loading, showActions }) {
       <div className="hidden md:block overflow-x-auto">
         <div className="bg-white rounded-lg">
           <h2 className="text-xl font-bold text-cohispania-blue mb-4 px-4 pt-4">
-            Solicitudes {showActions ? 'Pendientes' : requests[0]?.status === 'approved' ? 'Aprobadas' : 'Denegadas'}
+            Solicitudes{" "}
+            {showActions
+              ? "Pendientes"
+              : requests[0]?.status === "approved"
+              ? "Aprobadas"
+              : "Denegadas"}
           </h2>
           <p className="text-gray-300 mb-6 px-4">
-            {showActions ? 'Solicitudes que requieren tu aprobación' : 
-             requests[0]?.status === 'approved' ? 'Histórico de solicitudes aprobadas' : 
-             'Histórico de solicitudes denegadas'}
+            {showActions
+              ? "Solicitudes que requieren tu aprobación"
+              : requests[0]?.status === "approved"
+              ? "Histórico de solicitudes aprobadas"
+              : "Histórico de solicitudes denegadas"}
           </p>
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-stroke">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Empleado</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Fecha de solicitud</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Período</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Estado</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Comentarios</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                  Empleado
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                  <button
+                    onClick={() =>
+                      onSortChange(sortOrder === "desc" ? "asc" : "desc")
+                    }
+                    className="flex items-center gap-2 hover:text-cohispania-blue transition-colors"
+                    title={
+                      sortOrder === "desc"
+                        ? "Ordenar ascendente"
+                        : "Ordenar descendente"
+                    }
+                  >
+                    Fecha de solicitud
+                    {sortOrder === "desc" ? (
+                      <ArrowDown className="h-4 w-4" />
+                    ) : (
+                      <ArrowUp className="h-4 w-4" />
+                    )}
+                  </button>
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                  Período
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                  Estado
+                </th>
+                <th className="text-center py-3 px-4 text-sm font-semibold text-gray-400">
+                  Comentarios
+                </th>
                 {showActions && (
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">Acciones</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
+                    Acciones
+                  </th>
                 )}
               </tr>
             </thead>
             <tbody>
               {requests.map((request) => (
-                <RequestRow 
-                  key={request.id} 
-                  request={request} 
+                <RequestRow
+                  key={request.id}
+                  request={request}
                   showActions={showActions}
                 />
               ))}
@@ -171,18 +230,44 @@ function RequestsList({ requests, emptyMessage, loading, showActions }) {
 
       {/* Vista Mobile: Cards */}
       <div className="md:hidden space-y-4">
-        <h2 className="text-xl font-bold text-cohispania-blue mb-2">
-          Solicitudes {showActions ? 'Pendientes' : requests[0]?.status === 'approved' ? 'Aprobadas' : 'Denegadas'}
-        </h2>
-        <p className="text-gray-300 mb-4">
-          {showActions ? 'Solicitudes que requieren tu aprobación' : 
-           requests[0]?.status === 'approved' ? 'Histórico de solicitudes aprobadas' : 
-           'Histórico de solicitudes denegadas'}
-        </p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-cohispania-blue mb-2">
+              Solicitudes{" "}
+              {showActions
+                ? "Pendientes"
+                : requests[0]?.status === "approved"
+                ? "Aprobadas"
+                : "Denegadas"}
+            </h2>
+            <p className="text-gray-300">
+              {showActions
+                ? "Solicitudes que requieren tu aprobación"
+                : requests[0]?.status === "approved"
+                ? "Histórico de solicitudes aprobadas"
+                : "Histórico de solicitudes denegadas"}
+            </p>
+          </div>
+          <button
+            onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
+            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+            title={
+              sortOrder === "desc"
+                ? "Ordenar ascendente"
+                : "Ordenar descendente"
+            }
+          >
+            {sortOrder === "desc" ? (
+              <ArrowDown className="h-4 w-4" />
+            ) : (
+              <ArrowUp className="h-4 w-4" />
+            )}
+          </button>
+        </div>
         {requests.map((request) => (
-          <RequestCard 
-            key={request.id} 
-            request={request} 
+          <RequestCard
+            key={request.id}
+            request={request}
             showActions={showActions}
           />
         ))}
@@ -200,41 +285,39 @@ function RequestRow({ request, showActions }) {
   const [showRejectModal, setShowRejectModal] = useState(false);
 
   const formatDate = (date) => {
-    if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+    if (!date) return "-";
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { variant: 'purple', label: 'Pendiente' },
-      approved: { variant: 'success', label: 'Aprobado' },
-      rejected: { variant: 'info', label: 'Rechazado' },
+      pending: { variant: "purple", label: "Pendiente" },
+      approved: { variant: "success", label: "Aprobado" },
+      rejected: { variant: "info", label: "Rechazado" },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const hasRequesterComment = request.reason && request.reason.trim() !== '';
-  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasRequesterComment = request.reason && request.reason.trim() !== "";
+  const hasApproverComment = request.comments && request.comments.trim() !== "";
   const hasAnyComment = hasRequesterComment || hasApproverComment;
 
   return (
     <>
       <tr className="border-b border-gray-stroke hover:bg-light-background transition-colors">
         <td className="py-4 px-4">
-          <span className="text-cohispania-blue font-medium">
-            {request.requesterName || 'Sin nombre'}
+          <span className="text-cohispania-blue font-medium text-sm">
+            {request.requesterName || "Sin nombre"}
           </span>
         </td>
         <td className="py-4 px-4">
-          <span className="text-gray-400">
-            {formatDate(request.createdAt)}
-          </span>
+          <span className="text-gray-400">{formatDate(request.createdAt)}</span>
         </td>
         <td className="py-4 px-4">
           <div className="flex items-center gap-2 text-gray-400">
@@ -244,21 +327,21 @@ function RequestRow({ request, showActions }) {
             </span>
           </div>
         </td>
+        <td className="py-4 px-4">{getStatusBadge(request.status)}</td>
         <td className="py-4 px-4">
-          {getStatusBadge(request.status)}
-        </td>
-        <td className="py-4 px-4">
-          {hasAnyComment ? (
-            <button
-              onClick={() => setShowCommentsModal(true)}
-              className="flex items-center gap-2 text-cohispania-blue hover:text-cohispania-orange transition-colors"
-            >
-              <Eye className="h-4 w-4" />
-              <span className="text-sm font-medium">Ver comentarios</span>
-            </button>
-          ) : (
-            <span className="text-gray-300 text-sm">-</span>
-          )}
+          <div className="flex items-center justify-center">
+            {hasAnyComment ? (
+              <button
+                onClick={() => setShowCommentsModal(true)}
+                className="text-cohispania-blue hover:text-cohispania-orange transition-colors"
+                title="Ver más info"
+              >
+                <Eye className="h-5 w-5" />
+              </button>
+            ) : (
+              <span className="text-gray-300 text-sm">-</span>
+            )}
+          </div>
         </td>
         {showActions && (
           <td className="py-4 px-4">
@@ -318,26 +401,26 @@ function RequestCard({ request, showActions }) {
 
   const formatDate = (date) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: { variant: 'purple', label: 'Pendiente' },
-      approved: { variant: 'success', label: 'Aprobado' },
-      rejected: { variant: 'info', label: 'Rechazado' },
+      pending: { variant: "purple", label: "Pendiente" },
+      approved: { variant: "success", label: "Aprobado" },
+      rejected: { variant: "info", label: "Rechazado" },
     };
 
     const config = statusConfig[status] || statusConfig.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const hasRequesterComment = request.reason && request.reason.trim() !== '';
-  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasRequesterComment = request.reason && request.reason.trim() !== "";
+  const hasApproverComment = request.comments && request.comments.trim() !== "";
   const hasAnyComment = hasRequesterComment || hasApproverComment;
 
   return (
@@ -348,7 +431,7 @@ function RequestCard({ request, showActions }) {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-semibold text-cohispania-blue">
-                {request.requesterName || 'Sin nombre'}
+                {request.requesterName || "Sin nombre"}
               </p>
               <p className="text-xs text-gray-400">
                 Solicitado: {formatDate(request.createdAt)}
@@ -429,17 +512,18 @@ function RequestCard({ request, showActions }) {
  * CommentsModal - Modal para ver comentarios de la solicitud
  */
 function CommentsModal({ isOpen, onClose, request }) {
+  // Formato DD/MM/YYYY
   const formatDate = (date) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
-  const hasRequesterComment = request.reason && request.reason.trim() !== '';
-  const hasApproverComment = request.comments && request.comments.trim() !== '';
+  const hasRequesterComment = request.reason && request.reason.trim() !== "";
+  const hasApproverComment = request.comments && request.comments.trim() !== "";
 
   return (
     <Modal
@@ -450,9 +534,12 @@ function CommentsModal({ isOpen, onClose, request }) {
       <div className="space-y-4">
         {/* Período de la solicitud */}
         <div className="bg-light-background p-4 rounded-lg">
-          <p className="text-sm text-gray-400 font-semibold mb-1">Período solicitado</p>
+          <p className="text-sm text-gray-400 font-semibold mb-1">
+            Período solicitado
+          </p>
           <p className="text-sm text-cohispania-blue font-semibold">
-            {formatDate(request.startDate)} - {formatDate(request.endDate)} ({request.requestedDays} días)
+            {formatDate(request.startDate)} - {formatDate(request.endDate)} (
+            {request.requestedDays} días)
           </p>
         </div>
 
@@ -497,26 +584,27 @@ function CommentsModal({ isOpen, onClose, request }) {
  * ApproveRejectModal - Modal para aprobar o rechazar solicitudes
  */
 function ApproveRejectModal({ isOpen, onClose, request, action }) {
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { approveRequest, rejectRequest, fetchAllRequests } = useVacationStore();
+  const { approveRequest, rejectRequest, fetchAllRequests } =
+    useVacationStore();
 
-  const isApprove = action === 'approve';
-  const title = isApprove ? 'Aprobar Solicitud' : 'Denegar Solicitud';
-  const buttonText = isApprove ? 'Aprobar' : 'Denegar';
-  const buttonClass = isApprove ? 'bg-cohispania-blue' : 'bg-red-400';
+  const isApprove = action === "approve";
+  const title = isApprove ? "Aprobar Solicitud" : "Denegar Solicitud";
+  const buttonText = isApprove ? "Aprobar" : "Denegar";
+  const buttonClass = isApprove ? "bg-cohispania-blue" : "bg-red-400";
 
-  // El comentario es obligatorio solo para rechazar
+
   const isCommentRequired = !isApprove;
-  const canSubmit = isCommentRequired ? comment.trim() !== '' : true;
+  const canSubmit = isCommentRequired ? comment.trim() !== "" : true;
 
   const formatDate = (date) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
-    });
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const handleSubmit = async () => {
@@ -526,53 +614,53 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
     try {
       if (isApprove) {
         await approveRequest(request.id, comment || null);
-        toast.success('Solicitud aprobada correctamente');
+        toast.success("Solicitud aprobada correctamente");
       } else {
         await rejectRequest(request.id, comment);
-        toast.success('Solicitud denegada correctamente');
+        toast.success("Solicitud denegada correctamente");
       }
-      
+
       // Recargar solicitudes
       await fetchAllRequests();
-      
+
       onClose();
-      setComment('');
+      setComment("");
     } catch (error) {
-      toast.error(error.message || 'Error al procesar la solicitud');
+      toast.error(error.message || "Error al procesar la solicitud");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleClose = () => {
-    setComment('');
+    setComment("");
     onClose();
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={title}
-    >
+    <Modal isOpen={isOpen} onClose={handleClose} title={title}>
       <div className="space-y-4">
         {/* Información de la solicitud */}
         <div className="bg-light-background p-4 rounded-lg space-y-2">
           <p className="text-sm text-gray-400 font-semibold">
-            Solicitud de {request.requesterName || 'Sin nombre'} para el período del {formatDate(request.startDate)} al {formatDate(request.endDate)}
+            Solicitud de {request.requesterName || "Sin nombre"} para el período
+            del {formatDate(request.startDate)} al {formatDate(request.endDate)}
           </p>
         </div>
 
         {/* Campo de comentario */}
         <div>
           <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
-            Comentario {isCommentRequired && <span className="text-red-400">*</span>}
-            {!isCommentRequired && <span className="text-gray-400 font-normal">(opcional)</span>}
+            Comentario{" "}
+            {isCommentRequired && <span className="text-red-400">*</span>}
+            {!isCommentRequired && (
+              <span className="text-gray-400 font-normal">(opcional)</span>
+            )}
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Añade un comentario opcional..."
+            placeholder="Añade un comentario..."
             rows={4}
             className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition resize-none"
           />
@@ -605,7 +693,11 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
               </>
             ) : (
               <>
-                {isApprove ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                {isApprove ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
                 <span>{buttonText}</span>
               </>
             )}

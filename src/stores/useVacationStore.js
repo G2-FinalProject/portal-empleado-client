@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import * as vacationApi from "../services/vacationApi";
 
-/**
- * Mapea los datos de una solicitud del backend al formato del frontend
- */
+
 const mapRequest = (req) => ({
   id: req.id,
   userId: req.user_id,
@@ -18,8 +16,8 @@ const mapRequest = (req) => ({
   approvedAt: req.approved_at,
   rejectedBy: req.rejected_by,
   rejectedAt: req.rejected_at,
-  createdAt: req.created_at,
-  updatedAt: req.updated_at,
+  createdAt: req.createdAt || req.created_at || req.updatedAt || req.updated_at,
+  updatedAt: req.updatedAt || req.updated_at,
   requesterName:
     req.requester_name ||
     req.user_name ||
@@ -32,7 +30,6 @@ const mapRequest = (req) => ({
 });
 
 /**
- * Calcula las estadísticas de vacaciones
  * IMPORTANTE: Esta función es solo un FALLBACK cuando no hay conexión con la BD
  * @param {Array} requests - Array de solicitudes del usuario
  * @returns {Object} { total, available, used, pending }
@@ -46,8 +43,6 @@ const calculateStats = (requests) => {
     .filter((r) => r.status === "pending")
     .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
 
-  // FALLBACK: Si no tenemos datos de la BD, devolvemos valores mínimos
-  // Esto solo debería pasar si falla la llamada a getVacationSummary
   return {
     total: used,
     available: 0,
@@ -79,14 +74,11 @@ const getUserIdFromToken = () => {
 const useVacationStore = create((set, get) => ({
   myRequests: [],
   allRequests: [],
-  stats: { total: 0, available: 0, used: 0, pending: 0 }, // Sin valores hardcodeados
+  stats: { total: 0, available: 0, used: 0, pending: 0 },
   loading: false,
   error: null,
 
-  /**
-   * 📊 Obtiene las solicitudes del usuario Y su resumen de vacaciones de la BD
-   * Esta es la función principal que carga TODOS los datos
-   */
+
   fetchMyRequests: async () => {
     set({ loading: true, error: null });
     try {
@@ -98,10 +90,9 @@ const useVacationStore = create((set, get) => ({
       if (userId) {
         try {
           summaryData = await vacationApi.getVacationSummary(userId);
-          console.log("✅ Resumen de vacaciones obtenido:", summaryData);
         } catch (summaryError) {
           console.warn(
-            "⚠️ No se pudo obtener el summary, usando valores calculados:",
+            "No se pudo obtener el summary, usando valores calculados:",
             summaryError
           );
         }
@@ -116,9 +107,8 @@ const useVacationStore = create((set, get) => ({
               .filter((r) => r.status === "pending")
               .reduce((sum, r) => sum + (r.requestedDays || 0), 0),
           }
-        : calculateStats(requests); // Fallback si no hay summary
+        : calculateStats(requests);
 
-      console.log("📊 Stats calculadas:", stats);
 
       set({
         myRequests: requests,
@@ -126,7 +116,7 @@ const useVacationStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      console.error("❌ Error en fetchMyRequests:", error);
+      console.error("Error en fetchMyRequests:", error);
       set({
         error:
           error.response?.data?.message ||
@@ -138,9 +128,7 @@ const useVacationStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Crea una nueva solicitud de vacaciones
-   */
+ 
   createRequest: async (data) => {
     set({ loading: true, error: null });
     try {
@@ -149,7 +137,6 @@ const useVacationStore = create((set, get) => ({
       const { myRequests, stats } = get();
       const updated = [newRequest, ...myRequests];
 
-      // Recalcular stats (el pending aumenta)
       const newPending = updated
         .filter((r) => r.status === "pending")
         .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
@@ -172,16 +159,11 @@ const useVacationStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Recarga las estadísticas desde la BD
-   */
   fetchStats: async () => {
     await get().fetchMyRequests();
   },
 
-  /**
-   * 📋 Obtiene todas las solicitudes (para managers/admins)
-   */
+
   fetchAllRequests: async (filters = {}) => {
     set({ loading: true, error: null });
     try {
@@ -206,9 +188,7 @@ const useVacationStore = create((set, get) => ({
     }
   },
 
-  /**
-   * ✅ Aprueba una solicitud
-   */
+
   approveRequest: async (id, comment = null) => {
     set({ loading: true, error: null });
     try {
@@ -232,9 +212,7 @@ const useVacationStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Rechaza una solicitud
-   */
+
   rejectRequest: async (id, comment = null) => {
     set({ loading: true, error: null });
     try {
@@ -258,16 +236,13 @@ const useVacationStore = create((set, get) => ({
     }
   },
 
-  /**
-   * Actualiza una solicitud localmente (sin llamar al backend)
-   */
+
   updateRequestLocal: (id, updates) => {
     const { myRequests, allRequests, stats } = get();
     const updatedMy = myRequests.map((r) =>
       r.id === id ? { ...r, ...updates } : r
     );
 
-    // Recalcular pending
     const newPending = updatedMy
       .filter((r) => r.status === "pending")
       .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
@@ -281,14 +256,12 @@ const useVacationStore = create((set, get) => ({
     });
   },
 
-  /**
-   * Elimina una solicitud localmente
-   */
+ 
   removeRequestLocal: (id) => {
     const { myRequests, allRequests, stats } = get();
     const updatedMy = myRequests.filter((r) => r.id !== id);
 
-    // Recalcular pending
+
     const newPending = updatedMy
       .filter((r) => r.status === "pending")
       .reduce((sum, r) => sum + (r.requestedDays || 0), 0);
@@ -300,26 +273,20 @@ const useVacationStore = create((set, get) => ({
     });
   },
 
-  /**
-   * Limpia el error
-   */
+
   clearError: () => set({ error: null }),
 
-  /**
-   * Resetea el store al estado inicial
-   */
+ 
   reset: () =>
     set({
       myRequests: [],
       allRequests: [],
-      stats: { total: 0, available: 0, used: 0, pending: 0 }, // Sin valores hardcodeados
+      stats: { total: 0, available: 0, used: 0, pending: 0 },
       loading: false,
       error: null,
     }),
 
-  /**
-   * 🔍 Obtiene solicitudes por estado
-   */
+ 
   getRequestsByStatus: (status, fromAll = false) => {
     const { myRequests, allRequests } = get();
     return (fromAll ? allRequests : myRequests).filter(

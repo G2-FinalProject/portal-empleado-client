@@ -52,7 +52,7 @@ export default function EmployeeForm({
       role_id: "",
       department_id: "",
       location_id: "",
-      available_days: 23,
+      available_days: "",
     },
   });
 
@@ -65,7 +65,7 @@ export default function EmployeeForm({
       setValue("role_id", initialData.role_id || "");
       setValue("department_id", initialData.department_id || "");
       setValue("location_id", initialData.location_id || "");
-      setValue("available_days", initialData.available_days || 23);
+      setValue("available_days", initialData.available_days || "");
     }
   }, [initialData, isEditMode, setValue]);
 
@@ -114,7 +114,7 @@ export default function EmployeeForm({
           <Input
             label="Nombre"
             name="first_name"
-            placeholder="Juan"
+            placeholder="Introduce el nombre del empleado"
             register={register}
             validation={{ required: "El nombre es obligatorio" }}
             errors={errors}
@@ -125,7 +125,7 @@ export default function EmployeeForm({
           <Input
             label="Apellidos"
             name="last_name"
-            placeholder="García López"
+            placeholder="Introduce los apellidos del empleado"
             register={register}
             validation={{ required: "Los apellidos son obligatorios" }}
             errors={errors}
@@ -138,7 +138,7 @@ export default function EmployeeForm({
               label="Email"
               name="email"
               type="email"
-              placeholder="juan.garcia@cohispania.com"
+              placeholder="Introduce el correo corporativo"
               register={register}
               validation={{
                 required: "El email es obligatorio",
@@ -256,7 +256,7 @@ export default function EmployeeForm({
               label="Días de Vacaciones Disponibles"
               name="available_days"
               type="number"
-              placeholder="23"
+              placeholder="Introduce los días disponibles"
               register={register}
               validation={{
                 required: "Los días disponibles son obligatorios",
