@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -375,7 +375,8 @@ function RequestSummaryForm({
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }
+  const textareaId = useId();
 
   return (
     <div className="bg-white rounded-lg border-2 border-cohispania-orange p-4 sm:p-5 animate-fadeIn">
@@ -418,13 +419,13 @@ function RequestSummaryForm({
         {/* Campo de comentarios */}
         <div>
           <label
-            htmlFor="comments"
+            htmlFor={textareaId}
             className="block text-sm font-semibold mb-2 text-cohispania-blue"
           >
             Comentarios (opcional)
           </label>
           <textarea
-            id="comments"
+            id={textareaId}
             className="w-full px-3 py-2 border border-gray-stroke rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent transition-all"
             placeholder="Añade un comentario..."
             value={comments}
