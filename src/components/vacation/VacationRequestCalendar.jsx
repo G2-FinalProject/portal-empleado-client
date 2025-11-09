@@ -25,7 +25,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     fetchInitialData();
   }, [myRequests]);
 
-
   useEffect(() => {
     if (onSelectionChange) {
       onSelectionChange(selectedRange);
@@ -58,21 +57,28 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       const approvedVacations = myRequests
         .filter((req) => req.status === "approved")
         .flatMap((req) => {
-          const start = new Date(req.startDate);
-          const end = new Date(req.endDate);
+          const start = new Date(req.startDate + "T00:00:00");
+          const end = new Date(req.endDate + "T00:00:00");
           const days = eachDayOfInterval({ start, end });
 
-          return days.map((day) => ({
-            title: isMobileDevice ? "✈️ V " : "Vacaciones",
-            start: day.toISOString().split("T")[0],
-            display: "background",
-            backgroundColor: "#d1fae5",
-            borderColor: "#10b981",
-            extendedProps: {
-              isApprovedVacation: true,
-              requestId: req.id,
-            },
-          }));
+          return days.map((day) => {
+            const year = day.getFullYear();
+            const month = String(day.getMonth() + 1).padStart(2, "0");
+            const dayNum = String(day.getDate()).padStart(2, "0");
+            const dateStr = `${year}-${month}-${dayNum}`;
+
+            return {
+              title: isMobileDevice ? "✈️ V " : "Vacaciones",
+              start: dateStr,
+              display: "background",
+              backgroundColor: "#d1fae5",
+              borderColor: "#10b981",
+              extendedProps: {
+                isApprovedVacation: true,
+                requestId: req.id,
+              },
+            };
+          });
         });
 
       setHolidays([...holidayEvents, ...approvedVacations]);
@@ -301,7 +307,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
             {!selectedRange && (
               <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                 <p className="text-sm sm:text-base text-indigo-500 text-center">
-                  Selecciona o arrastra sobre el calendario para seleccionar tus fechas de vacaciones
+                  Selecciona o arrastra sobre el calendario para seleccionar tus
+                  fechas de vacaciones
                 </p>
               </div>
             )}
