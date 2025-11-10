@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -24,7 +24,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
   useEffect(() => {
     fetchInitialData();
   }, [myRequests]);
-
 
   useEffect(() => {
     if (onSelectionChange) {
@@ -58,21 +57,32 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       const approvedVacations = myRequests
         .filter((req) => req.status === "approved")
         .flatMap((req) => {
-          const start = new Date(req.startDate);
-          const end = new Date(req.endDate);
+          /* Añadir T00:00:00 para forzar hora local y evitar que las 
+          fechas cambien al día anterior por conversión de timezone*/
+          const start = new Date(req.startDate + "T00:00:00");
+          const end = new Date(req.endDate + "T00:00:00");
           const days = eachDayOfInterval({ start, end });
 
-          return days.map((day) => ({
-            title: isMobileDevice ? "✈️ V " : "Vacaciones",
-            start: day.toISOString().split("T")[0],
-            display: "background",
-            backgroundColor: "#d1fae5",
-            borderColor: "#10b981",
-            extendedProps: {
-              isApprovedVacation: true,
-              requestId: req.id,
-            },
-          }));
+          return days.map((day) => {
+            /* Usar métodos locales (getFullYear, getMonth, getDate) en lugar de toISOString() 
+            para mantener el día correcto sin conversión a UTC */
+            const year = day.getFullYear();
+            const month = String(day.getMonth() + 1).padStart(2, "0");
+            const dayNum = String(day.getDate()).padStart(2, "0");
+            const dateStr = `${year}-${month}-${dayNum}`;
+
+            return {
+              title: isMobileDevice ? "✈️ V " : "Vacaciones",
+              start: dateStr,
+              display: "background",
+              backgroundColor: "#d1fae5",
+              borderColor: "#10b981",
+              extendedProps: {
+                isApprovedVacation: true,
+                requestId: req.id,
+              },
+            };
+          });
         });
 
       setHolidays([...holidayEvents, ...approvedVacations]);
@@ -92,6 +102,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     endDate.setDate(endDate.getDate() - 1);
     const actualEndStr = endDate.toISOString().split("T")[0];
 
+    /* Añadir T00:00:00 para forzar interpretación en hora local y 
+    evitar desfases de 1 día por conversión de timezone */
     const start = new Date(startStr + "T00:00:00");
     const end = new Date(actualEndStr + "T00:00:00");
 
@@ -129,17 +141,37 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
   };
 
   const isDateSelectable = (selectInfo) => {
-    const date = selectInfo.start;
-    const dayOfWeek = date.getDay();
-    const dateString = date.toISOString().split("T")[0];
+    const start = new Date(selectInfo.start);
+    const end = new Date(selectInfo.end);
+    end.setDate(end.getDate() - 1);
 
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      return false;
+    const current = new Date(start);
+    const rangeDates = [];
+
+    while (current <= end) {
+      // Usar getFullYear/getMonth/getDate en lugar de toISOString() para evitar
+      // problemas de timezone que cambian el día al convertir a UTC
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, "0");
+      const day = String(current.getDate()).padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
+
+      rangeDates.push(dateStr);
+      current.setDate(current.getDate() + 1);
     }
 
-    const isUnavailable = holidays.some((h) => h.start === dateString);
-    if (isUnavailable) {
-      return false;
+    for (const dateStr of rangeDates) {
+      const date = new Date(dateStr + "T00:00:00");
+      const dayOfWeek = date.getDay();
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return false;
+      }
+
+      const isUnavailable = holidays.some((h) => h.start === dateStr);
+      if (isUnavailable) {
+        return false;
+      }
     }
 
     return true;
@@ -301,7 +333,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
             {!selectedRange && (
               <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                 <p className="text-sm sm:text-base text-indigo-500 text-center">
-                  Selecciona o arrastra sobre el calendario para seleccionar tus fechas de vacaciones
+                  Selecciona o arrastra sobre el calendario para seleccionar tus
+                  fechas de vacaciones
                 </p>
               </div>
             )}
@@ -342,7 +375,8 @@ function RequestSummaryForm({
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
-  };
+  }
+  const textareaId = useId();
 
   return (
     <div className="bg-white rounded-lg border-2 border-cohispania-orange p-4 sm:p-5 animate-fadeIn">
@@ -385,13 +419,13 @@ function RequestSummaryForm({
         {/* Campo de comentarios */}
         <div>
           <label
-            htmlFor="comments"
+            htmlFor={textareaId}
             className="block text-sm font-semibold mb-2 text-cohispania-blue"
           >
             Comentarios (opcional)
           </label>
           <textarea
-            id="comments"
+            id={textareaId}
             className="w-full px-3 py-2 border border-gray-stroke rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-cohispania-orange focus:border-transparent transition-all"
             placeholder="Añade un comentario..."
             value={comments}

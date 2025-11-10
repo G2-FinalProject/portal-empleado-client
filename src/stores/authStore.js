@@ -26,16 +26,15 @@ const decodeToken = (token) => {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) {
-      console.error('❌ Token inválido: no tiene 3 partes');
+      console.error("❌ Token inválido: no tiene 3 partes");
       return null;
     }
     const payload = parts[1];
     const decoded = JSON.parse(atob(payload));
 
     return decoded;
-
   } catch (error) {
-    console.error('❌ Error decodificando token:', error);
+    console.error("❌ Error decodificando token:", error);
     return null;
   }
 };
@@ -70,7 +69,6 @@ const useAuthStore = create((set, get) => ({
    *   login(response.data.token, response.data.sesionData);
    */
   login: (token, sesionData) => {
-    console.log("🔐 authStore: Guardando sesión");
     const decoded = decodeToken(token);
     if (!decoded) {
       console.error("❌ No se pudo decodificar el token");
@@ -78,12 +76,12 @@ const useAuthStore = create((set, get) => ({
     }
 
     const userData = {
-      id: decoded.id,                          // Del JWT
-      firstName: sesionData.first_name,        // De sesionData
-      roleId: sesionData.role_id,              // De sesionData
-      departmentId: sesionData.department_id,  // De sesionData
-      exp: decoded.exp,                       // Del JWT - fecha expiración
-      iat: decoded.iat                        // Del JWT - fecha creación
+      id: decoded.id,
+      firstName: sesionData.first_name,
+      roleId: sesionData.role_id,
+      departmentId: sesionData.department_id,
+      exp: decoded.exp,
+      iat: decoded.iat,
     };
 
     console.log("   - Usuario:", userData.firstName);
@@ -112,16 +110,7 @@ const useAuthStore = create((set, get) => ({
   // ACCIÓN: LOGOUT
   // ============================================
 
-  /**
-   * Cerrar sesión y limpiar todo
-   *
-   * Ejemplo de uso:
-   *   const { logout } = useAuthStore();
-   *   logout();
-   */
   logout: () => {
-    console.log("👋 authStore: Cerrando sesión");
-
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
@@ -129,37 +118,24 @@ const useAuthStore = create((set, get) => ({
       token: null,
       user: null,
     });
-
-    // Toast informativo
-    showSuccess('Sesión cerrada correctamente');
-    console.log("✅ authStore: Sesión cerrada");
   },
-},
-
 
   // ============================================
-  //  VERIFICACIÓN: ¿ESTÁ AUTENTICADO?
+  // VERIFICACIÓN: ¿ESTÁ AUTENTICADO?
   // ============================================
 
   /**
    * Verifica si hay sesión activa
    *
    * @returns {boolean} true si hay token, false si no
-   *
-   * Ejemplo de uso:
-   *   const { isAuthenticated } = useAuthStore();
-   *   if (isAuthenticated()) {
-   *     // Usuario tiene sesión activa
-   *   }
    */
   isAuthenticated: () => {
     const state = get();
     return state.token !== null;
   },
 
-
   // ============================================
-  //  VERIFICACIÓN: ¿TIENE ESTE ROL? (por ID)
+  // VERIFICACIÓN: ¿TIENE ESTE ROL? (por ID)
   // ============================================
 
   /**
@@ -167,18 +143,11 @@ const useAuthStore = create((set, get) => ({
    *
    * @param {number} roleId - El ID del rol (1=admin, 2=manager, 3=employee)
    * @returns {boolean} true si tiene ese rol, false si no
-   *
-   * Ejemplo de uso:
-   *   const { hasRoleId } = useAuthStore();
-   *   if (hasRoleId(1)) {
-   *     // Es administrador
-   *   }
    */
   hasRoleId: (roleId) => {
     const state = get();
     return state.user?.roleId === roleId;
   },
-
 
   // ============================================
   // VERIFICACIÓN: ¿ES ADMIN?
@@ -188,21 +157,14 @@ const useAuthStore = create((set, get) => ({
    * Atajo para verificar si es administrador
    *
    * @returns {boolean}
-   *
-   * Ejemplo de uso:
-   *   const { isAdmin } = useAuthStore();
-   *   if (isAdmin()) {
-   *     // Mostrar panel de administración
-   *   }
    */
   isAdmin: () => {
     const state = get();
-    return state.user?.roleId === 1;  // 1 = admin
+    return state.user?.roleId === 1; // 1 = admin
   },
 
-
   // ============================================
-  //  VERIFICACIÓN: ¿ES MANAGER?
+  // VERIFICACIÓN: ¿ES MANAGER?
   // ============================================
 
   /**
@@ -210,20 +172,14 @@ const useAuthStore = create((set, get) => ({
    *
    * @returns {boolean}
    *
-   * Ejemplo de uso:
-   *   const { isManager } = useAuthStore();
-   *   if (isManager()) {
-   *     // Mostrar solicitudes pendientes de aprobar
-   *   }
    */
   isManager: () => {
     const state = get();
-    return state.user?.roleId === 2;  // 2 = manager
+    return state.user?.roleId === 2; // 2 = manager
   },
 
-
   // ============================================
-  // 👤 VERIFICACIÓN: ¿ES EMPLEADO?
+  // VERIFICACIÓN: ¿ES EMPLEADO?
   // ============================================
 
   /**
@@ -231,69 +187,44 @@ const useAuthStore = create((set, get) => ({
    *
    * @returns {boolean}
    *
-   * Ejemplo de uso:
-   *   const { isEmployee } = useAuthStore();
-   *   if (isEmployee()) {
-   *     // Mostrar formulario de solicitud de vacaciones
-   *   }
    */
   isEmployee: () => {
     const state = get();
-    return state.user?.roleId === 3;  // 3 = employee
+    return state.user?.roleId === 3; // 3 = employee
   },
 
-
   // ============================================
-  //  ACCIÓN: ACTUALIZAR ESTADO DE CARGA
+  // ACCIÓN: ACTUALIZAR ESTADO DE CARGA
   // ============================================
 
   /**
    * Actualiza el estado de carga (útil durante peticiones al backend)
    *
-   * @param {boolean} loading - true si está cargando, false si terminó
+   * @param {boolean} loading (Muestra u oculta el spinner)
    *
-   * Ejemplo de uso:
-   *   const { setLoading } = useAuthStore();
-   *   setLoading(true);   // Mostrar spinner
-   *   await hacerPeticion();
-   *   setLoading(false);  // Ocultar spinner
    */
   setLoading: (loading) => set({ isLoading: loading }),
-
 
   // ============================================
   // ACCIÓN: ACTUALIZAR DATOS DEL USUARIO
   // ============================================
 
   /**
-   * Actualiza los datos del usuario (útil después de hacer petición a /user/me)
+   * Actualiza los datos del usuario
    *
    * @param {object} userData - Objeto con datos completos del usuario
-   *
-   * Ejemplo de uso:
-   *   const { updateUser } = useAuthStore();
-   *   const response = await api.get('/user/me');
-   *   updateUser(response.data);
    */
   updateUser: (userData) => {
-    console.log("🔄 authStore: Actualizando datos del usuario");
-
-    // Combinar datos actuales con los nuevos
     const currentUser = get().user;
     const updatedUser = {
-      ...currentUser,      // Mantenemos id, roleId, exp, iat
-      ...userData          // Añadimos/actualizamos el resto
+      ...currentUser,
+      ...userData,
     };
 
-    // Guardar en localStorage
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
-    // Actualizar estado
     set({ user: updatedUser });
-
-    console.log("✅ authStore: Datos actualizados");
   },
-
 }));
 
 export default useAuthStore;

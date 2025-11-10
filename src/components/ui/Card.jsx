@@ -10,23 +10,20 @@
  */
 export default function Card({
   children,
-  className = '',
+  className = "",
   padding = true,
   shadow = true,
   onClick,
   ...props
 }) {
-  const baseStyles = 'bg-white rounded-lg transition-all duration-200 border border-gray-stroke';
+  const baseStyles =
+    "bg-white rounded-lg transition-all duration-200 border border-gray-stroke";
 
-  const paddingStyles = padding ? 'p-6' : '';
+  const paddingStyles = padding ? "p-6" : "";
 
-  const shadowStyles = shadow
-    ? 'shadow-sm hover:shadow-md'
-    : '';
+  const shadowStyles = shadow ? "shadow-sm hover:shadow-md" : "";
 
-  const clickableStyles = onClick
-    ? 'cursor-pointer hover:scale-[1.01]'
-    : '';
+  const clickableStyles = onClick ? "cursor-pointer hover:scale-[1.01]" : "";
 
   const combinedClassName = `
     ${baseStyles}
@@ -36,12 +33,15 @@ export default function Card({
     ${className}
   `.trim();
 
-  const Component = onClick ? 'button' : 'div';
+  const Component = "div";
 
   return (
     <Component
       className={combinedClassName}
       onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === "Enter" && onClick(e) : undefined}
       {...props}
     >
       {children}
