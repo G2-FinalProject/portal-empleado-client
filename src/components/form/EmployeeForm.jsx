@@ -1,33 +1,14 @@
 import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useEffect } from "react";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 
 /**
- * Formulario reutilizable para crear/editar empleados
- *
- * @param {Object} props
- * @param {Array} props.roles - Lista de roles disponibles
- * @param {Array} props.departments - Lista de departamentos
- * @param {Array} props.locations - Lista de poblaciones
- * @param {Function} props.onSubmit - Función que se ejecuta al enviar
- * @param {Object} props.initialData - Datos iniciales para pre-rellenar (modo edición)
- * @param {boolean} props.isEditMode - Si está en modo edición (oculta contraseña)
- * @param {Function} props.onCancel - Función para cancelar (opcional)
+ * 🎯 EmployeeForm - Alta de nuevo empleado
+ * Bordes finos y discretos, al estilo del resto de la interfaz.
  */
-
-const getRoleDisplayName = (roleName) => {
-  const roleTranslations = {
-    employee: "Empleado",
-    manager: "Responsable",
-    admin: "Administrador",
-  };
-
-  return roleTranslations[roleName.toLowerCase()] || roleName;
-};
-
 export default function EmployeeForm({
   roles = [],
   departments = [],
@@ -35,12 +16,11 @@ export default function EmployeeForm({
   onSubmit,
   initialData = null,
   isEditMode = false,
-  onCancel,
 }) {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
     setValue,
   } = useForm({
@@ -72,44 +52,26 @@ export default function EmployeeForm({
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
-      toast.success(
-        isEditMode
-        ? "Empleado actualizado correctamente 🎉"
-        : "Empleado creado correctamente 🎉"
-      );
-      
-      if (!isEditMode) {
-        reset();
-      } 
-      
+      toast.success("Empleado creado correctamente 🎉");
+      reset();
     } catch (error) {
-      console.error("Error en el formulario:", error);
-      const errorMessage = isEditMode
-        ? "Hubo un problema al actualizar el empleado"
-        : "Hubo un problema al crear el empleado";
-      toast.error(errorMessage);
+      console.error("Error al crear empleado:", error);
+      toast.error("Hubo un problema al crear el empleado");
     }
   };
 
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      reset();
-    }
-  };
+  // 🎨 Clase base para inputs/selects: borde fino y elegante
+  const inputBase =
+    "w-full px-4 py-3 rounded-md bg-white text-cohispania-blue border border-gray-300 focus:border-[#F68D2E] focus:ring-0 outline-none transition-all duration-150";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-      {/* 🧾 Formulario de empleado */}
       <Card>
         <h2 className="text-xl font-semibold text-cohispania-blue mb-2">
-          {isEditMode ? "Editar Información" : "Información del Empleado"}
+          Información del Empleado
         </h2>
-        <p className="text-sm text-gray-300 mb-6">
-          {isEditMode
-            ? "Modifica los datos del empleado"
-            : "Completa los datos del nuevo empleado"}
+        <p className="text-sm text-gray-400 mb-6">
+          Completa los datos del nuevo empleado
         </p>
 
         <form
@@ -159,26 +121,24 @@ export default function EmployeeForm({
           </div>
 
           {/* Contraseña */}
-          {!isEditMode && (
-            <div className="md:col-span-2">
-              <Input
-                label="Contraseña"
-                name="password"
-                type="password"
-                placeholder="********"
-                register={register}
-                validation={{
-                  required: "La contraseña es obligatoria",
-                  minLength: {
-                    value: 8,
-                    message: "Debe tener al menos 8 caracteres",
-                  },
-                }}
-                errors={errors}
-                required
-              />
-            </div>
-          )}
+          <div className="md:col-span-2">
+            <Input
+              label="Contraseña"
+              name="password"
+              type="password"
+              placeholder="Crea una contraseña segura"
+              register={register}
+              validation={{
+                required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 8,
+                  message: "Debe tener al menos 8 caracteres",
+                },
+              }}
+              errors={errors}
+              required
+            />
+          </div>
 
           {/* Rol */}
           <div>
@@ -189,16 +149,13 @@ export default function EmployeeForm({
             </label>
             <select
             id="role_id"
-              {...register("role_id", {
-                required: "Selecciona un rol",
-                valueAsNumber: true,
-              })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              {...register("role_id", { required: "Selecciona un rol" })}
+              className={inputBase}
             >
               <option value="">Selecciona un rol</option>
               {roles.map((role) => (
                 <option key={role.id} value={role.id}>
-                  {getRoleDisplayName(role.role_name)}
+                  {role.role_name}
                 </option>
               ))}
             </select>
@@ -221,7 +178,7 @@ export default function EmployeeForm({
               {...register("department_id", {
                 required: "Selecciona un departamento",
               })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              className={inputBase}
             >
               <option value="">Selecciona departamento</option>
               {departments.map((dept) => (
@@ -249,7 +206,7 @@ export default function EmployeeForm({
               {...register("location_id", {
                 required: "Selecciona una localización",
               })}
-              className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition"
+              className={inputBase}
             >
               <option value="">Selecciona una localización</option>
               {locations.map((loc) => (
@@ -274,11 +231,8 @@ export default function EmployeeForm({
               placeholder="Introduce los días disponibles"
               register={register}
               validation={{
-                required: "Los días disponibles son obligatorios",
-                min: {
-                  value: 0,
-                  message: "Debe ser un número positivo",
-                },
+                required: true,
+                min: 0,
                 valueAsNumber: true,
               }}
               errors={errors}
@@ -290,9 +244,8 @@ export default function EmployeeForm({
             <Button
               type="button"
               variant="ghost"
-              className="border border-gray-stroke text-cohispania-blue bg-white hover:bg-gray-100"
-              onClick={handleCancel}
-              disabled={isSubmitting}
+              className="border border-gray-300 text-cohispania-blue bg-white hover:bg-gray-100"
+              onClick={() => reset()}
             >
               Cancelar
             </Button>
@@ -300,9 +253,8 @@ export default function EmployeeForm({
               type="submit"
               variant="secondary"
               className="bg-cohispania-blue text-white hover:opacity-90"
-              loading={isSubmitting}
             >
-              {isEditMode ? "Guardar Cambios" : "Guardar Empleado"}
+              Guardar Empleado
             </Button>
           </div>
         </form>
