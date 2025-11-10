@@ -3,7 +3,14 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, it, vi, beforeEach, afterEach, expect } from "vitest";
 import CreateEmployeePage from "../../../pages/employeeManagement/CreateEmployeePage";
 
-// 🧱 Mocks de dependencias
+vi.mock("axios", () => ({
+  __esModule: true,
+  default: {
+    get: vi.fn().mockResolvedValue({ data: [] }),
+    post: vi.fn().mockResolvedValue({ data: {} }),
+  },
+}));
+
 vi.mock("react-hot-toast", () => ({
   toast: {
     success: vi.fn(),
@@ -30,10 +37,7 @@ vi.mock("../../../components/form/EmployeeForm", () => ({
   default: ({ onSubmit, onCancel }) => (
     <div>
       <p>Formulario simulado</p>
-      <button
-        data-testid="mock-create-btn"
-        onClick={() => onSubmit({ first_name: "Lisi" })}
-      >
+      <button data-testid="mock-create-btn" onClick={() => onSubmit({ first_name: "Lisi" })}>
         Crear
       </button>
       <button data-testid="mock-cancel-btn" onClick={onCancel}>
@@ -54,7 +58,7 @@ describe("🧩 CreateEmployeePage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    cleanup(); // 🧽 limpia el DOM antes de cada test
+    cleanup();
 
     useAdminStore.mockReturnValue({
       roles: [{ id: 1, role_name: "Admin" }],
@@ -67,7 +71,7 @@ describe("🧩 CreateEmployeePage", () => {
     });
   });
 
-  afterEach(() => cleanup()); // 🧼 asegura que no queden residuos tras cada test
+  afterEach(() => cleanup());
 
   it("renderiza correctamente el título y el formulario", () => {
     render(
@@ -101,11 +105,11 @@ describe("🧩 CreateEmployeePage", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getAllByTestId("mock-create-btn")[0]); // 👈 usa el primero
+    fireEvent.click(screen.getByTestId("mock-create-btn"));
 
     await waitFor(() => {
       expect(createUser).toHaveBeenCalledWith({ first_name: "Lisi" });
-      expect(toast.success).toHaveBeenCalledWith("Empleado creado correctamente"); // 👈 revisa que coincida con tu código real
+      expect(toast.success).toHaveBeenCalledWith("Empleado creado correctamente");
       expect(mockNavigate).toHaveBeenCalledWith("/employees");
     });
   });
@@ -121,10 +125,22 @@ describe("🧩 CreateEmployeePage", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getAllByTestId("mock-create-btn")[0]);
+    fireEvent.click(screen.getByTestId("mock-create-btn"));
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Error de servidor");
     });
+  });
+
+  it("permite cancelar sin errores", () => {
+    render(
+      <MemoryRouter>
+        <CreateEmployeePage />
+      </MemoryRouter>
+    );
+
+    expect(() => {
+      fireEvent.click(screen.getByTestId("mock-cancel-btn"));
+    }).not.toThrow();
   });
 });

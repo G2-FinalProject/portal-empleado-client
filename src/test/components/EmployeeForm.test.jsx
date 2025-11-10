@@ -31,9 +31,17 @@ describe("🧩 EmployeeForm", () => {
     fireEvent.change(screen.getByPlaceholderText("Introduce los apellidos del empleado"), { target: { value: "Cruz" } });
     fireEvent.change(screen.getByPlaceholderText("Introduce el correo corporativo"), { target: { value: "lisi@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("Crea una contraseña segura"), { target: { value: "contraseñaSegura" } });
-    fireEvent.change(screen.getByLabelText(/Rol/i), { target: { value: 1 } });
-    fireEvent.change(screen.getByLabelText(/Departamento/i), { target: { value: 1 } });
-    fireEvent.change(screen.getByLabelText(/Población/i), { target: { value: 1 } });
+    
+    // ✅ CAMBIO: Usar getElementById en lugar de getByLabelText
+    const roleSelect = document.getElementById("role_id");
+    fireEvent.change(roleSelect, { target: { value: 1 } });
+    
+    const departmentSelect = document.getElementById("department_id");
+    fireEvent.change(departmentSelect, { target: { value: 1 } });
+    
+    const locationSelect = document.getElementById("location_id");
+    fireEvent.change(locationSelect, { target: { value: 1 } });
+    
     fireEvent.change(screen.getByPlaceholderText("Introduce los días disponibles"), { target: { value: 20 } });
 
     // 🔥 Dispara el envío real del formulario
