@@ -1,6 +1,16 @@
 import toast from 'react-hot-toast';
 
 /**
+ *  SISTEMA DE TOASTS CENTRALIZADO
+ *
+ * Este archivo centraliza todos los toasts de la aplicación
+ * con estilos consistentes de CoHispania
+ */
+
+// ============================================
+//  ESTILOS BASE
+// ============================================
+/**
  * Muestra una notificación de éxito
  * @param {string} message - Mensaje a mostrar
  * @returns {string} ID del toast

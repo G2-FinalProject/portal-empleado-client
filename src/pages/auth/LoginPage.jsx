@@ -1,14 +1,15 @@
 
 import { useState } from 'react';
-import { useForm } from 'react-hook-form'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 import { login as apiLogin } from '../../services/authApi';
 import useAuthStore from '../../stores/authStore';
 import logo from '../../assets/cohispania_logo.svg';
 import loginImage from '../../assets/images/login_image.jpg';
-import toast from 'react-hot-toast'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
-import { Button } from '../../components/ui';
+import toast from 'react-hot-toast';
+import { Button, Input } from '../../components/ui';
+import { Loader2 } from 'lucide-react';
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
