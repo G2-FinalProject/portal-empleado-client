@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest --pool=threads",
+    "test:ui": "set VITEST_POOL=forks && vitest --pool=forks --ui",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.19",
@@ -34,6 +37,7 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react-swc": "^4.1.0",
+    "@vitest/coverage-v8": "^4.0.8",
     "@vitest/ui": "^4.0.8",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",

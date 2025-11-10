@@ -13,9 +13,30 @@ export default defineConfig({
     port: 5173,
   },
   // 🧪 Configuración de Vitest
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setupTests.js',
-  },
+  // 🧪 Configuración de Vitest
+// 🧪 Configuración de Vitest
+test: {
+  globals: true,
+  environment: "jsdom",
+  setupFiles: "./src/test/setupTests.js",
+  isolate: false,
+  pool:'forks', 
+
+  // ✅ Cobertura
+  coverage: {
+  provider: "v8",
+  reporter: ["text", "html", "text-summary", "json-summary"],
+  reportsDirectory: "./coverage",
+  all: true,
+  include: ["src/**/*.{js,jsx}"],
+  exclude: [
+    "src/test/**",
+    "node_modules/**",
+    "vite.config.*",
+    "**/mocks/**",
+    "**/*.d.ts",
+  ],
+},
+},
+
 })

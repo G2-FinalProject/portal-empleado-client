@@ -17,13 +17,11 @@ export default function CreateEmployeePage() {
     createUser,
   } = useAdminStore();
 
-
   useEffect(() => {
     fetchRoles();
     fetchDepartments();
     fetchLocations();
   }, [fetchRoles, fetchDepartments, fetchLocations]);
-
 
   const handleCreateUser = async (data) => {
     try {
@@ -35,8 +33,12 @@ export default function CreateEmployeePage() {
         error.response?.data?.errors?.[0]?.msg ||
         error.response?.data?.message ||
         "Error al crear el empleado";
-        toast.error(errorMessage);
-        throw error;
+      toast.error(errorMessage);
+
+      // ✅ solo muestra en consola si estás en modo desarrollo
+      if (import.meta.env.MODE === "development") {
+        console.warn("Error al crear empleado:", error);
+      }
     }
   };
 
@@ -48,7 +50,7 @@ export default function CreateEmployeePage() {
     <div className="space-y-6">
       <div>
         <button
-          onClick={handleCancel} 
+          onClick={handleCancel}
           className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2"
         >
           ← Volver al listado
@@ -60,14 +62,14 @@ export default function CreateEmployeePage() {
           Completa los datos para registrar un nuevo empleado en el sistema.
         </p>
       </div>
-      
+
       <EmployeeForm
         roles={roles}
         departments={departments}
         locations={locations}
         onSubmit={handleCreateUser}
-        onCancel={handleCancel} 
-        isEditMode={false} 
+        onCancel={handleCancel}
+        isEditMode={false}
       />
     </div>
   );

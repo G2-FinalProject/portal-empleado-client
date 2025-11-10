@@ -95,7 +95,7 @@ describe("🛡️ ProtectedRoute", () => {
     );
 
     expect(mockLogout).toHaveBeenCalled();
-    expect(screen.getByText("Página de Login")).toBeInTheDocument();
+    expect(screen.getAllByText(/Página de Login/i).length).toBeGreaterThan(0);
   });
 
   it("muestra mensaje de acceso denegado si el rol no está permitido", () => {

@@ -72,6 +72,12 @@ export default function EmployeeForm({
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
+      toast.success(
+        isEditMode
+        ? "Empleado actualizado correctamente 🎉"
+        : "Empleado creado correctamente 🎉"
+      );
+      
       if (!isEditMode) {
         reset();
       } 
@@ -176,10 +182,13 @@ export default function EmployeeForm({
 
           {/* Rol */}
           <div>
-            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label 
+            htmlFor="role_id"
+            className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Rol <span className="text-red-400">*</span>
             </label>
             <select
+            id="role_id"
               {...register("role_id", {
                 required: "Selecciona un rol",
                 valueAsNumber: true,
@@ -202,10 +211,13 @@ export default function EmployeeForm({
 
           {/* Departamento */}
           <div>
-            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label 
+            htmlFor="department_id"
+            className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Departamento <span className="text-red-400">*</span>
             </label>
             <select
+            id="department_id"
               {...register("department_id", {
                 required: "Selecciona un departamento",
               })}
@@ -227,10 +239,13 @@ export default function EmployeeForm({
 
           {/* Población */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label 
+            htmlFor="location_id"
+            className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Población <span className="text-red-400">*</span>
             </label>
             <select
+            id="location_id"
               {...register("location_id", {
                 required: "Selecciona una localización",
               })}
