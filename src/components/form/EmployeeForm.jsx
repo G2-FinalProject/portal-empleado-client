@@ -52,7 +52,7 @@ export default function EmployeeForm({
       role_id: "",
       department_id: "",
       location_id: "",
-      available_days: 23,
+      available_days: "",
     },
   });
 
@@ -65,7 +65,7 @@ export default function EmployeeForm({
       setValue("role_id", initialData.role_id || "");
       setValue("department_id", initialData.department_id || "");
       setValue("location_id", initialData.location_id || "");
-      setValue("available_days", initialData.available_days || 23);
+      setValue("available_days", initialData.available_days || "");
     }
   }, [initialData, isEditMode, setValue]);
 
