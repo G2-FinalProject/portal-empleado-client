@@ -216,7 +216,7 @@ const useVacationStore = create((set, get) => ({
   rejectRequest: async (id, comment = null) => {
     set({ loading: true, error: null });
     try {
-      const response = await vacationApi.reject(id, { reason: comment });
+      const response = await vacationApi.reject(id, comment);
       const updated = mapRequest(response.data || response);
       const { allRequests } = get();
       set({
