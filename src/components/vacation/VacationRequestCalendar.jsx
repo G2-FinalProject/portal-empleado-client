@@ -57,14 +57,14 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       const approvedVacations = myRequests
         .filter((req) => req.status === "approved")
         .flatMap((req) => {
-          /* Añadir T00:00:00 para forzar hora local y evitar que las 
+          /* Añadir T00:00:00 para forzar hora local y evitar que las
           fechas cambien al día anterior por conversión de timezone*/
           const start = new Date(req.startDate + "T00:00:00");
           const end = new Date(req.endDate + "T00:00:00");
           const days = eachDayOfInterval({ start, end });
 
           return days.map((day) => {
-            /* Usar métodos locales (getFullYear, getMonth, getDate) en lugar de toISOString() 
+            /* Usar métodos locales (getFullYear, getMonth, getDate) en lugar de toISOString()
             para mantener el día correcto sin conversión a UTC */
             const year = day.getFullYear();
             const month = String(day.getMonth() + 1).padStart(2, "0");
@@ -102,7 +102,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     endDate.setDate(endDate.getDate() - 1);
     const actualEndStr = endDate.toISOString().split("T")[0];
 
-    /* Añadir T00:00:00 para forzar interpretación en hora local y 
+    /* Añadir T00:00:00 para forzar interpretación en hora local y
     evitar desfases de 1 día por conversión de timezone */
     const start = new Date(startStr + "T00:00:00");
     const end = new Date(actualEndStr + "T00:00:00");
@@ -116,6 +116,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       endStr: actualEndStr,
       workingDays: workingDays,
       calendarApi: selectInfo.view.calendar,
+      
     });
   };
 
