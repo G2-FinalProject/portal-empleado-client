@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import UserPage from "../../../pages/users/UserPage";
 
 // ============================================
@@ -198,6 +198,9 @@ const setupMocks = ({
 beforeEach(() => {
   vi.clearAllMocks(); // Limpia todos los mocks
   setupMocks(); // Configura los mocks con valores por defecto
+});
+afterEach(() => {
+  cleanup(); // 
 });
 
 // ============================================
@@ -458,8 +461,8 @@ describe("UserPage", () => {
     mockFetchMyRequests.mockClear();
 
  
-    const createButton = screen.getByText("Simular Request Created");
-    createButton.click();
+ const createButtons = screen.getAllByText("Simular Request Created");
+createButtons[0].click();
 
 
     await waitFor(() => {
