@@ -1,84 +1,105 @@
 @import "tailwindcss";
 
+/**
+ * @file styles.css
+ * @description Tokens de tema, animaciones y utilidades globales para Portal Empleado.
+ * @depends Tailwind v4 (@theme)
+ */
+
+/* ──────────────────────────────────────────────────────────────────────────────
+ * THEME TOKENS
+ * ────────────────────────────────────────────────────────────────────────────── */
+
 @theme {
-  /* Colores */
+  /* ===== Brand (CoHispania) ===== */
   --color-cohispania-orange: #F68D2E;
   --color-cohispania-blue: #1F2A44;
+
+  /* Background & Strokes */
   --color-light-background: #F4F6FA;
   --color-gray-stroke: #E0E4EA;
   --color-blue-stroke: #273758;
 
+  /* Support Colors - Rojos */
   --color-red-400: #EC5B59;
-  --color-red-600: #D32F2F;
+  --color-red-600: #E0322F;
+  --color-red-900: #C12022;
+
+  /* Support Colors - Verde claro */
   --color-light-green-400: #9CCC65;
   --color-light-green-600: #7CB342;
   --color-light-green-800: #558B2F;
+
+  /* Support Colors - Verde oscuro */
+  --color-green-400: #71BC79;
+  --color-green-600: #52A158;
+  --color-green-800: #3E7E43;
+
+  /* Support Colors - Indigo y morado */
   --color-indigo-400: #6171C9;
   --color-indigo-500: #3F51B5;
   --color-purple-400: #AB47BC;
 
-  --color-gray-100:#C9C9CE;
-  --color-gray-200:#A5A6AE;
+  /* Neutral Scale */
+  --color-gray-100: #C9C9CE;
+  --color-gray-200: #A5A6AE;
   --color-gray-300: #80828E;
   --color-gray-400: #656775;
 
-  /* Tipografía */
-  --font-family-sans: 'Open Sans', system-ui, sans-serif;
+  /* Typography */
+  --font-family-sans: "Open Sans", system-ui, sans-serif;
   --font-sans: "Open Sans", sans-serif;
 
- /* Variables de animación */
+  /* Motion */
   --animate-fade-in: fade-in 0.3s ease-out;
   --animate-slide-in: slide-in 0.3s ease-out;
 }
 
-/* Animaciones */
+/* ──────────────────────────────────────────────────────────────────────────────
+ * KEYFRAMES (animaciones)
+ * ────────────────────────────────────────────────────────────────────────────── */
+
+/** @animation fade-in: Opacidad 0→1 con traslación vertical suave */
 @keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/** @animation slide-in: Opacidad 0→1 con deslizamiento horizontal */
 @keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* Clases de utilidad */
-.animate-fadeIn {
-  animation: var(--animate-fade-in);
-}
+/* ──────────────────────────────────────────────────────────────────────────────
+ * BASE (ajustes globales)
+ * ────────────────────────────────────────────────────────────────────────────── */
 
-.animate-slideIn {
-  animation: var(--animate-slide-in);
-}
-
-
-/* Estilos Globales */
 :root {
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-
   color: var(--color-cohispania-blue);
   background-color: var(--color-light-background);
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Aplica la fuente del tema a html/body sin pisar utilidades de Tailwind */
+@layer base {
+  html,
+  body {
+    font-family: var(--font-family-sans);
+    font-size: 16px;
+  }
+
+}
+
+/* ──────────────────────────────────────────────────────────────────────────────
+ * UTILS (clases auxiliares)
+ * ────────────────────────────────────────────────────────────────────────────── */
 
 /* Login hero overlay con paleta de marca */
 .login-hero-overlay {
@@ -90,27 +111,21 @@
   );
 }
 
-
-
-/* ============================================
-   ESTILOS PERSONALIZADOS PARA FULLCALENDAR
-   ============================================ */
+/* ──────────────────────────────────────────────────────────────────────────────
+ * FULLCALENDAR (desktop + ajustes móviles)
+ * ────────────────────────────────────────────────────────────────────────────── */
 
 /* Contenedor del calendario con cursor apropiado */
-.vacation-calendar-wrapper {
-  cursor: default;
-}
+.vacation-calendar-wrapper { cursor: default; }
 
 /* Cursor de arrastre en días seleccionables */
-.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable) {
-  cursor: grab;
-}
+.vacation-calendar-wrapper
+  .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable) { cursor: grab; }
 
-.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):active {
-  cursor: grabbing;
-}
+.vacation-calendar-wrapper
+  .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):active { cursor: grabbing; }
 
-/* Fines de semana - Estilo "prohibido" */
+/* Fines de semana deshabilitados */
 .fc-day-weekend-disabled {
   position: relative;
   background-color: #f5f5f5 !important;
@@ -118,31 +133,28 @@
   cursor: not-allowed !important;
 }
 
+/* Días no disponibles (festivos/vacaciones) */
+.fc-day-unavailable { cursor: not-allowed !important; }
 
-/* Días no disponibles (festivos/vacaciones) - cursor not-allowed */
-.fc-day-unavailable {
-  cursor: not-allowed !important;
-}
-
-
-/* Asegurar que la selección se mantenga visible */
+/* Selección visible (usa cohispania-blue con transparencia) */
 .fc .fc-highlight {
-  background: rgba(31, 42, 68, 0.1) !important; /* cohispania-blue con transparencia */
+  background: rgba(31, 42, 68, 0.1) !important;
   border: 2px solid var(--color-cohispania-blue) !important;
 }
 
-/* Efecto hover en días seleccionables */
-.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):hover {
-  background-color: rgba(246, 141, 46, 0.05) !important; /* cohispania-orange muy transparente */
+/* Hover en días seleccionables (cohispania-orange muy suave) */
+.vacation-calendar-wrapper
+  .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):hover {
+  background-color: rgba(246, 141, 46, 0.05) !important;
   transition: background-color 0.2s ease;
 }
-/* Ajustes para el calendario en móvil */
+
+/* ——— Ajustes móviles (≤ 640px) ——— */
 @media (max-width: 640px) {
-  .fc .fc-toolbar-title {
-    font-size: 1rem !important;
-  }
+  .fc .fc-toolbar-title { font-size: 1rem !important; }
 
   .fc .fc-button {
+    /* versión táctil con mínimo 44x44 */
     padding: 0.5rem 0.75rem !important;
     font-size: 0.875rem !important;
     min-height: 44px !important;
@@ -150,9 +162,9 @@
     touch-action: manipulation;
   }
 
-  /* Mejorar área táctil de los días */
+  /* Área táctil de día y números */
   .fc .fc-daygrid-day {
-    min-height: 3rem !important;
+    min-height: 3rem !important; /* una sola definición */
     touch-action: manipulation;
   }
 
@@ -161,18 +173,12 @@
     font-size: 0.875rem !important;
   }
 
-  /* Mejorar selección táctil */
-  .fc .fc-highlight {
-    border-width: 3px !important;
-  }
+  /* Mejorar visibilidad de rango seleccionado */
+  .fc .fc-highlight { border-width: 3px !important; }
 
   .fc .fc-col-header-cell-cushion {
     padding: 0.25rem !important;
     font-size: 0.75rem !important;
-  }
-
-  .fc .fc-daygrid-day {
-    min-height: 2.5rem !important;
   }
 
   .fc .fc-daygrid-event {
@@ -180,9 +186,7 @@
     padding: 1px 2px !important;
   }
 
-  .fc .fc-daygrid-day-frame {
-    padding: 2px !important;
-  }
+  .fc .fc-daygrid-day-frame { padding: 2px !important; }
 
   .fc-day-weekend-disabled::after {
     font-size: 0.8rem !important;

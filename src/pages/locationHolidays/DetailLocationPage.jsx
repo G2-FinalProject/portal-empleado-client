@@ -18,7 +18,7 @@ export default function DetailLocationPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-   // Formatear fecha para mostrar
+  // Formatear fecha para mostrar
   const formatDate = (dateStr) => {
     return new Date(dateStr + 'T00:00:00').toLocaleDateString('es-ES', {
       day: 'numeric',
@@ -53,7 +53,6 @@ export default function DetailLocationPage() {
         const locationData = await getLocationById(id);
         setLocation(locationData);
       } catch (error) {
-        console.error('Error loading location:', error);
         const errorMessage = error.response?.data?.message || 'Error al cargar la población';
         setError(errorMessage);
         showError(errorMessage);
@@ -132,8 +131,8 @@ export default function DetailLocationPage() {
           {/* Lista de festivos */}
           <div>
             <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-cohispania-orange" />
-              Lista de Festivos ({location.holidays?.length || 0})
+              <CalendarIcon className="w-6 h-6" />
+              Listado de Festivos ({location.holidays?.length || 0})
             </h3>
 
             {location.holidays && location.holidays.length > 0 ? (
@@ -157,7 +156,6 @@ export default function DetailLocationPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-400">
-                <CalendarIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>No hay festivos configurados para esta población</p>
                 <button
                   onClick={() => navigate(`/locations/${id}/edit`)}
@@ -172,7 +170,6 @@ export default function DetailLocationPage() {
           {/* Calendario de festivos (solo lectura) */}
           <div>
             <h2 className="text-xl font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-              <CalendarIcon className="w-6 h-6" />
               Calendario de Festivos
             </h2>
             <p className="text-sm text-gray-500 mb-4">

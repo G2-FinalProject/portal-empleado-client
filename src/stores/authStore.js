@@ -25,7 +25,6 @@ const decodeToken = (token) => {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) {
-      console.error("❌ Token inválido: no tiene 3 partes");
       return null;
     }
     const payload = parts[1];
@@ -33,7 +32,6 @@ const decodeToken = (token) => {
 
     return decoded;
   } catch (error) {
-    console.error("❌ Error decodificando token:", error);
     return null;
   }
 };
@@ -63,7 +61,6 @@ const useAuthStore = create((set, get) => ({
   login: (token, sesionData) => {
     const decoded = decodeToken(token);
     if (!decoded) {
-      console.error("❌ No se pudo decodificar el token");
       return;
     }
 

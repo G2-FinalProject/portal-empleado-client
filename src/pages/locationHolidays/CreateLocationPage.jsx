@@ -222,9 +222,6 @@ export default function CreateLocationPage() {
       dismiss(loadingToastId);
       showError(errorMessage);
 
-      if (import.meta.env.MODE === "development") {
-        console.warn("Error al crear población:", error);
-      }
     } finally {
       setIsSubmitting(false);
     }

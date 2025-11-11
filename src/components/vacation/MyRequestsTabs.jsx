@@ -3,6 +3,12 @@ import { Tabs, Badge, Card, Modal } from "../ui";
 import { Calendar, Eye, ArrowDown, ArrowUp } from "lucide-react";
 import useVacationStore from "../../stores/useVacationStore";
 
+const STATUS_BADGE_VARIANTS = {
+  pending: { variant: "purple", label: "Pendiente" },
+  approved: { variant: "success", label: "Aprobada" },
+  rejected: { variant: "danger", label: "Rechazada" },
+};
+
 export default function MyRequestsTabs() {
   const myRequests = useVacationStore((state) => state.myRequests);
   const loading = useVacationStore((state) => state.loading);
@@ -219,13 +225,8 @@ function RequestRow({ request }) {
   };
 
   const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { variant: "purple", label: "Pendiente" },
-      approved: { variant: "success", label: "Aprobado" },
-      rejected: { variant: "info", label: "Rechazado" },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
+    const config =
+      STATUS_BADGE_VARIANTS[status] || STATUS_BADGE_VARIANTS.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
@@ -270,7 +271,7 @@ function RequestRow({ request }) {
               <button
                 onClick={() => setShowModal(true)}
                 className="text-cohispania-blue hover:text-cohispania-orange transition-colors cursor-pointer"
-                title="Ver más info"
+                title="Ver más info" aria-label="Ver comentarios de la solicitud"
               >
                 <Eye className="h-5 w-5 cursor-pointer" />
               </button>
@@ -353,13 +354,8 @@ function RequestCard({ request }) {
   };
 
   const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { variant: "purple", label: "Pendiente" },
-      approved: { variant: "success", label: "Aprobado" },
-      rejected: { variant: "info", label: "Rechazado" },
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
+    const config =
+      STATUS_BADGE_VARIANTS[status] || STATUS_BADGE_VARIANTS.pending;
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 

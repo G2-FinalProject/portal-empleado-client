@@ -55,7 +55,6 @@ export default function EditLocationPage() {
 
         showSuccess('Población cargada correctamente');
       } catch (error) {
-        console.error('Error loading location:', error);
 
         let errorMessage = 'Error al cargar la población';
         if (error.response?.status === 404) {
@@ -267,7 +266,6 @@ export default function EditLocationPage() {
 
       navigate(`/locations/${id}`);
     } catch (error) {
-      console.error('Error saving changes:', error);
 
       let errorMessage = 'Error al guardar los cambios';
 
@@ -333,7 +331,7 @@ export default function EditLocationPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="animate-fadeIn">
+      <div>
         <Button
           variant="ghost"
           onClick={() => navigate(`/locations/${id}`)}
@@ -350,7 +348,7 @@ export default function EditLocationPage() {
       </div>
 
       {/* Formulario */}
-      <Card className="animate-fadeIn" padding={true}>
+      <Card padding={true}>
         <div className="space-y-6">
           {/* Nombre de la población */}
           <div>

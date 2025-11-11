@@ -58,9 +58,16 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       const approvedVacations = myRequests
         .filter((req) => req.status === "approved")
         .flatMap((req) => {
-          const start = new Date(req.startDate + "T00:00:00");
-          const end = new Date(req.endDate + "T00:00:00");
+          const start = new Date(`${req.startDate}T00:00:00`);
+          const end = new Date(`${req.endDate}T00:00:00`);
           const days = eachDayOfInterval({ start, end });
+
+          const startLabel = formatDateLabel(req.startDate);
+          const endLabel = formatDateLabel(req.endDate);
+          const accessibleLabel =
+            startLabel === endLabel
+              ? `Vacaciones aprobadas el ${startLabel}`
+              : `Vacaciones aprobadas del ${startLabel} al ${endLabel}`;
 
           return days.map((day) => {
             const year = day.getFullYear();
@@ -84,7 +91,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
 
       setHolidays([...holidayEvents, ...approvedVacations]);
     } catch (error) {
-      console.error("Error al cargar datos iniciales:", error);
       showError("Error al cargar los datos. Por favor, recarga la página.");
     } finally {
       setIsLoading(false);
@@ -102,7 +108,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     const start = new Date(startStr + "T00:00:00");
     const end = new Date(actualEndStr + "T00:00:00");
 
-    // ✅ VALIDACIÓN: Verificar que el rango sea seleccionable
+    // Validación: Verificar que el rango sea seleccionable
     if (!isDateSelectable(selectInfo)) {
       if (selectInfo.view?.calendar) {
         selectInfo.view.calendar.unselect();
@@ -180,7 +186,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     return true;
   };
 
-  // ✅ Clases CSS personalizadas para las celdas
+  // Clases CSS personalizadas para las celdas
   const dayCellClassNames = (arg) => {
     const classes = ["text-xs", "sm:text-sm"];
     const dayOfWeek = arg.date.getDay();
@@ -196,6 +202,13 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     }
 
     return classes;
+  };
+
+  const handleEventDidMount = ({ el, event }) => {
+    const label = event.extendedProps?.accessibleLabel || event.title;
+    if (label) {
+      el.setAttribute("aria-label", label);
+    }
   };
 
   const handleSubmitRequest = async () => {
@@ -242,7 +255,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       dismiss(loadingToast);
       showSuccess("¡Solicitud enviada correctamente!");
     } catch (error) {
-      console.error("Error al crear solicitud:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0]?.msg ||
@@ -301,18 +313,20 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
 
         <div className="p-4 sm:p-6">
           {/* Leyenda - Colores unificados: festivos rojo, vacaciones verde */}
-          <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
+          <div className="flex flex-wrap gap-4 mb-4 text-sm sm:text-base">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[var(--color-red-400)] border border-[var(--color-red-400)]"></div>
-              <span className="text-gray-400">Festivos</span>
+              <div className="w-4 h-4 rounded bg-red-400 border border-red-600"></div>
+              <span className="text-cohispania-blue font-semibold">Festivos</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[var(--color-light-green-400)] border border-[var(--color-light-green-600)]"></div>
-              <span className="text-gray-400">Vacaciones aprobadas</span>
+              <div className="w-4 h-4 rounded bg-light-green-400 border border-light-green-600"></div>
+              <span className="text-cohispania-blue font-semibold">
+                Vacaciones aprobadas
+              </span>
             </div>
           </div>
 
-          {/* Calendario - ✅ Wrapper unificado */}
+          {/* Calendario - Wrapper unificado */}
           <div className="vacation-calendar-wrapper">
             <FullCalendar
               plugins={[dayGridPlugin, interactionPlugin]}
@@ -326,6 +340,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
               events={holidays}
               select={handleDateSelect}
               selectAllow={isDateSelectable}
+              eventDidMount={handleEventDidMount}
               headerToolbar={{
                 left: "prev,next",
                 center: "title",
@@ -341,7 +356,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
               dayHeaderFormat={{ weekday: "short" }}
               dayCellClassNames={dayCellClassNames}
               eventClassNames="text-xs"
-              selectMinDistance={5}
               editable={false}
             />
 
@@ -379,7 +393,7 @@ function RequestSummaryForm({
   const textareaId = useId();
 
   return (
-    <div className="bg-white rounded-lg border-2 border-cohispania-orange p-4 sm:p-5 animate-fadeIn">
+    <div className="bg-white rounded-lg border-2 border-cohispania-orange p-4 sm:p-5">
       <h3 className="text-base sm:text-lg font-bold mb-4 text-cohispania-blue">
         Resumen de Solicitud
       </h3>
@@ -434,7 +448,7 @@ function RequestSummaryForm({
 
         {selectedRange.workingDays > (vacationSummary?.remaining_days || 0) && (
           <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-            <span className="text-lg">⚠️</span>
+            <span className="text-lg" aria-label="Advertencia">⚠</span>
             <div className="flex-1">
               <p className="text-red-700 font-semibold text-sm">
                 Días insuficientes

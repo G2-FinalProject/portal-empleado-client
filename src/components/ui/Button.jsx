@@ -30,11 +30,11 @@ export default function Button({
 
   // Estilos por variante
   const variantStyles = {
-    primary: 'bg-cohispania-orange text-cohispania-blue shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-blue)]',
-    secondary: 'bg-cohispania-blue text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-orange)]',
-    success: 'bg-[var(--color-light-green-600)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-light-green-800)]',
-    danger: 'bg-[var(--color-red-600)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-red-600)]',
-    ghost: 'bg-transparent text-cohispania-blue border border-gray-stroke hover:bg-gray-100 focus-visible:ring-[var(--color-blue-stroke)]',
+    primary: 'bg-cohispania-orange text-cohispania-blue shadow hover:opacity-90 focus-visible:ring-cohispania-blue',
+    secondary: 'bg-cohispania-blue text-white shadow hover:opacity-90 focus-visible:ring-cohispania-orange',
+    success: 'bg-light-green-600 text-white shadow hover:opacity-90 focus-visible:ring-light-green-800',
+    danger: 'bg-red-600 text-white shadow hover:opacity-90 focus-visible:ring-red-600',
+    ghost: 'bg-transparent text-cohispania-blue border border-gray-stroke hover:bg-gray-100 focus-visible:ring-blue-stroke',
   };
 
   // Estilos por tamaño

@@ -67,7 +67,6 @@ const getUserIdFromToken = () => {
     const payload = JSON.parse(atob(parts[1]));
     return payload.id;
   } catch (error) {
-    console.error("Error al decodificar token:", error);
     return null;
   }
 };
@@ -92,10 +91,6 @@ const useVacationStore = create((set, get) => ({
         try {
           summaryData = await vacationApi.getVacationSummary(userId);
         } catch (summaryError) {
-          console.warn(
-            "No se pudo obtener el summary, usando valores calculados:",
-            summaryError
-          );
         }
       }
 
@@ -117,7 +112,6 @@ const useVacationStore = create((set, get) => ({
         loading: false,
       });
     } catch (error) {
-      console.error("Error en fetchMyRequests:", error);
       set({
         error: getApiErrorMessage(error),
         loading: false,

@@ -12,17 +12,15 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
-  // 🧪 Configuración de Vitest
-  // 🧪 Configuración de Vitest
-// 🧪 Configuración de Vitest
-test: {
-  globals: true,
-  environment: "jsdom",
-  setupFiles: "./src/test/setupTests.js",
-  isolate: false,
-  pool:'forks', 
+  // Configuración de Vitest
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setupTests.js",
+    isolate: false,
+    pool: 'forks',
 
-  // ✅ Cobertura
+    // Cobertura
   coverage: {
   provider: "v8",
   reporter: ["text", "html", "text-summary", "json-summary"],

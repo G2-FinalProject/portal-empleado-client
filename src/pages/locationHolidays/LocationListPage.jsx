@@ -83,7 +83,6 @@ export default function LocationListPage() {
       setShowDeleteModal(false);
       setLocationToDelete(null);
     } catch (error) {
-      console.error('Error al eliminar población:', error);
     }
   };
 
@@ -98,7 +97,7 @@ export default function LocationListPage() {
   return (
     <main className="space-y-6">
       {/* Botón de nueva población */}
-      <div className="flex justify-end animate-fadeIn">
+      <div className="flex justify-end">
         <Link to="/locations/create" className="cursor-pointer">
           <Button variant="secondary" className="flex items-center gap-3 rounded-2xl">
             <HousePlus className="w-6 h-6" />
@@ -108,7 +107,7 @@ export default function LocationListPage() {
       </div>
 
       {/* Título y subtítulo */}
-      <div className="animate-fadeIn">
+      <div>
         <h1 className="text-3xl font-bold text-cohispania-blue">
           Lista de poblaciones
         </h1>
@@ -118,7 +117,7 @@ export default function LocationListPage() {
       </div>
 
       {/* Card principal */}
-      <Card className="animate-fadeIn" padding={true}>
+      <Card padding={true}>
         {/* Búsqueda */}
         <div className="space-y-4 mb-6">
           <div className="relative w-full">
@@ -240,7 +239,7 @@ export default function LocationListPage() {
                               }}
                               className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer shadow-sm hover:shadow-md"
                             >
-                              <Trash2 className="w-5 h-5 text-[var(--color-red-600)]" />
+                              <Trash2 className="w-5 h-5 text-red-600" />
                             </button>
                           </div>
                         </td>

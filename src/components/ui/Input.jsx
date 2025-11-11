@@ -71,7 +71,7 @@ export default function Input({
           text-cohispania-blue
           border border-gray-stroke
           placeholder-cohispania-blue placeholder-opacity-60
-          focus:ring-0 focus:border-[var(--color-cohispania-orange)]
+          focus:ring-0 focus:border-cohispania-orange
           outline-none transition
           disabled:opacity-50 disabled:cursor-not-allowed
           ${hasError ? 'border-red-400 focus:ring-0 focus:border-red-400' : ''}

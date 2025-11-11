@@ -96,7 +96,6 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
         const summary = await getVacationSummary();
         setVacationSummary(summary);
       } catch (error) {
-        console.error("Error al cargar resumen:", error);
       }
     };
     loadSummary();
@@ -148,7 +147,6 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
       dismiss(loadingToast);
       showSuccess("¡Solicitud enviada correctamente!");
     } catch (error) {
-      console.error("Error al crear solicitud:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.errors?.[0]?.msg ||
