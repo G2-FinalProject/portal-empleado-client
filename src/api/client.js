@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleUnauthorized } from "../utils/errors";
 
 //Configuración de la instancia de axios
 const api = axios.create({
@@ -29,11 +30,8 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
-    }
+    // 401 → limpieza y redirección centralizada
+    if (error?.response?.status === 401) handleUnauthorized();
     return Promise.reject(error);
   }
 );

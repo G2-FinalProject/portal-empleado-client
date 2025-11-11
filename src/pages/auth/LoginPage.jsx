@@ -7,7 +7,7 @@ import { login as apiLogin } from '../../services/authApi';
 import useAuthStore from '../../stores/authStore';
 import logo from '../../assets/cohispania_logo.svg';
 import loginImage from '../../assets/images/login_image.jpg';
-import toast from 'react-hot-toast'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
+import toast from '../../services/toast';
 import { Button } from '../../components/ui';
 
 export default function LoginPage() {
@@ -32,41 +32,20 @@ export default function LoginPage() {
 
       loginStore(response.token, response.sesionData);
       //Toast de éxito
-      toast.success('¡Bienvenido de vuelta!', {
-        style: {
-          background: '#1F2A44',
-          color: '#fff',
-        },
-        iconTheme: {
-          primary: '#F68D2E',
-          secondary: '#fff',
-        },
-      });
+      toast.success('¡Bienvenido de vuelta!');
       navigate('/myportal');
 
     } catch (error) {
       console.error('❌ Error en login:', error);
       // Toast de error
-      toast.error(
-      error.response?.data?.message || 'Email o contraseña incorrectos',
-      {
-        style: {
-          background: '#1F2A44',
-          color: '#fff',
-        },
-        iconTheme: {
-          primary: '#ef4444',
-          secondary: '#fff',
-        },
-      }
-    );
+      toast.error(error.response?.data?.message || 'Email o contraseña incorrectos');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#F5F7FA' }}>
+    <div className="min-h-screen flex bg-light-background">
       {/* LEFT SIDE - Formulario */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24">
         {/* Logo */}
@@ -79,25 +58,13 @@ export default function LoginPage() {
         </div>
 
         {/* Card del formulario */}
-        <div
-          className="bg-white rounded-2xl p-8 sm:p-10"
-          style={{
-            border: '1px solid #B3B3B3',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-          }}
-        >
+        <div className="bg-white rounded-2xl p-8 sm:p-10 border border-gray-stroke shadow-sm">
           {/* Título */}
           <div className="mb-8">
-            <h1
-              className="text-3xl font-bold mb-2"
-              style={{ color: '#1F2A44' }}
-            >
+            <h1 className="text-3xl font-bold mb-2 text-cohispania-blue">
               Iniciar sesión
             </h1>
-            <p
-              className="text-sm"
-              style={{ color: '#767676' }}
-            >
+            <p className="text-sm text-gray-300">
               Ingresa tus credenciales para acceder a la plataforma
             </p>
           </div>
@@ -108,8 +75,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#1F2A44' }}
+                className="block text-sm font-semibold mb-2 text-cohispania-blue"
               >
                 Correo electrónico
               </label>
@@ -118,12 +84,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="tu.email@cohispania.com"
                 disabled={isLoading}
-                style={{
-                  backgroundColor: '#F4F6FA',
-                  color: '#1F2A44',
-                  border: '1px solid #E0E4EA'
-                }}
-                className="w-full px-4 py-3 rounded-lg placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('email', {
                   required: 'El email es obligatorio',
                   pattern: {
@@ -143,8 +104,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: '#1F2A44' }}
+                className="block text-sm font-semibold mb-2 text-cohispania-blue"
               >
                 Contraseña
               </label>
@@ -153,12 +113,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder="········"
                 disabled={isLoading}
-                style={{
-                  backgroundColor: '#F4F6FA',
-                  color: '#1F2A44',
-                  border: '1px solid #E0E4EA'
-                }}
-                className="w-full px-4 py-3 rounded-lg placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('password', {
                   required: 'La contraseña es obligatoria',
                   minLength: {
@@ -198,41 +153,20 @@ export default function LoginPage() {
         />
 
         {/* Overlay con colores de marca */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(
-              135deg,
-              rgba(31, 42, 68, 0.90) 0%,
-              rgba(31, 42, 68, 0.85) 50%,
-              rgba(246, 141, 46, 0.12) 100%
-            )`
-          }}
-        />
+        <div className="absolute inset-0 login-hero-overlay" />
 
         {/* Texto sobre la imagen */}
         <div className="relative z-10 flex items-center justify-center px-16 py-16">
           <div className="max-w-2xl">
-            <h2
-              className="text-3xl font-bold text-white leading-tight"
-              style={{
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-              }}
-            >
+            <h2 className="text-3xl font-bold text-white leading-tight drop-shadow">
               La plataforma de CoHispania para reservar tus vacaciones de manera ágil y sencilla
             </h2>
           </div>
         </div>
 
         {/* Círculos decorativos */}
-        <div
-          className="absolute top-20 right-20 w-48 h-48 rounded-full blur-3xl opacity-15"
-          style={{ backgroundColor: '#F68D2E' }}
-        />
-        <div
-          className="absolute bottom-20 left-20 w-64 h-64 rounded-full blur-3xl opacity-10"
-          style={{ backgroundColor: '#F68D2E' }}
-        />
+        <div className="absolute top-20 right-20 w-48 h-48 rounded-full blur-3xl opacity-15 bg-[var(--color-cohispania-orange)]" />
+        <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full blur-3xl opacity-10 bg-[var(--color-cohispania-orange)]" />
       </div>
     </div>
   );

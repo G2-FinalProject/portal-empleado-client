@@ -72,10 +72,10 @@ export default function LocationListPage() {
       {/* Botón de nueva población */}
       <div className="flex justify-end animate-fadeIn">
         <Link to="/locations/create" className="cursor-pointer">
-          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium cursor-pointer">
+          <Button variant="secondary" className="flex items-center gap-3 rounded-2xl">
             <HousePlus className="w-6 h-6" />
             Nueva Población
-          </button>
+          </Button>
         </Link>
       </div>
 
@@ -131,10 +131,10 @@ export default function LocationListPage() {
               </p>
               {!query && (
                 <Link to="/locations/create" className="mt-4 inline-block cursor-pointer">
-                  <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium mx-auto cursor-pointer">
+                  <Button variant="secondary" className="flex items-center gap-3 rounded-2xl mx-auto">
                     <UserPlus className="w-6 h-6" />
                     Crear primera población
-                  </button>
+                  </Button>
                 </Link>
               )}
             </div>

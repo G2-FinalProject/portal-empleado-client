@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import React, { useEffect } from "react";
-import { toast } from "react-hot-toast";
+import toast from "../../services/toast";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -62,7 +62,7 @@ export default function EmployeeForm({
 
   // 🎨 Clase base para inputs/selects: borde fino y elegante
   const inputBase =
-    "w-full px-4 py-3 rounded-md bg-white text-cohispania-blue border border-gray-300 focus:border-[#F68D2E] focus:ring-0 outline-none transition-all duration-150";
+    "w-full px-4 py-3 rounded-md bg-white text-cohispania-blue border border-gray-300 focus:border-[var(--color-cohispania-orange)] focus:ring-0 outline-none transition-all duration-150";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">

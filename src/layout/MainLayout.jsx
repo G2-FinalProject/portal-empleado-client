@@ -16,10 +16,10 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-light-background">
-      {/* Overlay oscuro en mobile*/}
+      {/* Overlay oscuro en tablet/mobile*/}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={closeSidebar}
           aria-hidden="true"
         />

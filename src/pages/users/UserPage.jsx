@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import toast from "../../services/toast";
 import useAuthStore from "../../stores/authStore";
 import useVacationStore from "../../stores/useVacationStore";
 import VacationRequestCalendar, {
@@ -157,10 +157,7 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
 
     onClearSelection();
 
-    toast("Selección cancelada", {
-      icon: "ℹ️",
-      duration: 2000,
-    });
+    toast.info("Selección cancelada", { duration: 2000 });
   };
 
   if (!vacationSummary) {

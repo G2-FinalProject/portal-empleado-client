@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import useVacationStore from "../../stores/useVacationStore";
 import useAuthStore from "../../stores/authStore";
-import { toast } from "react-hot-toast";
+import { showSuccess, showError } from "../../utils/notifications";
 
 export default function RequestsPage() {
   const { allRequests, fetchAllRequests, loading } = useVacationStore();
@@ -180,11 +180,11 @@ function RequestsList({
                   Empleado
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
-                  <button
+                  <Button
                     onClick={() =>
                       onSortChange(sortOrder === "desc" ? "asc" : "desc")
                     }
-                    className="flex items-center gap-2 hover:text-cohispania-blue transition-colors"
+                    className="flex items-center gap-2"
                     title={
                       sortOrder === "desc"
                         ? "Ordenar ascendente"
@@ -197,7 +197,7 @@ function RequestsList({
                     ) : (
                       <ArrowUp className="h-4 w-4" />
                     )}
-                  </button>
+                  </Button>
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
                   Período
@@ -248,9 +248,10 @@ function RequestsList({
                 : "Histórico de solicitudes denegadas"}
             </p>
           </div>
-          <button
+          <Button
             onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
-            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+            variant="secondary"
+            size="small"
             title={
               sortOrder === "desc"
                 ? "Ordenar ascendente"
@@ -262,7 +263,7 @@ function RequestsList({
             ) : (
               <ArrowUp className="h-4 w-4" />
             )}
-          </button>
+          </Button>
         </div>
         {requests.map((request) => (
           <RequestCard
@@ -331,13 +332,13 @@ function RequestRow({ request, showActions }) {
         <td className="py-4 px-4">
           <div className="flex items-center justify-center">
             {hasAnyComment ? (
-              <button
+              <Button
                 onClick={() => setShowCommentsModal(true)}
-                className="text-cohispania-blue hover:text-cohispania-orange transition-colors"
+                variant="ghost"
                 title="Ver más info"
               >
-                <Eye className="h-5 w-5" />
-              </button>
+                <Eye className="h-5 w-5 cursor-pointer" />
+              </Button>
             ) : (
               <span className="text-gray-300 text-sm">-</span>
             )}
@@ -346,20 +347,22 @@ function RequestRow({ request, showActions }) {
         {showActions && (
           <td className="py-4 px-4">
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 onClick={() => setShowApproveModal(true)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                variant="secondary"
+                size="small"
               >
                 <Check className="h-4 w-4" />
                 Aprobar
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowRejectModal(true)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-red-400 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                variant="danger"
+                size="small"
               >
                 <X className="h-4 w-4" />
                 Denegar
-              </button>
+              </Button>
             </div>
           </td>
         )}
@@ -453,32 +456,36 @@ function RequestCard({ request, showActions }) {
 
           {/* Botón para ver comentarios */}
           {hasAnyComment && (
-            <button
+            <Button
               onClick={() => setShowCommentsModal(true)}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors"
+              variant="ghost"
             >
               <Eye className="h-4 w-4" />
               <span className="text-sm font-medium">Ver comentarios</span>
-            </button>
+            </Button>
           )}
 
           {/* Botones de acción */}
           {showActions && (
             <div className="flex gap-2 pt-2">
-              <button
+              <Button
                 onClick={() => setShowApproveModal(true)}
-                className="flex-1 flex items-center justify-center gap-1 py-2 px-4 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                variant="secondary"
+                size="small"
+                className="flex-1"
               >
                 <Check className="h-4 w-4" />
                 Aprobar
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setShowRejectModal(true)}
-                className="flex-1 flex items-center justify-center gap-1 py-2 px-4 bg-red-400 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                variant="danger"
+                size="small"
+                className="flex-1"
               >
                 <X className="h-4 w-4" />
                 Denegar
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -592,7 +599,7 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
   const isApprove = action === "approve";
   const title = isApprove ? "Aprobar Solicitud" : "Denegar Solicitud";
   const buttonText = isApprove ? "Aprobar" : "Denegar";
-  const buttonClass = isApprove ? "bg-cohispania-blue" : "bg-red-400";
+  const buttonVariant = isApprove ? "secondary" : "danger";
 
 
   const isCommentRequired = !isApprove;
@@ -681,10 +688,11 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
           >
             Cancelar
           </Button>
-          <button
+          <Button
             onClick={handleSubmit}
             disabled={!canSubmit || isSubmitting}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-white rounded-lg transition-opacity font-semibold disabled:opacity-50 disabled:cursor-not-allowed ${buttonClass}`}
+            variant={buttonVariant}
+            className="flex-1 flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>
@@ -701,7 +709,7 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
                 <span>{buttonText}</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Pencil, ArrowLeft } from "lucide-react";
-import { toast } from "react-hot-toast";
+import toast from "../../services/toast";
 import * as userApi from "../../services/userApi";
 import * as vacationApi from "../../services/vacationApi";
 import { Card, Button } from "../../components/ui";

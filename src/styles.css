@@ -79,6 +79,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Login hero overlay con paleta de marca */
+.login-hero-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(31, 42, 68, 0.90) 0%,
+    rgba(31, 42, 68, 0.85) 50%,
+    rgba(246, 141, 46, 0.12) 100%
+  );
+}
+
 
 /* Ajustes para el calendario en móvil */
 @media (max-width: 640px) {
@@ -104,5 +114,99 @@
   /* Reducir altura de las celdas */
   .fc .fc-daygrid-day {
     min-height: 2.5rem !important;
+  }
+}
+
+/* ============================================
+   ESTILOS PERSONALIZADOS PARA FULLCALENDAR
+   ============================================ */
+
+/* Contenedor del calendario con cursor apropiado */
+.vacation-calendar-wrapper {
+  cursor: default;
+}
+
+/* Cursor de arrastre en días seleccionables */
+.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable) {
+  cursor: grab;
+}
+
+.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):active {
+  cursor: grabbing;
+}
+
+/* Fines de semana - Estilo "prohibido" */
+.fc-day-weekend-disabled {
+  position: relative;
+  background-color: #f5f5f5 !important;
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
+
+
+/* Días no disponibles (festivos/vacaciones) - cursor not-allowed */
+.fc-day-unavailable {
+  cursor: not-allowed !important;
+}
+
+/* Mejorar la visualización en mobile */
+@media (max-width: 640px) {
+  .fc-day-weekend-disabled::after {
+    font-size: 1rem;
+  }
+}
+
+/* Asegurar que la selección se mantenga visible */
+.fc .fc-highlight {
+  background: rgba(31, 42, 68, 0.1) !important; /* cohispania-blue con transparencia */
+  border: 2px solid var(--color-cohispania-blue) !important;
+}
+
+/* Efecto hover en días seleccionables */
+.vacation-calendar-wrapper .fc-daygrid-day:not(.fc-day-weekend-disabled):not(.fc-day-unavailable):hover {
+  background-color: rgba(246, 141, 46, 0.05) !important; /* cohispania-orange muy transparente */
+  transition: background-color 0.2s ease;
+}
+/* Ajustes CRÍTICOS para el calendario en móvil */
+@media (max-width: 640px) {
+  /* Hacer el texto del calendario más pequeño */
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+  }
+
+  .fc .fc-button {
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: 0.75rem !important;
+  }
+
+  .fc .fc-col-header-cell-cushion {
+    padding: 0.25rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* Reducir altura de las celdas */
+  .fc .fc-daygrid-day {
+    min-height: 2.5rem !important;
+  }
+
+  /* ✅ CRÍTICO: Hacer la leyenda más pequeña en móvil */
+  .fc .fc-daygrid-event {
+    font-size: 0.65rem !important;
+    padding: 1px 2px !important;
+  }
+
+  /* ✅ CRÍTICO: Ajustar padding del calendario */
+  .fc .fc-daygrid-day-frame {
+    padding: 2px !important;
+  }
+
+  /* ✅ NUEVO: Ocultar emoji de fin de semana en móvil si ocupa mucho */
+  .fc-day-weekend-disabled::after {
+    font-size: 0.8rem !important;
+    opacity: 0.2 !important;
   }
 }

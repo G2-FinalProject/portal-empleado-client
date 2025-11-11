@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useAdminStore from "../../stores/useAdminStore";
-import { toast } from "react-hot-toast";
+import toast from "../../services/toast";
 import EmployeeForm from "../../components/form/EmployeeForm";
 import * as userApi from "../../services/userApi";
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAdminStore from "../../stores/useAdminStore";
-import { toast } from "react-hot-toast";
+import toast from "../../services/toast";
 import EmployeeForm from "../../components/form/EmployeeForm";
 
 export default function CreateEmployeePage() {

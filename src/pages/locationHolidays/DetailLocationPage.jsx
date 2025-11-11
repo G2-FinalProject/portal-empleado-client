@@ -4,9 +4,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Card } from '../../components/ui';
+import { Card, Button } from '../../components/ui';
 import { getById as getLocationById } from '../../services/locationApi';
-import toast from 'react-hot-toast';
+import { showError } from '../../utils/notifications';
 import { ArrowLeft, Edit, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function DetailLocationPage() {
@@ -27,13 +27,13 @@ export default function DetailLocationPage() {
     });
   };
 
-  // Crear eventos para FullCalendar desde los festivos
+  // Crear eventos para FullCalendar desde los festivos (rojo de la paleta)
   const calendarEvents = location?.holidays?.map(holiday => ({
     title: holiday.holiday_name,
     start: holiday.holiday_date,
-    backgroundColor: '#F68D2E', // cohispania-orange
-    borderColor: '#F68D2E',
-    textColor: '#1F2A44', // cohispania-blue
+    backgroundColor: 'var(--color-red-400)',
+    borderColor: 'var(--color-red-400)',
+    textColor: '#FFFFFF',
     display: 'block',
   })) || [];
 
@@ -83,7 +83,7 @@ export default function DetailLocationPage() {
         </h2>
         <button
           onClick={() => navigate('/locations')}
-          className="text-cohispania-blue hover:underline"
+          className="text-cohispania-blue hover:underline cursor-pointer"
         >
           Volver al listado
         </button>
@@ -106,21 +106,15 @@ export default function DetailLocationPage() {
 
         {/* Botones de acción */}
         <div className="flex gap-3">
-          <button
-            onClick={() => navigate('/locations')}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold cursor-pointer"
-          >
+          <Button variant="ghost" onClick={() => navigate('/locations')} className="flex items-center gap-2">
             <ArrowLeft className="w-5 h-5" />
             Volver
-          </button>
+          </Button>
 
-          <button
-            onClick={() => navigate(`/locations/${id}/edit`)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold cursor-pointer"
-          >
+          <Button variant="primary" onClick={() => navigate(`/locations/${id}/edit`)} className="flex items-center gap-2">
             <Edit className="w-5 h-5" />
             Editar
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -191,7 +185,7 @@ export default function DetailLocationPage() {
                 <p>No hay festivos configurados para esta población</p>
                 <button
                   onClick={() => navigate(`/locations/${id}/edit`)}
-                  className="mt-2 text-cohispania-blue hover:underline"
+                  className="mt-2 text-cohispania-blue hover:underline cursor-pointer"
                 >
                   Añadir festivos
                 </button>

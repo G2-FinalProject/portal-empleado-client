@@ -9,7 +9,7 @@ import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
 import { Modal, Card, Button } from '../../components/ui';
 import { getById as getLocationById, update as updateLocation } from '../../services/locationApi';
 import { create as createHoliday, deleteHoliday } from '../../services/holidaysApi';
-import toast from 'react-hot-toast';
+import { showSuccess, showError, showInfo, showLoading, dismiss } from '../../utils/notifications';
 
 export default function EditLocationPage() {
   const { id } = useParams();
@@ -18,21 +18,25 @@ export default function EditLocationPage() {
 
   // Estado
   const [locationName, setLocationName] = useState('');
-  const [originalLocationName, setOriginalLocationName] = useState(''); // Para detectar cambios
-  const [existingHolidays, setExistingHolidays] = useState([]); // Festivos originales del backend
-  const [newHolidays, setNewHolidays] = useState([]); // Festivos nuevos por añadir
-  const [deletedHolidayIds, setDeletedHolidayIds] = useState([]); // IDs de festivos eliminados
+  const [originalLocationName, setOriginalLocationName] = useState('');
+  const [existingHolidays, setExistingHolidays] = useState([]);
+  const [newHolidays, setNewHolidays] = useState([]);
+  const [deletedHolidayIds, setDeletedHolidayIds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDates, setSelectedDates] = useState([]);
   const [holidayName, setHolidayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ✅ NUEVO: Modal de confirmación para eliminar
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [holidayToDelete, setHolidayToDelete] = useState(null);
+
   // Cargar datos existentes
   useEffect(() => {
     const loadLocationData = async () => {
       if (!id || isNaN(parseInt(id))) {
-        toast.error('ID de población no válido');
+        showError('ID de población no válido');
         navigate('/locations');
         return;
       }
@@ -45,10 +49,11 @@ export default function EditLocationPage() {
           throw new Error('Datos de población incompletos');
         }
 
-        // Establecer datos originales
         setLocationName(locationData.location_name);
         setOriginalLocationName(locationData.location_name);
         setExistingHolidays(locationData.holidays || []);
+
+        showSuccess('Población cargada correctamente');
       } catch (error) {
         console.error('Error loading location:', error);
 
@@ -59,7 +64,7 @@ export default function EditLocationPage() {
           errorMessage = 'No tienes permisos para editar esta población';
         }
 
-        toast.error(errorMessage);
+        showError(errorMessage);
         navigate('/locations');
       } finally {
         setIsLoading(false);
@@ -92,7 +97,6 @@ export default function EditLocationPage() {
     const start = new Date(selectInfo.startStr);
     const end = new Date(selectInfo.endStr);
 
-    // Crear array con todas las fechas del rango
     const dates = [];
     const current = new Date(start);
 
@@ -101,41 +105,60 @@ export default function EditLocationPage() {
       current.setDate(current.getDate() + 1);
     }
 
+    if (dates.length === 0) {
+      showError('Selección no válida. Selecciona al menos un día.');
+      return;
+    }
+
     setSelectedDates(dates);
     setIsModalOpen(true);
   };
 
-  // Manejar click en evento existente (eliminar festivo)
+  // ✅ NUEVO: Manejar click en evento (abrir modal de confirmación)
   const handleEventClick = (clickInfo) => {
     const eventId = clickInfo.event.id;
 
-    // Verificar si es un festivo existente o nuevo
     const existingHoliday = existingHolidays.find(h => h.id.toString() === eventId);
     const newHoliday = newHolidays.find(h => h.tempId === eventId);
 
-    if (existingHoliday) {
-      // Es un festivo existente - añadir a lista de eliminados
-      if (window.confirm(`¿Eliminar el festivo "${existingHoliday.holiday_name}"?`)) {
-        setDeletedHolidayIds(prev => [...prev, existingHoliday.id]);
-        toast.success('Festivo marcado para eliminar');
-      }
-    } else if (newHoliday) {
-      // Es un festivo nuevo - eliminar directamente
-      if (window.confirm(`¿Eliminar el festivo "${newHoliday.name}"?`)) {
-        setNewHolidays(prev => prev.filter(h => h.tempId !== newHoliday.tempId));
-        toast.success('Festivo eliminado');
-      }
+    if (existingHoliday || newHoliday) {
+      setHolidayToDelete({ event: existingHoliday || newHoliday, isNew: !!newHoliday });
+      setShowDeleteModal(true);
     }
+  };
+
+  // ✅ NUEVO: Confirmar eliminación desde modal
+  const handleConfirmDelete = () => {
+    if (!holidayToDelete) return;
+
+    if (holidayToDelete.isNew) {
+      // Es un festivo nuevo
+      setNewHolidays(prev => prev.filter(h => h.tempId !== holidayToDelete.event.tempId));
+      showSuccess('Festivo eliminado');
+    } else {
+      // Es un festivo existente
+      setDeletedHolidayIds(prev => [...prev, holidayToDelete.event.id]);
+      showSuccess('Festivo marcado para eliminar');
+    }
+
+    setShowDeleteModal(false);
+    setHolidayToDelete(null);
+  };
+
+  // ✅ NUEVO: Cancelar eliminación
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setHolidayToDelete(null);
+    showInfo('Eliminación cancelada');
   };
 
   // Añadir nuevo festivo temporal
   const handleAddHoliday = () => {
     if (!holidayName.trim()) {
-      toast.error('El nombre del festivo es obligatorio');
+      showError('El nombre del festivo es obligatorio');
       return;
     }
 
-    // Verificar duplicados con festivos existentes (no eliminados)
     const existingDates = existingHolidays
       .filter(h => !deletedHolidayIds.includes(h.id))
       .map(h => h.holiday_date);
@@ -146,11 +169,10 @@ export default function EditLocationPage() {
     const duplicates = selectedDates.filter(date => allCurrentDates.includes(date));
 
     if (duplicates.length > 0) {
-      toast.error('Ya hay festivos en algunas de las fechas seleccionadas');
+      showError('Ya hay festivos en algunas de las fechas seleccionadas');
       return;
     }
 
-    // Crear festivos para todas las fechas seleccionadas
     const newHolidaysToAdd = selectedDates.map(date => ({
       date,
       name: holidayName.trim(),
@@ -163,7 +185,7 @@ export default function EditLocationPage() {
     setIsModalOpen(false);
 
     const count = newHolidaysToAdd.length;
-    toast.success(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
+    showSuccess(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
   };
 
   // Cancelar modal
@@ -175,33 +197,59 @@ export default function EditLocationPage() {
     if (calendarRef.current) {
       calendarRef.current.getApi().unselect();
     }
+
+    showInfo('Selección cancelada');
+  };
+
+  // ✅ MEJORADO: Manejar cancelación con confirmación si hay cambios
+  const handleCancelEdit = () => {
+    const hasChanges =
+      locationName.trim() !== originalLocationName ||
+      newHolidays.length > 0 ||
+      deletedHolidayIds.length > 0;
+
+    if (hasChanges) {
+      if (window.confirm('¿Descartar cambios sin guardar?')) {
+        showInfo('Cambios descartados');
+        navigate(`/locations/${id}`);
+      }
+    } else {
+      navigate(`/locations/${id}`);
+    }
   };
 
   // Lógica de guardado completa
   const handleSaveChanges = async () => {
     if (!locationName.trim()) {
-      toast.error('El nombre de la población es obligatorio');
+      showError('El nombre de la población es obligatorio');
+      return;
+    }
+
+    const totalHolidays = existingHolidays.length - deletedHolidayIds.length + newHolidays.length;
+    if (totalHolidays === 0) {
+      showError('Debes tener al menos un festivo configurado');
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Guardando cambios...');
+    const loadingToast = showLoading('Guardando cambios...');
 
     try {
-      // 1. Actualizar nombre de población si cambió
+      const changesSummary = [];
+
       if (locationName.trim() !== originalLocationName) {
         await updateLocation(id, { location_name: locationName.trim() });
+        changesSummary.push('nombre');
       }
 
-      // 2. Eliminar festivos marcados para eliminar
       if (deletedHolidayIds.length > 0) {
         const deletePromises = deletedHolidayIds.map(holidayId =>
           deleteHoliday(holidayId)
         );
         await Promise.all(deletePromises);
+        changesSummary.push(`${deletedHolidayIds.length} eliminado${deletedHolidayIds.length > 1 ? 's' : ''}`);
       }
 
-      // 3. Crear nuevos festivos
       if (newHolidays.length > 0) {
         const createPromises = newHolidays.map(holiday =>
           createHoliday({
@@ -211,50 +259,65 @@ export default function EditLocationPage() {
           })
         );
         await Promise.all(createPromises);
+        changesSummary.push(`${newHolidays.length} festivo${newHolidays.length > 1 ? 's' : ''} nuevo${newHolidays.length > 1 ? 's' : ''}`);
       }
 
-      toast.success('¡Cambios guardados exitosamente!', { id: loadingToast });
+      dismiss(loadingToast);
+      showSuccess(`¡Cambios guardados! (${changesSummary.join(', ')})`);
 
-      // Redirigir a DetailLocationPage
       navigate(`/locations/${id}`);
     } catch (error) {
       console.error('Error saving changes:', error);
-      const errorMessage = error.response?.data?.message || 'Error al guardar los cambios';
-      toast.error(errorMessage, { id: loadingToast });
+
+      let errorMessage = 'Error al guardar los cambios';
+
+      if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.message || 'Datos inválidos';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Población no encontrada';
+      } else if (error.response?.status === 403) {
+        errorMessage = 'No tienes permisos para editar esta población';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      dismiss(loadingToast);
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Combinar festivos existentes (no eliminados) + nuevos para mostrar en calendario
+  // Combinar festivos existentes (no eliminados) + nuevos
   const allDisplayHolidays = [
     ...existingHolidays.filter(h => !deletedHolidayIds.includes(h.id)),
     ...newHolidays
   ];
 
-  // Crear eventos para FullCalendar
+  // Eventos para FullCalendar (festivos: rojo, nuevos: rojo con opacidad)
   const calendarEvents = [
-    // Festivos existentes (no eliminados)
+    // Festivos existentes (rojo de la paleta)
     ...existingHolidays
       .filter(h => !deletedHolidayIds.includes(h.id))
       .map(holiday => ({
         id: holiday.id.toString(),
         title: holiday.holiday_name,
         start: holiday.holiday_date,
-        backgroundColor: '#F68D2E', // cohispania-orange
-        borderColor: '#F68D2E',
-        textColor: '#1F2A44', // cohispania-blue
+        backgroundColor: 'var(--color-red-400)',
+        borderColor: 'var(--color-red-400)',
+        textColor: '#FFFFFF',
         display: 'block',
       })),
-    // Festivos nuevos
+    // Festivos nuevos (rojo con opacidad para diferenciar)
     ...newHolidays.map(holiday => ({
       id: holiday.tempId,
       title: holiday.name,
       start: holiday.date,
-      backgroundColor: '#22C55E', // verde para nuevos
-      borderColor: '#22C55E',
+      backgroundColor: 'var(--color-red-400)',
+      borderColor: 'var(--color-red-400)',
       textColor: '#FFFFFF',
       display: 'block',
+      classNames: 'opacity-75',
     }))
   ];
 
@@ -271,6 +334,13 @@ export default function EditLocationPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="animate-fadeIn">
+        <button
+          onClick={() => navigate(`/locations/${id}`)}
+          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
+          disabled={isSubmitting}
+        >
+          ← Volver a detalles
+        </button>
         <h1 className="text-3xl font-bold text-cohispania-blue">Editar población</h1>
         <p className="text-gray-300 mt-1">
           Modifica el nombre y gestiona los festivos de la población
@@ -306,13 +376,15 @@ export default function EditLocationPage() {
               Haz clic en un día para añadir festivos. Haz clic en un evento existente para eliminarlo.
             </p>
 
-            <div className="bg-white border border-gray-stroke rounded-lg p-4">
+            {/* ✅ Wrapper unificado con clase vacation-calendar-wrapper */}
+            <div className="vacation-calendar-wrapper bg-white border border-gray-stroke rounded-lg p-4">
               <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, multiMonthPlugin, interactionPlugin]}
                 initialView="multiMonthYear"
                 locale={esLocale}
                 selectable={true}
+                unselectAuto={false}
                 select={handleDateSelect}
                 eventClick={handleEventClick}
                 events={calendarEvents}
@@ -330,15 +402,11 @@ export default function EditLocationPage() {
               />
             </div>
 
-            {/* Leyenda de colores */}
+            {/* Leyenda de colores unificada */}
             <div className="mt-3 flex gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-cohispania-orange rounded"></div>
-                <span className="text-gray-600">Festivos existentes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded"></div>
-                <span className="text-gray-600">Festivos nuevos</span>
+                <div className="w-3 h-3 bg-[var(--color-red-400)] rounded"></div>
+                <span className="text-gray-400">Festivos</span>
               </div>
             </div>
           </div>
@@ -368,10 +436,8 @@ export default function EditLocationPage() {
                       </div>
                       <button
                         onClick={() => {
-                          if (window.confirm(`¿Eliminar el festivo "${holiday.holiday_name}"?`)) {
-                            setDeletedHolidayIds(prev => [...prev, holiday.id]);
-                            toast.success('Festivo marcado para eliminar');
-                          }
+                          setHolidayToDelete({ event: holiday, isNew: false });
+                          setShowDeleteModal(true);
                         }}
                         className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
                         disabled={isSubmitting}
@@ -397,10 +463,8 @@ export default function EditLocationPage() {
                       </div>
                       <button
                         onClick={() => {
-                          if (window.confirm(`¿Eliminar el festivo "${holiday.name}"?`)) {
-                            setNewHolidays(prev => prev.filter(h => h.tempId !== holiday.tempId));
-                            toast.success('Festivo eliminado');
-                          }
+                          setHolidayToDelete({ event: holiday, isNew: true });
+                          setShowDeleteModal(true);
                         }}
                         className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
                         disabled={isSubmitting}
@@ -425,19 +489,21 @@ export default function EditLocationPage() {
 
           {/* Botones de acción */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-stroke">
-            <button
-              onClick={() => navigate(`/locations/${id}`)}
+            <Button
+              variant="ghost"
+              onClick={handleCancelEdit}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="flex items-center gap-2"
             >
               <X className="w-5 h-5" />
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant="primary"
               onClick={handleSaveChanges}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer"
+              className="flex items-center gap-2 shadow-md"
             >
               {isSubmitting ? (
                 <>
@@ -450,19 +516,18 @@ export default function EditLocationPage() {
                   Guardar Cambios
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </Card>
 
-      {/* Modal para añadir festivo - ✅ ESTILO UNIFICADO CON LOCATIONLISTPAGE */}
+      {/* Modal para añadir festivo */}
       <Modal
         isOpen={isModalOpen}
         onClose={handleCancelModal}
         title={selectedDates.length > 1 ? "Añadir festivos" : "Añadir festivo"}
       >
         <div className="space-y-4">
-          {/* Fechas seleccionadas */}
           <div className="bg-light-background p-4 rounded-lg">
             <p className="text-sm text-gray-400 font-semibold mb-1">
               {selectedDates.length > 1 ? "Fechas seleccionadas" : "Fecha seleccionada"}
@@ -477,7 +542,6 @@ export default function EditLocationPage() {
             )}
           </div>
 
-          {/* Nombre del festivo */}
           <div>
             <label htmlFor="holidayName" className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Nombre del festivo <span className="text-red-400">*</span>
@@ -489,7 +553,7 @@ export default function EditLocationPage() {
               value={holidayName}
               onChange={(e) => setHolidayName(e.target.value)}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && holidayName.trim()) {
                   handleAddHoliday();
                 }
               }}
@@ -503,7 +567,6 @@ export default function EditLocationPage() {
             )}
           </div>
 
-          {/* Botones del modal - ✅ USANDO COMPONENTE BUTTON COMO LOCATIONLISTPAGE */}
           <div className="flex gap-3 mt-6">
             <Button
               variant="ghost"
@@ -515,9 +578,47 @@ export default function EditLocationPage() {
             <Button
               variant="primary"
               onClick={handleAddHoliday}
+              disabled={!holidayName.trim()}
               className="flex-1 cursor-pointer"
             >
               Añadir
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ✅ NUEVO: Modal de confirmación para eliminar festivo */}
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
+        title="Confirmar eliminación"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-400">
+            ¿Estás seguro de que deseas eliminar el festivo{" "}
+            <span className="font-bold text-cohispania-blue">
+              {holidayToDelete?.event?.holiday_name || holidayToDelete?.event?.name}
+            </span>
+            ?
+          </p>
+          <p className="text-sm text-red-400">
+            ⚠️ Esta acción se aplicará al guardar los cambios.
+          </p>
+
+          <div className="flex gap-3 mt-6">
+            <Button
+              variant="ghost"
+              onClick={handleCancelDelete}
+              className="flex-1 cursor-pointer"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleConfirmDelete}
+              className="flex-1 cursor-pointer"
+            >
+              Sí, eliminar
             </Button>
           </div>
         </div>

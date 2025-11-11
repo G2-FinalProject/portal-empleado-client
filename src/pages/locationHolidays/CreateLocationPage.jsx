@@ -6,10 +6,10 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
 import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle, Loader2 } from 'lucide-react';
-import { Modal, Card } from '../../components/ui';
+import { Modal, Card, Button } from '../../components/ui';
 import { create as createLocation } from '../../services/locationApi';
 import { create as createHoliday } from '../../services/holidaysApi';
-import toast from 'react-hot-toast';
+import { showSuccess, showError, showLoading, dismiss } from '../../utils/notifications';
 
 export default function CreateLocationPage() {
   const navigate = useNavigate();
@@ -29,14 +29,13 @@ export default function CreateLocationPage() {
   // Deshabilitar el calendario si no se ha introducido el nombre de la población a añadir
   const isCalendarDisabled = !locationName.trim();
 
-  // Eventos para FullCalendar (festivos temporales)
+  // Eventos para FullCalendar (festivos temporales: rojo de la paleta)
   const calendarEvents = holidays.map(holiday => ({
     title: holiday.name,
     start: holiday.date,
-    // Estilo unificado (usando el color naranja para los festivos creados)
     display: "background",
-    backgroundColor: '#ffedd5', // Naranja muy claro (similar al rojo claro de la ref)
-    borderColor: '#f97316', // Naranja intenso
+    backgroundColor: 'var(--color-red-400)',
+    borderColor: 'var(--color-red-400)',
     extendedProps: {
         isHoliday: true,
     }
@@ -113,7 +112,7 @@ export default function CreateLocationPage() {
         // límite de fechas, el array quedó vacío (aunque isDateSelectable debería prevenirlo).
         // Más importante: en un click de un solo día NO laborable (donde isDateSelectable=false),
         // esta función NO se ejecuta. El mensaje está como fallback.
-        toast.error('Selección no válida. Asegúrate de seleccionar solo días laborables no festivos.');
+        showError('Selección no válida. Asegúrate de seleccionar solo días laborables no festivos.');
         if (calendarRef.current) {
             calendarRef.current.getApi().unselect();
         }
@@ -128,7 +127,7 @@ export default function CreateLocationPage() {
   // Añadir festivo (s) para múltiples fechas
   const handleAddHoliday = () => {
     if (!holidayName.trim()) {
-      toast.error('El nombre del festivo es obligatorio');
+      showError('El nombre del festivo es obligatorio');
       return;
     }
 
@@ -138,7 +137,7 @@ export default function CreateLocationPage() {
     );
 
     if (duplicates.length > 0) {
-      toast.error(`Ya hay festivos en algunas de las ${duplicates.length} fecha(s) seleccionada(s)`);
+      showError(`Ya hay festivos en algunas de las ${duplicates.length} fecha(s) seleccionada(s)`);
       return;
     }
 
@@ -160,13 +159,13 @@ export default function CreateLocationPage() {
     }
 
     const count = newHolidays.length;
-    toast.success(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
+    showSuccess(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
   };
 
   // Eliminar festivo temporal
   const handleDeleteHoliday = (tempId) => {
     setHolidays(holidays.filter(h => h.tempId !== tempId));
-    toast.success('Festivo eliminado');
+    showSuccess('Festivo eliminado');
   };
 
   // Cancelar modal
@@ -184,17 +183,17 @@ export default function CreateLocationPage() {
   const handleSubmit = async () => {
     // Validaciones
     if (!locationName.trim()) {
-      toast.error('El nombre de la población es obligatorio');
+      showError('El nombre de la población es obligatorio');
       return;
     }
 
     if (holidays.length === 0) {
-      toast.error('Debes añadir al menos un festivo');
+      showError('Debes añadir al menos un festivo');
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToastId = toast.loading('Creando población...');
+    const loadingToastId = showLoading('Creando población...');
 
     try {
       // 1. Crear la población
@@ -388,19 +387,21 @@ export default function CreateLocationPage() {
 
           {/* Botones de acción */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-stroke">
-            <button
+            <Button
+              variant="ghost"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="flex items-center gap-2"
             >
               <X className="w-5 h-5" />
               Cancelar
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant="primary"
               onClick={handleSubmit}
               disabled={isSubmitting || !locationName.trim() || holidays.length === 0}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer"
+              className="flex items-center gap-2 shadow-md"
             >
               {isSubmitting ? (
                 <>
@@ -413,7 +414,7 @@ export default function CreateLocationPage() {
                   Crear Población
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </Card>
@@ -470,22 +471,24 @@ export default function CreateLocationPage() {
 
           {/* Botones del modal */}
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={handleAddHoliday}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              variant="primary"
+              className="flex-1 flex items-center justify-center gap-2"
               disabled={!holidayName.trim()}
             >
               <Save className="w-5 h-5" />
               Añadir
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleCancelModal}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold cursor-pointer"
+              variant="ghost"
+              className="flex-1 flex items-center justify-center gap-2"
             >
               <X className="w-5 h-5" />
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       </Modal>

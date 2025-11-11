@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
 
   //menú cerrado en mobile
   const handleLinkClick = () => {
-    if (window.innerWidth < 768 && onClose) {
+    if (window.innerWidth < 1024 && onClose) {
       onClose();
     }
   };
@@ -91,9 +91,9 @@ export default function Sidebar({ isOpen = true, onClose }) {
 
   return (
     <>
-      {/* Overlay oscuro solo en mobile cuando el sidebar está abierto */}
+      {/* Overlay oscuro en tablet/mobile cuando el sidebar está abierto */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -101,7 +101,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
       {/* Sidebar */}
       <aside
         className="
-          fixed md:relative
+          fixed lg:relative
           z-50
           w-64
           bg-cohispania-blue
@@ -109,7 +109,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
           flex flex-col
           h-screen
           animate-in slide-in-from-left duration-300
-          md:animate-none
+          lg:animate-none
         "
       >
         {/* Header con logo */}
@@ -130,10 +130,10 @@ export default function Sidebar({ isOpen = true, onClose }) {
             </div>
           </div>
 
-          {/* Botón X solo visible en mobile */}
+          {/* Botón X solo visible en tablet/mobile */}
           <button
             onClick={onClose}
-            className="md:hidden p-2 rounded-lg hover:bg-blue-stroke text-white transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-blue-stroke text-white transition-colors"
             aria-label="Cerrar menú"
           >
             <X className="h-5 w-5" />

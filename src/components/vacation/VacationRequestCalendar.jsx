@@ -8,7 +8,7 @@ import { create as createVacationRequest } from "../../services/vacationApi";
 import { getVacationSummary } from "../../services/authApi";
 import useVacationStore from "../../stores/useVacationStore";
 import Button from "../ui/Button";
-import toast from "react-hot-toast";
+import toast from "../../services/toast";
 import { eachDayOfInterval } from "date-fns";
 
 const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
@@ -18,7 +18,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
   const [comments, setComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [dragging, setDragging] = useState(false);
 
   const myRequests = useVacationStore((state) => state.myRequests);
 
@@ -44,12 +43,13 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
 
       const isMobileDevice = window.innerWidth < 640;
 
+      // ✅ Festivos: rojo de la paleta
       const holidayEvents = holidaysData.map((holiday) => ({
         title: isMobileDevice ? "🎉 F " : "Festivo",
         start: holiday.holiday_date,
         display: "background",
-        backgroundColor: "#fee2e2",
-        borderColor: "#fca5a5",
+        backgroundColor: "var(--color-red-400)",
+        borderColor: "var(--color-red-400)",
         extendedProps: {
           isHoliday: true,
         },
@@ -58,31 +58,27 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       const approvedVacations = myRequests
         .filter((req) => req.status === "approved")
         .flatMap((req) => {
-          /* Añadir T00:00:00 para forzar hora local y evitar que las
-          fechas cambien al día anterior por conversión de timezone*/
           const start = new Date(req.startDate + "T00:00:00");
           const end = new Date(req.endDate + "T00:00:00");
           const days = eachDayOfInterval({ start, end });
 
           return days.map((day) => {
-            /* Usar métodos locales (getFullYear, getMonth, getDate) en lugar de toISOString()
-            para mantener el día correcto sin conversión a UTC */
             const year = day.getFullYear();
             const month = String(day.getMonth() + 1).padStart(2, "0");
             const dayNum = String(day.getDate()).padStart(2, "0");
             const dateStr = `${year}-${month}-${dayNum}`;
 
-            return {
-              title: isMobileDevice ? "✈️ V " : "Vacaciones",
-              start: dateStr,
-              display: "background",
-              backgroundColor: "#d1fae5",
-              borderColor: "#10b981",
-              extendedProps: {
-                isApprovedVacation: true,
-                requestId: req.id,
-              },
-            };
+              return {
+                title: isMobileDevice ? "✈️ V " : "Vacaciones",
+                start: dateStr,
+                display: "background",
+                backgroundColor: "var(--color-light-green-400)",
+                borderColor: "var(--color-light-green-600)",
+                extendedProps: {
+                  isApprovedVacation: true,
+                  requestId: req.id,
+                },
+              };
           });
         });
 
@@ -103,10 +99,21 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     endDate.setDate(endDate.getDate() - 1);
     const actualEndStr = endDate.toISOString().split("T")[0];
 
-    /* Añadir T00:00:00 para forzar interpretación en hora local y
-    evitar desfases de 1 día por conversión de timezone */
     const start = new Date(startStr + "T00:00:00");
     const end = new Date(actualEndStr + "T00:00:00");
+
+    // ✅ VALIDACIÓN: Verificar que el rango sea seleccionable
+    if (!isDateSelectable(selectInfo)) {
+      if (selectInfo.view?.calendar) {
+        selectInfo.view.calendar.unselect();
+      }
+
+      toast.error('No puedes seleccionar fines de semana, festivos o días ya reservados', {
+        duration: 3000,
+        icon: '🚫',
+      });
+      return;
+    }
 
     const workingDays = calculateWorkingDays(start, end);
 
@@ -150,8 +157,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     const rangeDates = [];
 
     while (current <= end) {
-      // Usar getFullYear/getMonth/getDate en lugar de toISOString() para evitar
-      // problemas de timezone que cambian el día al convertir a UTC
       const year = current.getFullYear();
       const month = String(current.getMonth() + 1).padStart(2, "0");
       const day = String(current.getDate()).padStart(2, "0");
@@ -176,6 +181,24 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
     }
 
     return true;
+  };
+
+  // ✅ Clases CSS personalizadas para las celdas
+  const dayCellClassNames = (arg) => {
+    const classes = ["text-xs", "sm:text-sm"];
+    const dayOfWeek = arg.date.getDay();
+    const dateStr = arg.date.toISOString().split("T")[0];
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      classes.push("fc-day-weekend-disabled");
+    }
+
+    const hasEvent = holidays.some((h) => h.start === dateStr);
+    if (hasEvent) {
+      classes.push("fc-day-unavailable");
+    }
+
+    return classes;
   };
 
   const handleSubmitRequest = async () => {
@@ -247,10 +270,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       selectedRange.calendarApi.unselect();
     }
 
-    toast("Selección cancelada", {
-      icon: "ℹ️",
-      duration: 2000,
-    });
+    toast.info("Selección cancelada", { duration: 2000 });
   };
 
   if (isLoading) {
@@ -276,9 +296,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
 
   return (
     <div className="w-full">
-      {/* Card contenedor principal */}
       <div className="bg-white rounded-lg border border-gray-stroke overflow-hidden">
-        {/* Header de la card */}
         <div className="px-4 sm:px-6 py-4 border-b border-gray-stroke">
           <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
             Solicitar Vacaciones
@@ -288,33 +306,28 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
           </p>
         </div>
 
-        {/* Contenido */}
         <div className="p-4 sm:p-6">
-          {/* Leyenda del calendario */}
+          {/* Leyenda - Colores unificados: festivos rojo, vacaciones verde */}
           <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+              <div className="w-4 h-4 rounded bg-[var(--color-red-400)] border border-[var(--color-red-400)]"></div>
               <span className="text-gray-400">Festivos</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-100 border border-green-500 rounded"></div>
+              <div className="w-4 h-4 rounded bg-[var(--color-light-green-400)] border border-[var(--color-light-green-600)]"></div>
               <span className="text-gray-400">Vacaciones aprobadas</span>
             </div>
           </div>
 
-          {/* Calendario */}
-          <div
-            className={`w-full ${dragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
-            onMouseDown={() => setDragging(true)}
-            onMouseUp={() => setDragging(false)}
-            onMouseLeave={() => setDragging(false)}
-          >
+          {/* Calendario - ✅ Wrapper unificado */}
+          <div className="vacation-calendar-wrapper">
             <FullCalendar
               plugins={[dayGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
               locale={esLocale}
               selectable={true}
               selectMirror={true}
+              unselectAuto={false}
               events={holidays}
               select={handleDateSelect}
               selectAllow={isDateSelectable}
@@ -331,11 +344,10 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
               handleWindowResize={true}
               windowResizeDelay={100}
               dayHeaderFormat={{ weekday: "short" }}
-              dayCellClassNames="text-xs sm:text-sm"
+              dayCellClassNames={dayCellClassNames}
               eventClassNames="text-xs"
             />
 
-            {/* Mensaje informativo cuando no hay selección */}
             {!selectedRange && (
               <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
                 <p className="text-sm sm:text-base text-indigo-500 text-center">
@@ -346,7 +358,6 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
             )}
           </div>
 
-          {/* Formulario EN MOBILE: Aparece debajo del calendario */}
           {selectedRange && (
             <div className="lg:hidden mt-6">
               <RequestSummaryForm
@@ -381,7 +392,7 @@ function RequestSummaryForm({
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
-  }
+  };
   const textareaId = useId();
 
   return (
@@ -391,7 +402,6 @@ function RequestSummaryForm({
       </h3>
 
       <div className="space-y-4">
-        {/* Información de las fechas */}
         <div className="bg-light-background rounded-lg p-3 space-y-2 text-sm">
           <div className="flex justify-between items-center">
             <span className="text-gray-400 font-medium">Desde:</span>
@@ -422,7 +432,6 @@ function RequestSummaryForm({
           </div>
         </div>
 
-        {/* Campo de comentarios */}
         <div>
           <label
             htmlFor={textareaId}
@@ -440,7 +449,6 @@ function RequestSummaryForm({
           />
         </div>
 
-        {/* Mensaje de advertencia */}
         {selectedRange.workingDays > (vacationSummary?.remaining_days || 0) && (
           <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
             <span className="text-lg">⚠️</span>
@@ -456,7 +464,6 @@ function RequestSummaryForm({
           </div>
         )}
 
-        {/* Botones */}
         <div className="flex flex-col gap-2">
           <Button
             variant="primary"

@@ -124,10 +124,10 @@ export default function EmployeeListPage() {
       {/* Botón Nuevo Empleado */}
       <div className="flex justify-end">
         <Link to="/employees/create">
-          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium cursor-pointer">
+          <Button variant="secondary" className="flex items-center gap-3 rounded-2xl">
             <UserPlus className="w-6 h-6" />
             Nuevo Empleado
-          </button>
+          </Button>
         </Link>
       </div>
 
@@ -220,10 +220,10 @@ export default function EmployeeListPage() {
               </p>
               {!searchQuery && !selectedDepartmentId && (
                 <Link to="/employees/create" className="mt-4 inline-block">
-                  <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium mx-auto">
+                  <Button variant="secondary" className="flex items-center gap-3 rounded-2xl mx-auto">
                     <UserPlus className="w-6 h-6" />
                     Crear primer empleado
-                  </button>
+                  </Button>
                 </Link>
               )}
             </div>

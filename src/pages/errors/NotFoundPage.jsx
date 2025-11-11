@@ -16,7 +16,7 @@ export default function NotFoundPage() {
         </p>
         <button
           onClick={() => navigate('/myportal')}
-          className="px-6 py-3 bg-[--color-cohispania-orange] hover:bg-[#e57e1f] text-white font-semibold rounded-lg transition duration-200"
+          className="px-6 py-3 bg-[--color-cohispania-orange] hover:opacity-90 text-white font-semibold rounded-lg transition duration-200"
         >
           Volver al inicio
         </button>
