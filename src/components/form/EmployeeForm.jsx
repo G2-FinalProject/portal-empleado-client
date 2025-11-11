@@ -42,6 +42,7 @@ export default function EmployeeForm({
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm({
     defaultValues: {
       first_name: "",
