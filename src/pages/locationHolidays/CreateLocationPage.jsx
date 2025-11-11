@@ -291,7 +291,7 @@ export default function CreateLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full pl-4 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-[var(--color-cohispania-orange)] outline-none transition"
+              className="w-full pl-4 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-cohispania-orange outline-none transition"
               disabled={isSubmitting}
             />
             {/* Alerta cuando calendario está deshabilitado */}
@@ -377,7 +377,7 @@ export default function CreateLocationPage() {
                       </div>
                       <button
                         onClick={() => handleDeleteHoliday(holiday.tempId)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-600 hover:text-red-600 transition cursor-pointer shadow-sm hover:shadow-md"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.name}`}
                         title={`Eliminar ${holiday.name}`}

@@ -303,11 +303,11 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
           {/* Leyenda - Colores unificados: festivos rojo, vacaciones verde */}
           <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[var(--color-red-400)] border border-[var(--color-red-400)]"></div>
+              <div className="w-4 h-4 rounded bg-red-400 border border-red"></div>
               <span className="text-gray-400">Festivos</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-[var(--color-light-green-400)] border border-[var(--color-light-green-600)]"></div>
+              <div className="w-4 h-4 rounded bg-light-green-400 border border-light-green-600"></div>
               <span className="text-gray-400">Vacaciones aprobadas</span>
             </div>
           </div>

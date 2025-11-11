@@ -187,7 +187,7 @@ function RequestsList({
                   <button
                     type="button"
                     onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
-                    className="flex items-center gap-2 text-gray-400 hover:text-cohispania-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[var(--color-cohispania-orange)]"
+                    className="flex items-center gap-2 text-gray-400 hover:text-cohispania-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-cohispania-orange"
                     title={
                       sortOrder === "desc"
                         ? "Ordenar ascendente"
@@ -688,7 +688,7 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Añade un comentario..."
             rows={4}
-            className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke placeholder-cohispania-blue placeholder-opacity-60 focus:ring-0 focus:border-[var(--color-cohispania-orange)] outline-none transition resize-none"
+            className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke placeholder-cohispania-blue placeholder-opacity-60 focus:ring-0 focus:border-cohispania-orange outline-none transition resize-none"
           />
           {isCommentRequired && (
             <p className="mt-2 text-xs text-gray-400">

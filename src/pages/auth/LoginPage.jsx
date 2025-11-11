@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form'; //==> SE AÑADE FUNCIONES DE LA LIBRERÍA INSTALADA
 import { useNavigate } from 'react-router-dom';
@@ -165,8 +164,8 @@ export default function LoginPage() {
         </div>
 
         {/* Círculos decorativos */}
-        <div className="absolute top-20 right-20 w-48 h-48 rounded-full blur-3xl opacity-15 bg-[var(--color-cohispania-orange)]" />
-        <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full blur-3xl opacity-10 bg-[var(--color-cohispania-orange)]" />
+        <div className="absolute top-20 right-20 w-48 h-48 rounded-full blur-3xl opacity-15 bg-cohispania-orange" />
+        <div className="absolute bottom-20 left-20 w-64 h-64 rounded-full blur-3xl opacity-10 bg-cohispania-orange" />
       </div>
     </div>
   );

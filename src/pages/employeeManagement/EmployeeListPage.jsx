@@ -321,7 +321,7 @@ export default function EmployeeListPage() {
                               }}
                               className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer shadow-sm hover:shadow-md"
                             >
-                              <Trash2 className="w-5 h-5 text-[var(--color-red-600)]" />
+                              <Trash2 className="w-5 h-5 text-red-600" />
                             </button>
                           </div>
                         </td>
@@ -334,10 +334,9 @@ export default function EmployeeListPage() {
               {/* Cards Mobile */}
               <div className="md:hidden space-y-4">
                 {paginatedUsers.map((user) => (
-                  <div
+                  <Card
                     key={user.id}
                     className="p-4 border border-gray-stroke cursor-pointer"
-                    role="button"
                     onClick={() => navigate(`/employees/${user.id}`)}
                   >
                     <div className="space-y-3">
@@ -408,7 +407,7 @@ export default function EmployeeListPage() {
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
 

@@ -19,11 +19,13 @@ export default function CreateEmployeePage() {
     createUser,
   } = useAdminStore();
 
+
   useEffect(() => {
     fetchRoles();
     fetchDepartments();
     fetchLocations();
   }, [fetchRoles, fetchDepartments, fetchLocations]);
+
 
   const handleCreateUser = async (data) => {
     try {
@@ -37,7 +39,7 @@ export default function CreateEmployeePage() {
         "Error al crear el empleado";
       showError(errorMessage);
 
-      // ✅ solo muestra en consola si estás en modo desarrollo
+      //  solo muestra en consola si estás en modo desarrollo
       if (import.meta.env.MODE === "development") {
         console.warn("Error al crear empleado:", error);
       }

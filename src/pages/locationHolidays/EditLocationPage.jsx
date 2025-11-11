@@ -363,7 +363,7 @@ export default function EditLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-[var(--color-cohispania-orange)] focus:ring-0 outline-none transition"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-cohispania-orange focus:ring-0 outline-none transition"
               disabled={isSubmitting}
               autoFocus
             />
@@ -397,7 +397,7 @@ export default function EditLocationPage() {
                           setHolidayToDelete({ event: holiday, isNew: false });
                           setShowDeleteModal(true);
                         }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-600 hover:text-red-600 transition cursor-pointer shadow-sm hover:shadow-md"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.holiday_name}`}
                       >
@@ -419,16 +419,16 @@ export default function EditLocationPage() {
                       }}
                     >
                       <div>
-                        <p className="font-semibold text-[var(--color-light-green-600)]">{holiday.name}</p>
-                        <p className="text-sm text-[var(--color-light-green-600)] opacity-90">{formatDate(holiday.date)}</p>
-                        <p className="text-xs text-[var(--color-light-green-600)]/80">Nuevo</p>
+                        <p className="font-semibold text-light-green-600">{holiday.name}</p>
+                        <p className="text-sm text-light-green-600 opacity-90">{formatDate(holiday.date)}</p>
+                        <p className="text-xs text-light-green-600/80">Nuevo</p>
                       </div>
                       <button
                         onClick={() => {
                           setHolidayToDelete({ event: holiday, isNew: true });
                           setShowDeleteModal(true);
                         }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-600 hover:text-red-600 transition cursor-pointer shadow-sm hover:shadow-md"
                         disabled={isSubmitting}
                         aria-label={`Eliminar festivo temporal ${holiday.name}`}
                       >
@@ -458,7 +458,7 @@ export default function EditLocationPage() {
             {/* Leyenda de colores unificada */}
             <div className="mb-3 flex gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[var(--color-red-400)] rounded"></div>
+                <div className="w-3 h-3 bg-red-400 rounded"></div>
                 <span className="text-gray-400">Festivos</span>
               </div>
             </div>
