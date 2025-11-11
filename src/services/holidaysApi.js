@@ -15,33 +15,37 @@ export const getAll = async () => {
 };
 
 /**
- * Obtiene los festivos que aplican al usuario autenticado
+ * Obtiene los festivos del usuario autenticado según su location_id
+ * Usa el endpoint de locations para obtener los festivos
  * @returns {Promise} Lista de festivos del usuario
-
-export const getMyHolidays = async () => {
-  try {
-    const response = await api.get('/holidays/my-holidays');
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-*/
-
-/** Cuando esté el endpoint, borrar este y descomentar el anterior (L16-28)
- * Obtiene los festivos del usuario autenticado
- * (Temporal: obtiene todos y los filtra en el frontend)
  */
 export const getMyHolidays = async () => {
   try {
-    // Por ahora, obtenemos todos los festivos
-    const response = await api.get('/holidays');
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
 
-    // TODO: Filtrar por location_id del usuario cuando tengamos el endpoint
-    // Por ahora devolvemos todos
-    return response.data;
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Token inválido');
+    }
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const userId = payload.id;
+
+    const userResponse = await api.get(`/users/${userId}`);
+    const locationId = userResponse.data.location_id;
+
+    if (!locationId) {
+      throw new Error('El usuario no tiene una ubicación asignada');
+    }
+
+    const locationResponse = await api.get(`/locations/${locationId}`);
+    
+    return locationResponse.data.holidays || [];
   } catch (error) {
-    console.error('Error fetching holiday:', error);
+    console.error('Error fetching my holidays:', error);
     throw error;
   }
 };
