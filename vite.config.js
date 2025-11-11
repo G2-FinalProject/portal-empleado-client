@@ -13,14 +13,13 @@ export default defineConfig({
     port: 5173,
   },
   // 🧪 Configuración de Vitest
-  // 🧪 Configuración de Vitest
-// 🧪 Configuración de Vitest
+
 test: {
   globals: true,
   environment: "jsdom",
   setupFiles: "./src/test/setupTests.js",
   isolate: false,
-  pool:'forks', 
+  pool:'threads', 
 
   // ✅ Cobertura
   coverage: {
