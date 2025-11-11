@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "vitest --pool=threads",
-    "test:ui": "set VITEST_POOL=forks && vitest --pool=forks --ui",
-    "coverage": "vitest run --coverage"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.19",
@@ -32,21 +29,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react-swc": "^4.1.0",
-    "@vitest/coverage-v8": "^4.0.8",
-    "@vitest/ui": "^4.0.8",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
-    "jsdom": "^27.1.0",
     "json-server": "^1.0.0-beta.3",
-    "msw": "^2.12.0",
-    "vite": "^7.1.7",
-    "vitest": "^4.0.8"
+    "vite": "^7.1.7"
   }
 }
