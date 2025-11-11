@@ -1,4 +1,3 @@
-// src/components/ui/Button.jsx
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -27,38 +26,14 @@ export default function Button({
   ...props
 }) {
   // Estilos base
-  const baseStyles = 'font-semibold rounded-lg transition duration-200 ease-in-out cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+  const baseStyles = 'font-semibold rounded-lg transition duration-200 ease-in-out cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1';
 
   // Estilos por variante
   const variantStyles = {
-    primary: 'hover:opacity-90',
-    secondary: 'hover:opacity-80',
-    danger: 'hover:opacity-90',
-    ghost: 'hover:bg-gray-100',
-  };
-
-  // Estilos inline por variante (colores de marca)
-  const variantInlineStyles = {
-    primary: {
-      backgroundColor: '#F68D2E',
-      color: '#1F2A44',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    },
-    secondary: {
-      backgroundColor: '#1F2A44',
-      color: '#FFFFFF',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    },
-    danger: {
-      backgroundColor: '#ef4444',
-      color: '#FFFFFF',
-      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-      color: '#1F2A44',
-      border: '1px solid #E0E4EA',
-    },
+    primary: 'bg-cohispania-orange text-cohispania-blue shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-blue)]',
+    secondary: 'bg-cohispania-blue text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-orange)]',
+    danger: 'bg-[var(--color-red-400)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-red-400)]',
+    ghost: 'bg-transparent text-cohispania-blue border border-gray-stroke hover:bg-gray-100 focus-visible:ring-[var(--color-blue-stroke)]',
   };
 
   // Estilos por tamaño
@@ -84,7 +59,6 @@ export default function Button({
     <button
       type={type}
       disabled={disabled || loading}
-      style={variantInlineStyles[variant]}
       className={combinedClassName}
       onClick={onClick}
       {...props}
