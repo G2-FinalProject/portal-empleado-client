@@ -135,7 +135,7 @@ function RequestsList({
                   onClick={() =>
                     onSortChange(sortOrder === "desc" ? "asc" : "desc")
                   }
-                  className="flex items-center gap-2 hover:text-cohispania-blue transition-colors"
+                  className="flex items-center gap-2 hover:text-cohispania-blue transition-colors cursor-pointer"
                   title={
                     sortOrder === "desc"
                       ? "Ordenar ascendente"
@@ -181,7 +181,7 @@ function RequestsList({
           </p>
           <button
             onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
-            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm cursor-pointer"
             title={
               sortOrder === "desc"
                 ? "Ordenar ascendente"
@@ -269,10 +269,10 @@ function RequestRow({ request }) {
             {hasAnyComment ? (
               <button
                 onClick={() => setShowModal(true)}
-                className="text-cohispania-blue hover:text-cohispania-orange transition-colors"
+                className="text-cohispania-blue hover:text-cohispania-orange transition-colors cursor-pointer"
                 title="Ver más info"
               >
-                <Eye className="h-5 w-5" />
+                <Eye className="h-5 w-5 cursor-pointer" />
               </button>
             ) : (
               <span className="text-gray-300 text-sm">-</span>
@@ -317,7 +317,7 @@ function RequestRow({ request }) {
               <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Respuesta del responsable:
               </h3>
-              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
+              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-2 border-cohispania-orange">
                 {request.comments}
               </p>
             </div>
@@ -409,7 +409,7 @@ function RequestCard({ request }) {
           {hasAnyComment && (
             <button
               onClick={() => setShowModal(true)}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors cursor-pointer"
             >
               <Eye className="h-4 w-4" />
               <span className="text-sm font-medium">Ver comentarios</span>
@@ -451,7 +451,7 @@ function RequestCard({ request }) {
               <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Respuesta del responsable:
               </h3>
-              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-l-4 border-cohispania-orange">
+              <p className="text-base text-cohispania-blue bg-light-background p-4 rounded-lg border-l-2 border-cohispania-orange">
                 {request.comments}
               </p>
             </div>

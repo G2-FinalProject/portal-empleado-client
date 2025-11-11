@@ -48,7 +48,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
             className="text-gray-400 hover:text-cohispania-blue transition-colors"
             aria-label="Cerrar modal"
           >
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6 cursor-pointer" />
           </button>
         </div>
 

@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
       icon: Users,
     },
     {
-      title: "Festivos Poblaciones",
+      title: "Poblaciones y festivos",
       url: "/locations",
       icon: Calendar,
     },
@@ -104,9 +104,9 @@ export default function Sidebar({ isOpen = true, onClose }) {
           fixed md:relative
           z-50
           w-64
-          bg-cohispania-blue 
-          border-r border-blue-stroke 
-          flex flex-col 
+          bg-cohispania-blue
+          border-r border-blue-stroke
+          flex flex-col
           h-screen
           animate-in slide-in-from-left duration-300
           md:animate-none
@@ -193,7 +193,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
           {/* Botón de cerrar sesión */}
           <button
             onClick={logout}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-blue-stroke text-white transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-blue-stroke text-white transition-colors cursor-pointer"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span className="whitespace-nowrap">Cerrar Sesión</span>

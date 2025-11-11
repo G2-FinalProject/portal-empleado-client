@@ -51,7 +51,7 @@ export default function CreateEmployeePage() {
       <div>
         <button
           onClick={handleCancel}
-          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2"
+          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
         >
           ← Volver al listado
         </button>

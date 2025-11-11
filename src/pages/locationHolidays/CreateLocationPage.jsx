@@ -1,12 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle } from 'lucide-react';
-import { Modal, Button, Card } from '../../components/ui';
+import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle, Loader2 } from 'lucide-react';
+import { Modal, Card } from '../../components/ui';
 import { create as createLocation } from '../../services/locationApi';
 import { create as createHoliday } from '../../services/holidaysApi';
 import toast from 'react-hot-toast';
@@ -19,30 +19,109 @@ export default function CreateLocationPage() {
   const [locationName, setLocationName] = useState('');
   const [holidays, setHolidays] = useState([]); // { date, name, tempId }
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDates, setSelectedDates] = useState([]); //Array para selección múltiple
+  const [selectedDates, setSelectedDates] = useState([]); // Array para selección múltiple
   const [holidayName, setHolidayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Estado para unificar el estilo de arrastre del calendario
+  const [dragging, setDragging] = useState(false);
 
   // Deshabilitar el calendario si no se ha introducido el nombre de la población a añadir
   const isCalendarDisabled = !locationName.trim();
 
-  // Meanejar selección de rango de fechas (tipo drag para que sea como en el general)
-  const handleDateSelect = (selectInfo) => {
-    if (isCalendarDisabled) return;
+  // Eventos para FullCalendar (festivos temporales)
+  const calendarEvents = holidays.map(holiday => ({
+    title: holiday.name,
+    start: holiday.date,
+    // Estilo unificado (usando el color naranja para los festivos creados)
+    display: "background",
+    backgroundColor: '#ffedd5', // Naranja muy claro (similar al rojo claro de la ref)
+    borderColor: '#f97316', // Naranja intenso
+    extendedProps: {
+        isHoliday: true,
+    }
+  }));
 
-    const start = new Date(selectInfo.startStr);
-    const end = new Date(selectInfo.endStr);
+  // Función unificada para navegar de vuelta
+  const handleCancel = useCallback(() => {
+    navigate('/locations');
+  }, [navigate]);
 
-    //Crear array con todas las fechas del rango
-    const dates = [];
+  // Lógica para determinar si un rango de fechas es seleccionable (copiado de VacationRequestCalendar)
+  // Un día no es seleccionable si: es fin de semana O ya ha sido añadido como festivo temporal
+  const isDateSelectable = (selectInfo) => {
+    const start = new Date(selectInfo.start);
+    const end = new Date(selectInfo.end);
+    end.setDate(end.getDate() - 1);
+
     const current = new Date(start);
+    const rangeDates = [];
 
-    while (current < end) {
-      dates.push(current.toISOString().split('T')[0]);
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, "0");
+      const day = String(current.getDate()).padStart(2, "0");
+      const dateStr = `${year}-${month}-${day}`;
+
+      rangeDates.push(dateStr);
       current.setDate(current.getDate() + 1);
     }
 
+    for (const dateStr of rangeDates) {
+      const date = new Date(dateStr + "T00:00:00");
+      const dayOfWeek = date.getDay();
+
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        return false; // Es fin de semana
+      }
+
+      // Comprueba si ya es un festivo temporalmente añadido
+      const isAlreadyHoliday = holidays.some((h) => h.date === dateStr);
+      if (isAlreadyHoliday) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  // Manejar selección de rango de fechas (Simplificado, confiando en selectAllow para la validación)
+  const handleDateSelect = (selectInfo) => {
+    if (isCalendarDisabled) return;
+
+    // 1. Determinar el rango de fechas real (excluyendo el día final de FullCalendar)
+    const startStr = selectInfo.startStr;
+    const endStr = selectInfo.endStr;
+
+    const endDate = new Date(endStr);
+    endDate.setDate(endDate.getDate() - 1);
+    const actualEndStr = endDate.toISOString().split("T")[0];
+
+    const dates = [];
+    const current = new Date(startStr);
+    const end = new Date(actualEndStr);
+
+    // 2. Recolectar todas las fechas. Si selectAllow fue 'true', sabemos que todas son válidas.
+    while (current <= end) {
+        dates.push(current.toISOString().split('T')[0]);
+        current.setDate(current.getDate() + 1);
+    }
+
+    // 3. Validación explícita y toast de error
+    if (dates.length === 0) {
+        // Esto captura casos donde selectAllow pudo haber sido true, pero por error de cálculo o
+        // límite de fechas, el array quedó vacío (aunque isDateSelectable debería prevenirlo).
+        // Más importante: en un click de un solo día NO laborable (donde isDateSelectable=false),
+        // esta función NO se ejecuta. El mensaje está como fallback.
+        toast.error('Selección no válida. Asegúrate de seleccionar solo días laborables no festivos.');
+        if (calendarRef.current) {
+            calendarRef.current.getApi().unselect();
+        }
+        return;
+    }
+
     setSelectedDates(dates);
+    setHolidayName(''); // Limpia el nombre del festivo anterior
     setIsModalOpen(true);
   };
 
@@ -53,13 +132,13 @@ export default function CreateLocationPage() {
       return;
     }
 
-    //Verificar duplicados
+    // Verificar si alguna fecha seleccionada ya fue marcada como festivo (doble check)
     const duplicates = selectedDates.filter(date =>
       holidays.some(h => h.date === date)
     );
 
     if (duplicates.length > 0) {
-      toast.error(`Ya hay festivos en algunas de las fechas seleccionadas`);
+      toast.error(`Ya hay festivos en algunas de las ${duplicates.length} fecha(s) seleccionada(s)`);
       return;
     }
 
@@ -67,13 +146,18 @@ export default function CreateLocationPage() {
     const newHolidays = selectedDates.map(date => ({
       date,
       name: holidayName.trim(),
-      tempId: `${date}-${Date.now()}`,
+      tempId: `${date}-${Date.now()}-${Math.random()}`,
     }));
 
     setHolidays([...holidays, ...newHolidays]);
     setHolidayName('');
     setSelectedDates([]);
     setIsModalOpen(false);
+
+    // Limpiar selección del calendario
+    if (calendarRef.current) {
+        calendarRef.current.getApi().unselect();
+    }
 
     const count = newHolidays.length;
     toast.success(`${count} festivo${count > 1 ? 's' : ''} añadido${count > 1 ? 's' : ''} al calendario`);
@@ -89,7 +173,7 @@ export default function CreateLocationPage() {
   const handleCancelModal = () => {
     setIsModalOpen(false);
     setHolidayName('');
-    setSelectedDates([]); //Aquí limpio el array de fechas
+    setSelectedDates([]);
 
     if (calendarRef.current) {
       calendarRef.current.getApi().unselect();
@@ -110,7 +194,7 @@ export default function CreateLocationPage() {
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creando población...');
+    const loadingToastId = toast.loading('Creando población...');
 
     try {
       // 1. Crear la población
@@ -128,12 +212,18 @@ export default function CreateLocationPage() {
 
       await Promise.all(holidayPromises);
 
-      toast.success('¡Población creada exitosamente!', { id: loadingToast });
+      toast.success('¡Población creada exitosamente!', { id: loadingToastId });
       navigate('/locations');
     } catch (error) {
-      console.error('Error al crear población:', error);
-      const errorMessage = error.response?.data?.message || 'Error al crear la población';
-      toast.error(errorMessage, { id: loadingToast });
+      const errorMessage =
+        error.response?.data?.message ||
+        'Error al crear la población';
+
+      toast.error(errorMessage, { id: loadingToastId });
+
+      if (import.meta.env.MODE === "development") {
+        console.warn("Error al crear población:", error);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -151,28 +241,36 @@ export default function CreateLocationPage() {
   // Formatear rango de fechas para el modal
   const formatDateRange = () => {
     if (selectedDates.length === 0) return '';
-    if (selectedDates.length === 1) return formatDate(selectedDates[0]);
 
+    // Clonar y ordenar las fechas para asegurar que el rango sea correcto
     const sortedDates = [...selectedDates].sort();
-    return `${formatDate(sortedDates[0])} - ${formatDate(sortedDates[sortedDates.length - 1])}`;
+
+    const start = sortedDates[0];
+    const end = sortedDates[sortedDates.length - 1];
+
+    if (start === end) return formatDate(start);
+
+    // Solo mostramos el rango real (de la primera a la última fecha seleccionada)
+    return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
-  // Eventos para FullCalendar (festivos temporales)
-  const calendarEvents = holidays.map(holiday => ({
-    title: holiday.name,
-    start: holiday.date,
-    backgroundColor: '#F68D2E', // cohispania-orange
-    borderColor: '#F68D2E',
-    textColor: '#1F2A44',
-  }));
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header unificado con CreateEmployeePage */}
       <div>
-        <h1 className="text-3xl font-bold text-cohispania-blue">Añade una nueva población</h1>
-        <p className="text-gray-300 mt-1">
-          Selecciona los festivos de la nueva población
+        <button
+          onClick={handleCancel}
+          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
+          disabled={isSubmitting}
+        >
+          ← Volver al listado
+        </button>
+        <h1 className="text-3xl font-bold text-cohispania-blue">
+          Añade una nueva población
+        </h1>
+        <p className="text-sm text-gray-300 mt-2">
+          Completa los datos para registrar una nueva población y sus festivos en el sistema.
         </p>
       </div>
 
@@ -190,14 +288,14 @@ export default function CreateLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
+              className="w-full pl-4 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-cohispania-orange focus:border-2 outline-none transition"
               disabled={isSubmitting}
             />
             {/* Alerta cuando calendario está deshabilitado */}
             {isCalendarDisabled && (
               <p className="mt-2 text-sm text-gray-400 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4" />
-                Escribe el nombre de la población para habilitar el calendario
+                Escribe el **nombre de la población** para habilitar el calendario de festivos.
               </p>
             )}
           </div>
@@ -208,17 +306,26 @@ export default function CreateLocationPage() {
               Festivos <span className="text-red-400">*</span>
             </label>
             <p className="text-sm text-gray-300 mb-4">
-              Haz clic en un día o arrastra para seleccionar varios días consecutivos
+              Haz clic en un día o arrastra para seleccionar varios días laborables consecutivos
             </p>
 
-            <div className="bg-white border border-gray-stroke rounded-lg p-4">
+            {/* Calendario (Estilos y funcionalidad unificados) */}
+            <div
+                // CLASES CORREGIDAS: cursor-grab para inactivo, cursor-grabbing para arrastrar
+                className={`bg-white border border-gray-stroke rounded-lg p-4 ${dragging ? 'cursor-grabbing select-none' : 'cursor-grab'}`}
+                onMouseDown={() => setDragging(true)}
+                onMouseUp={() => setDragging(false)}
+                onMouseLeave={() => setDragging(false)}
+            >
               <FullCalendar
                 ref={calendarRef}
                 plugins={[dayGridPlugin, multiMonthPlugin, interactionPlugin]}
                 initialView="multiMonthYear"
                 locale={esLocale}
                 selectable={!isCalendarDisabled}
+                selectMirror={true}
                 select={handleDateSelect}
+                selectAllow={isDateSelectable}
                 events={calendarEvents}
                 headerToolbar={{
                   left: 'prev,next',
@@ -231,12 +338,16 @@ export default function CreateLocationPage() {
                 height="auto"
                 dayMaxEvents={3}
                 fixedWeekCount={false}
+                dayHeaderFormat={{ weekday: "short" }}
+                // CLASE CORREGIDA: Se elimina cursor-pointer para que el cursor-grab del div padre funcione
+                dayCellClassNames="text-xs sm:text-sm"
+                eventClassNames="text-xs"
               />
             </div>
 
             {/* Contador de días seleccionados */}
             <p className="text-sm text-gray-300 mt-2">
-              Días seleccionados: {holidays.length}
+              Días festivos temporales añadidos: **{holidays.length}**
             </p>
           </div>
 
@@ -249,7 +360,7 @@ export default function CreateLocationPage() {
               </h3>
 
               {/* Scroll en lista cuando hay muchos festivos */}
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                 {holidays
                   .sort((a, b) => new Date(a.date) - new Date(b.date))
                   .map((holiday) => (
@@ -263,7 +374,7 @@ export default function CreateLocationPage() {
                       </div>
                       <button
                         onClick={() => handleDeleteHoliday(holiday.tempId)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition"
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.name}`}
                       >
@@ -275,12 +386,12 @@ export default function CreateLocationPage() {
             </div>
           )}
 
-          {/* Botones de acción --> los cambio a derecha */}
+          {/* Botones de acción */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-stroke">
             <button
-              onClick={() => navigate('/locations')}
+              onClick={handleCancel}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <X className="w-5 h-5" />
               Cancelar
@@ -289,11 +400,11 @@ export default function CreateLocationPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || !locationName.trim() || holidays.length === 0}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer"
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-cohispania-blue border-t-transparent rounded-full animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   Creando...
                 </>
               ) : (
@@ -324,7 +435,7 @@ export default function CreateLocationPage() {
             </p>
             {selectedDates.length > 1 && (
               <p className="text-sm text-gray-300 mt-1">
-                {selectedDates.length} días consecutivos
+                **{selectedDates.length} días** laborables
               </p>
             )}
           </div>
@@ -340,18 +451,19 @@ export default function CreateLocationPage() {
               placeholder={selectedDates.length > 1 ? "Ej: Semana Santa, Navidades..." : "Ej: Día de la Constitución"}
               value={holidayName}
               onChange={(e) => setHolidayName(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && holidayName.trim()) {
+                  e.preventDefault();
                   handleAddHoliday();
                 }
               }}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-2 focus:ring-cohispania-blue focus:border-cohispania-blue outline-none transition"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-cohispania-orange focus:border-2 outline-none transition"
               autoFocus
             />
-            {/* MEJORA 3: Ayuda para selección múltiple */}
+            {/* Ayuda para selección múltiple */}
             {selectedDates.length > 1 && (
               <p className="text-xs text-gray-400 mt-2">
-                El mismo nombre se aplicará a todos los días seleccionados
+                El mismo nombre se aplicará a **todos los días seleccionados**.
               </p>
             )}
           </div>
@@ -360,7 +472,8 @@ export default function CreateLocationPage() {
           <div className="flex gap-3">
             <button
               onClick={handleAddHoliday}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-cohispania-orange text-cohispania-blue hover:opacity-90 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              disabled={!holidayName.trim()}
             >
               <Save className="w-5 h-5" />
               Añadir
@@ -368,7 +481,7 @@ export default function CreateLocationPage() {
 
             <button
               onClick={handleCancelModal}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border-2 border-cohispania-blue text-cohispania-blue hover:bg-light-background transition font-semibold cursor-pointer"
             >
               <X className="w-5 h-5" />
               Cancelar

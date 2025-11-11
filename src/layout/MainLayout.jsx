@@ -5,7 +5,7 @@ import { PanelLeft, Bell } from "lucide-react";
 
 export default function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -34,7 +34,7 @@ export default function MainLayout() {
         <header className="h-12 bg-white border-b border-gray-stroke flex items-center justify-between px-4 md:px-6">
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg hover:bg-cohispania-orange transition-colors text-cohispania-blue"
+            className="p-2 rounded-lg hover:bg-cohispania-orange transition-colors text-cohispania-blue cursor-pointer"
             aria-label={isSidebarOpen ? "Cerrar menú" : "Abrir menú"}
           >
             <PanelLeft className="h-5 w-5" />

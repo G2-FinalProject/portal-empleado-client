@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, Pencil, Trash2, Search, UserPlus } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, UserPlus, HousePlus } from 'lucide-react';
 import useAdminStore from '../../stores/useAdminStore';
 import { Card, Modal, Button } from '../../components/ui';
 
@@ -73,7 +73,7 @@ export default function LocationListPage() {
       <div className="flex justify-end animate-fadeIn">
         <Link to="/locations/create" className="cursor-pointer">
           <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium cursor-pointer">
-            <UserPlus className="w-6 h-6" />
+            <HousePlus className="w-6 h-6" />
             Nueva Población
           </button>
         </Link>

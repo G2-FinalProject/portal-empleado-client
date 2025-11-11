@@ -84,7 +84,7 @@ export default function DetailEmployeePage() {
           </p>
           <button
             onClick={() => navigate("/employees")}
-            className="mt-4 px-4 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90"
+            className="mt-4 px-4 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 cursor-pointer"
           >
             Volver al listado
           </button>
@@ -99,7 +99,7 @@ export default function DetailEmployeePage() {
       {/* Botón volver */}
       <button
         onClick={() => navigate("/employees")}
-        className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2"
+        className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4" />
         Volver al listado

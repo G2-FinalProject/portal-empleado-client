@@ -59,7 +59,7 @@ export default function Tabs({
                 flex items-center justify-center gap-2
                 transition-all duration-200
                 font-medium text-sm
-                focus:outline-none focus:ring-1 focus:ring-cohispania-orange focus:ring-offset-2
+                focus:outline-none focus:ring-1 focus:ring-cohispania-orange focus:ring-offset-2 cursor-pointer
                 ${
                   isActive
                     ? "bg-white text-cohispania-blue shadow-sm"

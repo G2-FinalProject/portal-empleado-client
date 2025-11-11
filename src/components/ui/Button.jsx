@@ -27,7 +27,7 @@ export default function Button({
   ...props
 }) {
   // Estilos base
-  const baseStyles = 'font-semibold rounded-lg transition duration-200 ease-in-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2';
+  const baseStyles = 'font-semibold rounded-lg transition duration-200 ease-in-out cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2';
 
   // Estilos por variante
   const variantStyles = {

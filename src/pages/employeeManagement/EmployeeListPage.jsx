@@ -124,7 +124,7 @@ export default function EmployeeListPage() {
       {/* Botón Nuevo Empleado */}
       <div className="flex justify-end">
         <Link to="/employees/create">
-          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium">
+          <button className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-cohispania-blue text-white hover:opacity-90 transition font-medium cursor-pointer">
             <UserPlus className="w-6 h-6" />
             Nuevo Empleado
           </button>
@@ -170,7 +170,7 @@ export default function EmployeeListPage() {
               id="department-filter"
               value={selectedDepartmentId || ""}
               onChange={(e) => setSelectedDepartmentId(e.target.value || null)}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue focus:ring-1 focus:ring-cohispania-orange  outline-none transition"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue focus:ring-1 focus:ring-cohispania-orange  outline-none transition cursor-pointer"
             >
               <option value="">Todos los departamentos</option>
               {departments.map((dept) => (
@@ -194,7 +194,7 @@ export default function EmployeeListPage() {
         {/* Loading State */}
         {loading?.users && (
           <div
-          role="status" 
+          role="status"
           aria-label="cargando..."
           className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-cohispania-blue" />
@@ -459,7 +459,7 @@ export default function EmployeeListPage() {
                           className={`w-10 h-10 rounded-lg font-medium transition ${
                             currentPage === pageNumber
                               ? "bg-cohispania-blue text-white"
-                              : "bg-light-background text-cohispania-blue hover:bg-gray-stroke"
+                              : "bg-light-background text-cohispania-blue hover:bg-gray-stroke cursor-pointer"
                           }`}
                         >
                           {pageNumber}
@@ -472,7 +472,7 @@ export default function EmployeeListPage() {
                   <button
                     onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-light-background text-cohispania-blue font-medium hover:bg-gray-stroke transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-light-background text-cohispania-blue font-medium hover:bg-gray-stroke transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Siguiente
                     <ChevronRight className="w-5 h-5" />
