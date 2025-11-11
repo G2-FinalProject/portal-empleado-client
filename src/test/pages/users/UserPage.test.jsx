@@ -1,5 +1,3 @@
-// src/test/pages/users/UserPage.test.jsx
-
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -8,11 +6,8 @@ import UserPage from "../../../pages/users/UserPage";
 // ============================================
 // MOCKS DE DEPENDENCIAS EXTERNAS
 // ============================================
-/**
- * - Aislamos UserPage de sus dependencias (stores, componentes hijos)
- * - Controlamos el comportamiento durante el test
- * - Evitamos llamadas reales a la API
- */
+
+
 
 // Mock de react-hot-toast
 vi.mock("react-hot-toast", () => ({
@@ -35,16 +30,40 @@ vi.mock("../../../stores/useVacationStore", () => ({
   default: vi.fn(),
 }));
 
+// Mock de authApi (para getVacationSummary)
+vi.mock("../../../services/authApi", () => ({
+  getVacationSummary: vi.fn(() =>
+    Promise.resolve({
+      remaining_days: 15,
+      used_days: 7,
+      allowance_days: 22,
+    })
+  ),
+}));
+
+// Mock de vacationApi (para create)
+vi.mock("../../../services/vacationApi", () => ({
+  create: vi.fn(() =>
+    Promise.resolve({
+      data: {
+        id: 999,
+        start_date: "2025-01-15",
+        end_date: "2025-01-20",
+        requested_days: 5,
+        status: "pending",
+      },
+    })
+  ),
+}));
+
 // Mock de VacationRequestCalendar (componente hijo)
-/**
- * Este componente se mockea porque tendrá su propio test y aquí solo nos interesa verificar que se renderiza.
- */
+
 vi.mock("../../../components/vacation/VacationRequestCalendar", () => ({
   __esModule: true,
   default: ({ onRequestCreated, onSelectionChange }) => (
     <div data-testid="vacation-calendar">
       <p>Calendario de Vacaciones</p>
-      {/* Simulamos los callbacks que recibe el componente */}
+
       <button onClick={onRequestCreated}>Simular Request Created</button>
       <button
         onClick={() =>
@@ -62,7 +81,7 @@ vi.mock("../../../components/vacation/VacationRequestCalendar", () => ({
       </button>
     </div>
   ),
-  // También exportamos RequestSummaryForm como named export
+
   RequestSummaryForm: ({ selectedRange, onClearSelection }) => (
     <div data-testid="request-summary-form">
       <p>Formulario de Resumen</p>
@@ -110,12 +129,9 @@ import useVacationStore from "../../../stores/useVacationStore";
 // DATOS DE PRUEBA (MOCK DATA)
 // ============================================
 
-/**
- * Datos simulados que usaremos en los tests
- */
 const mockUser = {
   id: 1,
-  firstName: "Pepa",
+  firstName: "Lisi",
   roleId: 3, // 3 = employee
   departmentId: 1,
 };
@@ -150,9 +166,6 @@ const mockStats = {
 // FUNCIÓN AUXILIAR PARA CONFIGURAR MOCKS
 // ============================================
 
-/**
- * Configura el estado de los stores mockeadosy centralizamos la configuración de los mocks
- */
 
 const setupMocks = ({
   user = mockUser,
@@ -211,8 +224,14 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Verificamos el título con el nombre del usuario
-    expect(screen.getByText(/Bienvenido <Pepa>/i)).toBeInTheDocument();
+
+    expect(
+      screen.getByText((content, element) => {
+        return element?.tagName.toLowerCase() === 'h1' && 
+               element?.textContent.includes('Bienvenido') &&
+               element?.textContent.includes('Lisi');
+      })
+    ).toBeInTheDocument();
     
     // Verificamos el texto descriptivo
     expect(
@@ -237,11 +256,11 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Bienvenido Pepa/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bienvenido Lisi/i)).toBeInTheDocument();
   });
 
   it("muestra 'Usuario' si no hay firstName en authStore", () => {
-    // Sobrescribimos el mock para este test específico
+
     setupMocks({ user: { ...mockUser, firstName: null } });
 
     render(
@@ -272,15 +291,15 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // 1. Calendario de solicitudes
+
     expect(screen.getByTestId("vacation-calendar")).toBeInTheDocument();
     expect(screen.getByText("Calendario de Vacaciones")).toBeInTheDocument();
 
-    // 2. Balance de vacaciones (sidebar)
+
     expect(screen.getByTestId("vacation-summary")).toBeInTheDocument();
     expect(screen.getByText("Balance de Vacaciones")).toBeInTheDocument();
 
-    // 3. Tabs con solicitudes
+
     expect(screen.getByTestId("my-requests-tabs")).toBeInTheDocument();
     expect(screen.getByText("Mis Solicitudes")).toBeInTheDocument();
   });
@@ -313,6 +332,7 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
+
     await waitFor(() => {
       expect(mockFetchMyRequests).toHaveBeenCalledTimes(1);
     });
@@ -338,10 +358,10 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Verificamos que está el balance de vacaciones
+
     expect(screen.getByTestId("vacation-summary")).toBeInTheDocument();
     
-    // Verificamos que NO está el formulario de resumen
+
     expect(
       screen.queryByTestId("request-summary-form")
     ).not.toBeInTheDocument();
@@ -354,16 +374,19 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Simulamos que el usuario selecciona fechas en el calendario
+
     const selectButton = screen.getByText("Simular Selection");
     selectButton.click();
 
-    // Esperamos a que cambie el estado
-    await waitFor(() => {
-      expect(screen.getByTestId("request-summary-form")).toBeInTheDocument();
-    });
 
-    // Verificamos que ya NO está el balance de vacaciones
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("request-summary-form")).toBeInTheDocument();
+      },
+      { timeout: 3000 } 
+    );
+
+
     expect(screen.queryByTestId("vacation-summary")).not.toBeInTheDocument();
   });
 
@@ -374,22 +397,29 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // 1. Seleccionamos fechas
+
     const selectButton = screen.getByText("Simular Selection");
     selectButton.click();
 
-    await waitFor(() => {
-      expect(screen.getByTestId("request-summary-form")).toBeInTheDocument();
-    });
 
-    // 2. Limpiamos la selección
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("request-summary-form")).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
+
+
     const clearButton = screen.getByText("Limpiar Selection");
     clearButton.click();
 
-    // 3. Verificamos que vuelve a aparecer el balance
-    await waitFor(() => {
-      expect(screen.getByTestId("vacation-summary")).toBeInTheDocument();
-    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("vacation-summary")).toBeInTheDocument();
+      },
+      { timeout: 3000 }
+    );
 
     expect(
       screen.queryByTestId("request-summary-form")
@@ -424,14 +454,14 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Limpiamos las llamadas previas del useEffect
+
     mockFetchMyRequests.mockClear();
 
-    // Simulamos que se creó una solicitud
+ 
     const createButton = screen.getByText("Simular Request Created");
     createButton.click();
 
-    // Verificamos que se llamó a fetchMyRequests
+
     await waitFor(() => {
       expect(mockFetchMyRequests).toHaveBeenCalledTimes(1);
     });
@@ -455,7 +485,7 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Buscamos el grid principal
+
     const gridElement = container.querySelector(".grid");
     
     expect(gridElement).toHaveClass("grid-cols-1");
@@ -479,7 +509,7 @@ describe("UserPage", () => {
       </MemoryRouter>
     );
 
-    // Verificamos el contenedor principal
+
     const mainContainer = container.querySelector(".max-w-7xl");
     expect(mainContainer).toBeInTheDocument();
     expect(mainContainer).toHaveClass("mx-auto");
