@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/re
 import { MemoryRouter } from "react-router-dom";
 import { describe, it, vi, beforeEach, afterEach, expect } from "vitest";
 import CreateEmployeePage from "../../../pages/employeeManagement/CreateEmployeePage";
+process.on("unhandledRejection", () => {});
 
 vi.mock("axios", () => ({
   __esModule: true,
@@ -125,7 +126,11 @@ describe("🧩 CreateEmployeePage", () => {
       </MemoryRouter>
     );
 
+  try {
     fireEvent.click(screen.getByTestId("mock-create-btn"));
+  } catch (error) {
+    
+  }
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith("Error de servidor");

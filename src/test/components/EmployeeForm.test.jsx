@@ -1,10 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
-import { toast } from "react-hot-toast";
 import EmployeeForm from "../../components/form/EmployeeForm";
 
-// 🧩 Mock de dependencias externas
+// Mock de dependencias externas
 vi.mock("react-hot-toast", () => ({
   toast: {
     error: vi.fn(),
@@ -16,26 +15,20 @@ vi.mock("../../components/ui/Card", () => ({
 }));
 
 vi.mock("../../components/ui/Input", () => ({
-  default: ({ label, name, placeholder, register, errors, type = "text" }) => (
+  default: ({ label, name, placeholder, register = () => ({}), errors, type = "text" }) => (
     <div>
       <label htmlFor={name}>{label}</label>
       <input
         id={name}
-        name={name}
+        {...register(name)}   
         placeholder={placeholder}
         type={type}
-        onChange={() => {}}
       />
       {errors?.[name] && <p>{errors[name].message}</p>}
     </div>
   ),
 }));
 
-vi.mock("../../components/ui/Button", () => ({
-  default: ({ children, ...props }) => (
-    <button {...props}>{children}</button>
-  ),
-}));
 
 describe("🧾 EmployeeForm", () => {
   const mockOnSubmit = vi.fn();
@@ -63,6 +56,7 @@ describe("🧾 EmployeeForm", () => {
     expect(screen.getByLabelText("Días de Vacaciones Disponibles")).toBeInTheDocument();
   });
 
+
   test("envía el formulario correctamente y llama a onSubmit", async () => {
     render(<EmployeeForm {...mockProps} />);
 
@@ -82,6 +76,17 @@ describe("🧾 EmployeeForm", () => {
       target: { value: 15 },
     });
 
+
+    fireEvent.change(screen.getByDisplayValue("Selecciona un rol"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByDisplayValue("Selecciona departamento"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByDisplayValue("Selecciona una localización"), {
+      target: { value: "1" },
+    });
+
     fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
 
     await waitFor(() => {
@@ -89,14 +94,16 @@ describe("🧾 EmployeeForm", () => {
     });
   });
 
+
   test("muestra errores si faltan campos requeridos", async () => {
     render(<EmployeeForm {...mockProps} />);
 
     fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalled();
+      expect(screen.getByText(/Selecciona un rol/i)).toBeInTheDocument();
     });
+
   });
 
   test("llama a onCancel cuando se presiona el botón cancelar", async () => {
