@@ -20,7 +20,7 @@ test: {
   environment: "jsdom",
   setupFiles: "./src/test/setupTests.js",
   isolate: false,
-  pool:'forks', 
+  pool:'threads', 
 
   // ✅ Cobertura
   coverage: {

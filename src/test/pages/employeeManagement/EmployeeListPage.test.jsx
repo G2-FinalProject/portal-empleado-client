@@ -46,11 +46,12 @@ const mockDepartments = [
   { id: 2, department_name: "Recursos Humanos" },
 ];
 
-// Reutilizamos siempre las mismas referencias
+// 🧩 Mocks reutilizables
 const fetchUsers = vi.fn();
 const fetchDepartments = vi.fn();
 const deleteUser = vi.fn();
 
+// 🧱 Función auxiliar para configurar el store
 const mockUseAdminStore = (state = {}) => {
   useAdminStore.mockImplementation((selector) =>
     selector({
@@ -66,6 +67,7 @@ const mockUseAdminStore = (state = {}) => {
   );
 };
 
+// 🔄 Reiniciar mocks antes de cada test
 beforeEach(() => {
   vi.clearAllMocks();
   useAuthStore.mockImplementation(() => ({
@@ -75,7 +77,7 @@ beforeEach(() => {
   }));
 });
 
-// 🧩 TESTS
+// 🧪 TESTS
 describe("📋 EmployeeListPage", () => {
   it("renderiza el título y el botón de Nuevo Empleado", () => {
     mockUseAdminStore({});
@@ -114,8 +116,9 @@ describe("📋 EmployeeListPage", () => {
       </MemoryRouter>
     );
 
-    const spinners = screen.getAllByRole("status", { hidden: true });
-    expect(spinners.length).toBeGreaterThan(0);
+    // ✅ Verifica visualmente el spinner sin depender de roles ARIA
+    const spinnerElement = document.querySelector(".animate-spin");
+    expect(spinnerElement).toBeTruthy();
   });
 
   it("muestra los empleados en la tabla", async () => {
@@ -144,21 +147,23 @@ describe("📋 EmployeeListPage", () => {
 
     // Encuentra el input visible (mobile/desktop)
     const inputs = screen.getAllByRole("textbox", { name: /buscar empleado/i });
-    const visibleInput = inputs.find((el) => el.offsetParent !== null) ?? inputs[0];
+    const visibleInput =
+      inputs.find((el) => el.offsetParent !== null) ?? inputs[0];
 
     // Simulamos escribir el nombre
     fireEvent.change(visibleInput, { target: { value: "Lisi" } });
 
-    // ✅ SOLUCIÓN: Buscar solo en la tabla visible
+    // ✅ Buscar solo en la tabla visible
     await waitFor(() => {
       const tables = screen.getAllByRole("table");
-      const visibleTable = tables.find((t) => !t.className.includes('hidden')) ?? tables[0];
-      
+      const visibleTable =
+        tables.find((t) => !t.className.includes("hidden")) ?? tables[0];
+
       // Verificar que Lisi aparece
       const lisiMatches = within(visibleTable).getAllByText(/lisi\s+cruz/i);
       expect(lisiMatches.length).toBeGreaterThan(0);
-      
-      // ✅ Verificar que Nicole NO aparece EN LA TABLA VISIBLE
+
+      // Verificar que Nicole NO aparece en la tabla visible
       const nicoleInTable = within(visibleTable).queryAllByText(/nicole/i);
       expect(nicoleInTable.length).toBe(0);
     });
