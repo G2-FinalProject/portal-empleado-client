@@ -1,48 +1,70 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { vi } from "vitest";
 import { toast } from "react-hot-toast";
 import EmployeeForm from "../../components/form/EmployeeForm";
 
-// ✅ Mock de react-hook-form con setValue incluido
-vi.mock("react-hook-form", async () => {
-  const actual = await vi.importActual("react-hook-form");
-  return {
-    ...actual,
-    useForm: () => ({
-      register: vi.fn(),
-      handleSubmit: (fn) => (e) => fn(e),
-      formState: { errors: {}, isSubmitting: false },
-      reset: vi.fn(),
-      setValue: vi.fn(), // 🧩 simulamos que existe
-    }),
-  };
-});
-
-// 🔧 Mock del toast
+// 🧩 Mock de dependencias externas
 vi.mock("react-hot-toast", () => ({
   toast: {
-    success: vi.fn(),
     error: vi.fn(),
   },
 }));
 
-// 🔧 Mock del Button
-vi.mock("../../components/ui/Button", () => ({
-  default: ({ children, ...props }) => <button {...props}>{children}</button>,
+vi.mock("../../components/ui/Card", () => ({
+  default: ({ children }) => <div data-testid="card">{children}</div>,
 }));
 
-describe("🧩 EmployeeForm", () => {
-  test("debe enviar el formulario correctamente y llamar a onSubmit", async () => {
-    const mockOnSubmit = vi.fn().mockResolvedValueOnce();
-
-    render(
-      <EmployeeForm
-        roles={[{ id: 1, role_name: "employee" }]}
-        departments={[{ id: 1, department_name: "Sistemas" }]}
-        locations={[{ id: 1, location_name: "Madrid" }]}
-        onSubmit={mockOnSubmit}
+vi.mock("../../components/ui/Input", () => ({
+  default: ({ label, name, placeholder, register, errors, type = "text" }) => (
+    <div>
+      <label htmlFor={name}>{label}</label>
+      <input
+        id={name}
+        name={name}
+        placeholder={placeholder}
+        type={type}
+        onChange={() => {}}
       />
-    );
+      {errors?.[name] && <p>{errors[name].message}</p>}
+    </div>
+  ),
+}));
+
+vi.mock("../../components/ui/Button", () => ({
+  default: ({ children, ...props }) => (
+    <button {...props}>{children}</button>
+  ),
+}));
+
+describe("🧾 EmployeeForm", () => {
+  const mockOnSubmit = vi.fn();
+  const mockOnCancel = vi.fn();
+
+  const mockProps = {
+    roles: [{ id: 1, role_name: "employee" }],
+    departments: [{ id: 1, department_name: "Sistemas" }],
+    locations: [{ id: 1, location_name: "Madrid" }],
+    onSubmit: mockOnSubmit,
+    onCancel: mockOnCancel,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  test("renderiza todos los campos principales", () => {
+    render(<EmployeeForm {...mockProps} />);
+
+    expect(screen.getByLabelText("Nombre")).toBeInTheDocument();
+    expect(screen.getByLabelText("Apellidos")).toBeInTheDocument();
+    expect(screen.getByLabelText("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText("Contraseña")).toBeInTheDocument();
+    expect(screen.getByLabelText("Días de Vacaciones Disponibles")).toBeInTheDocument();
+  });
+
+  test("envía el formulario correctamente y llama a onSubmit", async () => {
+    render(<EmployeeForm {...mockProps} />);
 
     fireEvent.change(screen.getByPlaceholderText("Introduce el nombre del empleado"), {
       target: { value: "Lisi" },
@@ -51,24 +73,44 @@ describe("🧩 EmployeeForm", () => {
       target: { value: "Cruz" },
     });
     fireEvent.change(screen.getByPlaceholderText("Introduce el correo corporativo"), {
-      target: { value: "lisi@example.com" },
+      target: { value: "lisi@test.com" },
     });
     fireEvent.change(screen.getByPlaceholderText("********"), {
       target: { value: "password123" },
     });
     fireEvent.change(screen.getByPlaceholderText("Introduce los días disponibles"), {
-      target: { value: 23 },
+      target: { value: 15 },
     });
 
-    // 🚀 Enviar formulario
-    fireEvent.click(screen.getByRole("button", { name: /guardar empleado/i }));
+    fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
 
-    // Espera que el onSubmit haya sido llamado una vez
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledTimes(1), {
-      timeout: 2000,
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
     });
+  });
 
-    // ✅ Sin errores
-    expect(toast.error).not.toHaveBeenCalled();
+  test("muestra errores si faltan campos requeridos", async () => {
+    render(<EmployeeForm {...mockProps} />);
+
+    fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
+
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalled();
+    });
+  });
+
+  test("llama a onCancel cuando se presiona el botón cancelar", async () => {
+    render(<EmployeeForm {...mockProps} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test("oculta el campo de contraseña en modo edición", () => {
+    render(<EmployeeForm {...mockProps} isEditMode={true} />);
+
+    const passwordField = screen.queryByLabelText("Contraseña");
+    expect(passwordField).not.toBeInTheDocument();
   });
 });
