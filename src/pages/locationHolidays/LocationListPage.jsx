@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, Pencil, Trash2, Search, UserPlus, HousePlus } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, UserPlus, HousePlus, ChevronLeft, ChevronRight } from 'lucide-react';
 import useAdminStore from '../../stores/useAdminStore';
 import { Card, Modal, Button } from '../../components/ui';
 
@@ -22,6 +22,10 @@ export default function LocationListPage() {
   const [query, setQuery] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [locationToDelete, setLocationToDelete] = useState(null);
+  
+  // ESTADO PARA PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   // ============================================
   // EFECTOS
@@ -40,6 +44,30 @@ export default function LocationListPage() {
       (loc.location_name || '').toLowerCase().includes(q)
     );
   }, [locations, query]);
+
+  // ============================================
+  // PAGINACIÓN
+  // ============================================
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = currentPage * ITEMS_PER_PAGE;
+  const paginatedLocations = filtered.slice(startIndex, endIndex);
+
+  const goToPreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query]);
 
   // ============================================
   // FUNCIONES DE ELIMINACIÓN
@@ -84,7 +112,7 @@ export default function LocationListPage() {
         <h1 className="text-3xl font-bold text-cohispania-blue">
           Lista de poblaciones
         </h1>
-        <p className="text-sm text-gray-300 mt-2 sm:text-base">
+        <p className="text-sm text-gray-500 mt-2 sm:text-base">
           Gestiona las poblaciones y sus festivos configurados
         </p>
       </div>
@@ -94,7 +122,7 @@ export default function LocationListPage() {
         {/* Búsqueda */}
         <div className="space-y-4 mb-6">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               aria-label="Buscar población"
@@ -124,7 +152,7 @@ export default function LocationListPage() {
         {!loading?.locations && !error && (
           filtered.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-500 text-lg">
                 {query
                   ? `No se encontraron poblaciones con "${query}"`
                   : 'No hay poblaciones registradas todavía'}
@@ -141,23 +169,23 @@ export default function LocationListPage() {
           ) : (
             <>
               {/* Tabla Desktop */}
-              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-stroke">
+              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200">
                 <table className="w-full">
                   <thead className="border-b border-gray-stroke">
                     <tr>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-500">
                         Nombre de Población
                       </th>
-                      <th className="text-center py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-center py-3 px-6 text-sm font-medium text-gray-500">
                         Festivos
                       </th>
-                      <th className="text-right py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-right py-3 px-6 text-sm font-medium text-gray-500">
                         Acciones
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-stroke bg-white">
-                    {filtered.map((location) => ( // ✅ CORREGIDO: filtered en lugar de filteredLocations
+                    {paginatedLocations.map((location) => (
                       <tr
                         key={location.id}
                         className="hover:bg-light-background transition-colors cursor-pointer"
@@ -179,11 +207,12 @@ export default function LocationListPage() {
                             <button
                               type="button"
                               aria-label={`Ver detalles de ${location.location_name}`}
+                              title={`Ver detalles de ${location.location_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/locations/${location.id}`);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer shadow-sm hover:shadow-md"
                             >
                               <Eye className="w-5 h-5 text-gray-400" />
                             </button>
@@ -191,11 +220,12 @@ export default function LocationListPage() {
                             <button
                               type="button"
                               aria-label={`Editar ${location.location_name}`}
+                              title={`Editar ${location.location_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/locations/${location.id}/edit`);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer shadow-sm hover:shadow-md"
                             >
                               <Pencil className="w-5 h-5 text-gray-400" />
                             </button>
@@ -203,13 +233,14 @@ export default function LocationListPage() {
                             <button
                               type="button"
                               aria-label={`Eliminar ${location.location_name}`}
+                              title={`Eliminar ${location.location_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClick(location);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer shadow-sm hover:shadow-md"
                             >
-                              <Trash2 className="w-5 h-5 text-red-400" />
+                              <Trash2 className="w-5 h-5 text-[var(--color-red-600)]" />
                             </button>
                           </div>
                         </td>
@@ -221,7 +252,7 @@ export default function LocationListPage() {
 
               {/* Cards Mobile */}
               <div className="md:hidden space-y-4">
-                {filtered.map((location) => (
+                {paginatedLocations.map((location) => (
                   <Card
                     key={location.id}
                     className="p-4 border border-gray-stroke cursor-pointer"
@@ -282,6 +313,77 @@ export default function LocationListPage() {
                   </Card>
                 ))}
               </div>
+
+              {/* CONTROLES DE PAGINACIÓN */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-stroke">
+                  {/* Botón Anterior */}
+                  <button
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-light-background text-cohispania-blue font-medium hover:bg-gray-stroke transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Anterior
+                  </button>
+
+                  {/* Números de página */}
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const pageNumber = index + 1;
+
+                      // Mostrar solo algunas páginas para no saturar
+                      // Lógica: mostrar primera, última, actual y 2 alrededor
+                      const showPage =
+                        pageNumber === 1 ||
+                        pageNumber === totalPages ||
+                        Math.abs(pageNumber - currentPage) <= 1;
+
+                      if (!showPage) {
+                        // Mostrar "..." solo una vez entre rangos
+                        if (
+                          pageNumber === currentPage - 2 ||
+                          pageNumber === currentPage + 2
+                        ) {
+                          return (
+                            <span
+                              key={pageNumber}
+                              className="px-2 text-gray-400"
+                            >
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      }
+
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => goToPage(pageNumber)}
+                          className={`w-10 h-10 rounded-lg font-medium transition cursor-pointer ${
+                            currentPage === pageNumber
+                              ? "bg-cohispania-blue text-white"
+                              : "bg-light-background text-cohispania-blue hover:bg-gray-stroke"
+                          }`}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Botón Siguiente */}
+                  <button
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-light-background text-cohispania-blue font-medium hover:bg-gray-stroke transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Siguiente
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </>
           )
         )}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import useAdminStore from "../../stores/useAdminStore";
-import toast from "../../services/toast";
+import { showSuccess, showError } from "../../utils/notifications";
 import EmployeeForm from "../../components/form/EmployeeForm";
 import * as userApi from "../../services/userApi";
+import { Button } from "../../components/ui";
 
 
 export default function EditEmployeePage() {
@@ -43,7 +45,7 @@ export default function EditEmployeePage() {
       } catch (err) {
         console.error("Error al cargar empleado:", err);
         setError("No se pudo cargar la información del empleado");
-        toast.error("Error al cargar el empleado");
+        showError("Error al cargar el empleado");
       } finally {
         setLoading(false);
       }
@@ -73,7 +75,7 @@ export default function EditEmployeePage() {
         available_days: Number(dataWithoutPassword.available_days),
       };
       await updateUser(id, dataToSend);
-      toast.success("Empleado actualizado correctamente");
+      showSuccess("Empleado actualizado correctamente");
       navigate(`/employees/${id}`);
       
     } catch (error) {
@@ -84,7 +86,7 @@ export default function EditEmployeePage() {
         || error.response?.data?.message
         || "Error al actualizar el empleado";
       
-      toast.error(errorMessage);
+      showError(errorMessage);
       throw error;
     }
   };
@@ -107,12 +109,14 @@ export default function EditEmployeePage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-red-50 border border-red-400 rounded-lg p-6 max-w-md">
           <p className="text-red-600 font-medium">{error}</p>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate("/employees")}
-            className="mt-4 px-4 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90"
+            className="mt-4 gap-2"
           >
+            <ArrowLeft className="w-4 h-4" />
             Volver al listado
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -122,16 +126,18 @@ export default function EditEmployeePage() {
     <div className="space-y-6">
       {/* Encabezado */}
       <div>
-        <button
+        <Button
+          variant="ghost"
           onClick={() => navigate(`/employees/${id}`)}
-          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2"
+          className="mb-4 flex items-center gap-2 w-fit"
         >
-          ← Volver a detalles
-        </button>
-        <h1 className="text-3xl font-bold text-cohispania-blue">
+          <ArrowLeft className="w-4 h-4" />
+          Volver a detalles
+        </Button>
+        <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
           Editar Empleado
         </h1>
-        <p className="text-sm text-gray-300 mt-2">
+        <p className="text-sm sm:text-base text-gray-500 mt-2">
           Modifica la información de{" "}
           <span className="font-semibold text-cohispania-blue">
             {employeeData?.first_name} {employeeData?.last_name}

@@ -4,11 +4,12 @@ import { describe, it, vi, beforeEach, afterEach, expect } from "vitest";
 import CreateEmployeePage from "../../../pages/employeeManagement/CreateEmployeePage";
 
 // 🧱 Mocks de dependencias
-vi.mock("react-hot-toast", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
+vi.mock("../../../utils/notifications", () => ({
+  showSuccess: vi.fn(),
+  showError: vi.fn(),
+  showInfo: vi.fn(),
+  showLoading: vi.fn(),
+  dismiss: vi.fn(),
 }));
 
 const mockNavigate = vi.fn();
@@ -43,8 +44,8 @@ vi.mock("../../../components/form/EmployeeForm", () => ({
   ),
 }));
 
-import { toast } from "react-hot-toast";
 import useAdminStore from "../../../stores/useAdminStore";
+import { showSuccess, showError } from "../../../utils/notifications";
 
 describe("🧩 CreateEmployeePage", () => {
   const fetchRoles = vi.fn();
@@ -105,7 +106,7 @@ describe("🧩 CreateEmployeePage", () => {
 
     await waitFor(() => {
       expect(createUser).toHaveBeenCalledWith({ first_name: "Lisi" });
-      expect(toast.success).toHaveBeenCalledWith("Empleado creado correctamente"); // 👈 revisa que coincida con tu código real
+      expect(showSuccess).toHaveBeenCalledWith("Empleado creado correctamente");
       expect(mockNavigate).toHaveBeenCalledWith("/employees");
     });
   });
@@ -124,7 +125,7 @@ describe("🧩 CreateEmployeePage", () => {
     fireEvent.click(screen.getAllByTestId("mock-create-btn")[0]);
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith("Error de servidor");
+      expect(showError).toHaveBeenCalledWith("Error de servidor");
     });
   });
 });

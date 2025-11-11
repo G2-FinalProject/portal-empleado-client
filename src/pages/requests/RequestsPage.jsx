@@ -12,6 +12,7 @@ import {
 import useVacationStore from "../../stores/useVacationStore";
 import useAuthStore from "../../stores/authStore";
 import { showSuccess, showError } from "../../utils/notifications";
+import { getApiErrorMessage } from "../../utils/errors";
 
 export default function RequestsPage() {
   const { allRequests, fetchAllRequests, loading } = useVacationStore();
@@ -115,7 +116,7 @@ export default function RequestsPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
           Todas las solicitudes
         </h1>
-        <p className="text-gray-300 mt-1">{subtitleText}</p>
+        <p className="text-gray-500 mt-1">{subtitleText}</p>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-stroke p-6">
@@ -147,7 +148,7 @@ function RequestsList({
   if (requests.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+        <Calendar className="mx-auto h-16 w-16 text-gray-400 mb-4" />
         <p className="text-gray-400 text-lg">{emptyMessage}</p>
       </div>
     );
@@ -166,7 +167,7 @@ function RequestsList({
               ? "Aprobadas"
               : "Denegadas"}
           </h2>
-          <p className="text-gray-300 mb-6 px-4">
+          <p className="text-gray-500 mb-6 px-4">
             {showActions
               ? "Solicitudes que requieren tu aprobación"
               : requests[0]?.status === "approved"
@@ -179,25 +180,27 @@ function RequestsList({
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
                   Empleado
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
-                  <Button
-                    onClick={() =>
-                      onSortChange(sortOrder === "desc" ? "asc" : "desc")
-                    }
-                    className="flex items-center gap-2"
+                <th
+                  className="text-left py-3 px-4 text-sm font-semibold text-gray-400"
+                  aria-sort={sortOrder === "desc" ? "descending" : "ascending"}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
+                    className="flex items-center gap-2 text-gray-400 hover:text-cohispania-blue transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[var(--color-cohispania-orange)]"
                     title={
                       sortOrder === "desc"
                         ? "Ordenar ascendente"
                         : "Ordenar descendente"
                     }
                   >
-                    Fecha de solicitud
+                    <span>Fecha de solicitud</span>
                     {sortOrder === "desc" ? (
                       <ArrowDown className="h-4 w-4" />
                     ) : (
                       <ArrowUp className="h-4 w-4" />
                     )}
-                  </Button>
+                  </button>
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-400">
                   Período
@@ -240,7 +243,7 @@ function RequestsList({
                 ? "Aprobadas"
                 : "Denegadas"}
             </h2>
-            <p className="text-gray-300">
+            <p className="text-gray-500">
               {showActions
                 ? "Solicitudes que requieren tu aprobación"
                 : requests[0]?.status === "approved"
@@ -250,13 +253,19 @@ function RequestsList({
           </div>
           <Button
             onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
-            variant="secondary"
+            variant="ghost"
             size="small"
+            aria-label={
+              sortOrder === "desc"
+                ? "Ordenar solicitudes de más antiguas a más recientes"
+                : "Ordenar solicitudes de más recientes a más antiguas"
+            }
             title={
               sortOrder === "desc"
                 ? "Ordenar ascendente"
                 : "Ordenar descendente"
             }
+            className="text-cohispania-blue"
           >
             {sortOrder === "desc" ? (
               <ArrowDown className="h-4 w-4" />
@@ -340,7 +349,7 @@ function RequestRow({ request, showActions }) {
                 <Eye className="h-5 w-5 cursor-pointer" />
               </Button>
             ) : (
-              <span className="text-gray-300 text-sm">-</span>
+              <span className="text-gray-400 text-sm">-</span>
             )}
           </div>
         </td>
@@ -351,6 +360,8 @@ function RequestRow({ request, showActions }) {
                 onClick={() => setShowApproveModal(true)}
                 variant="secondary"
                 size="small"
+                aria-label="Aprobar solicitud"
+                className="flex-1 gap-1 px-4 text-sm font-medium"
               >
                 <Check className="h-4 w-4" />
                 Aprobar
@@ -359,6 +370,8 @@ function RequestRow({ request, showActions }) {
                 onClick={() => setShowRejectModal(true)}
                 variant="danger"
                 size="small"
+                className="flex-1 gap-1 px-4 text-sm font-medium"
+                aria-label="Denegar solicitud"
               >
                 <X className="h-4 w-4" />
                 Denegar
@@ -472,7 +485,8 @@ function RequestCard({ request, showActions }) {
                 onClick={() => setShowApproveModal(true)}
                 variant="secondary"
                 size="small"
-                className="flex-1"
+                className="flex-1 gap-1 px-4 text-sm font-medium"
+                aria-label="Aprobar solicitud"
               >
                 <Check className="h-4 w-4" />
                 Aprobar
@@ -481,7 +495,8 @@ function RequestCard({ request, showActions }) {
                 onClick={() => setShowRejectModal(true)}
                 variant="danger"
                 size="small"
-                className="flex-1"
+                className="flex-1 gap-1 px-4 text-sm font-medium"
+                aria-label="Denegar solicitud"
               >
                 <X className="h-4 w-4" />
                 Denegar
@@ -556,7 +571,7 @@ function CommentsModal({ isOpen, onClose, request }) {
             <h3 className="text-base font-semibold text-cohispania-blue mb-2">
               Comentario del empleado:
             </h3>
-            <p className="text-base text-gray-300 bg-light-background p-4 rounded-lg">
+            <p className="text-base text-gray-500 bg-light-background p-4 rounded-lg">
               {request.reason}
             </p>
           </div>
@@ -619,13 +634,17 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
 
     setIsSubmitting(true);
     try {
+      let result;
       if (isApprove) {
-        await approveRequest(request.id, comment || null);
-        toast.success("Solicitud aprobada correctamente");
+        result = await approveRequest(request.id, comment || null);
       } else {
-        await rejectRequest(request.id, comment);
-        toast.success("Solicitud denegada correctamente");
+        result = await rejectRequest(request.id, comment);
       }
+
+      const successMessage = result?.message ||
+        (isApprove ? "Solicitud aprobada correctamente" : "Solicitud denegada correctamente");
+
+      showSuccess(successMessage);
 
       // Recargar solicitudes
       await fetchAllRequests();
@@ -633,7 +652,7 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
       onClose();
       setComment("");
     } catch (error) {
-      toast.error(error.message || "Error al procesar la solicitud");
+      showError(getApiErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -669,7 +688,7 @@ function ApproveRejectModal({ isOpen, onClose, request, action }) {
             onChange={(e) => setComment(e.target.value)}
             placeholder="Añade un comentario..."
             rows={4}
-            className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition resize-none"
+            className="w-full px-4 py-3 rounded-lg bg-light-background text-cohispania-blue border border-gray-stroke placeholder-cohispania-blue placeholder-opacity-60 focus:ring-0 focus:border-[var(--color-cohispania-orange)] outline-none transition resize-none"
           />
           {isCommentRequired && (
             <p className="mt-2 text-xs text-gray-400">

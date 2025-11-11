@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import toast from "../../services/toast";
+import { showError, showSuccess, showLoading, dismiss, showInfo } from "../../utils/notifications";
 import useAuthStore from "../../stores/authStore";
 import useVacationStore from "../../stores/useVacationStore";
 import VacationRequestCalendar, {
@@ -29,8 +29,8 @@ export default function UserPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
           Bienvenido {user?.firstName || "Usuario"}
         </h1>
-        <p className="text-gray-300 mt-2 text-sm sm:text-base">
-          Gestiona tus vacaciones y consulta el estado de tus solicitudes
+        <p className="text-gray-500 mt-2 text-sm sm:text-base">
+          Aquí puedes gestionar tus vacaciones, ver tus solicitudes y revisar tus días disponibles.
         </p>
       </div>
 
@@ -87,20 +87,19 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
 
   const handleSubmit = async () => {
     if (!selectedRange) {
-      toast.error("Por favor, selecciona un rango de fechas");
+      showError("Por favor, selecciona un rango de fechas");
       return;
     }
 
     if (selectedRange.workingDays > vacationSummary?.remaining_days) {
-      toast.error(
-        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`,
-        { duration: 5000 }
+      showError(
+        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`
       );
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Enviando solicitud...");
+    const loadingToast = showLoading("Enviando solicitud...");
 
     try {
       const { create: createVacationRequest } = await import(
@@ -129,9 +128,8 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
       fetchMyRequests();
       onClearSelection();
 
-      toast.success("¡Solicitud enviada correctamente!", {
-        id: loadingToast,
-      });
+      dismiss(loadingToast);
+      showSuccess("¡Solicitud enviada correctamente!");
     } catch (error) {
       console.error("Error al crear solicitud:", error);
       const errorMessage =
@@ -139,10 +137,8 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
         error.response?.data?.errors?.[0]?.msg ||
         "Error al enviar la solicitud. Por favor, inténtalo de nuevo.";
 
-      toast.error(errorMessage, {
-        id: loadingToast,
-        duration: 5000,
-      });
+      dismiss(loadingToast);
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -157,7 +153,7 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
 
     onClearSelection();
 
-    toast.info("Selección cancelada", { duration: 2000 });
+    showInfo("Selección cancelada");
   };
 
   if (!vacationSummary) {

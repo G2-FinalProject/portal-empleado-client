@@ -7,7 +7,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 import { Card, Button } from '../../components/ui';
 import { getById as getLocationById } from '../../services/locationApi';
 import { showError } from '../../utils/notifications';
-import { ArrowLeft, Edit, Calendar as CalendarIcon } from 'lucide-react';
+import { ArrowLeft, Pencil, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function DetailLocationPage() {
   const { id } = useParams();
@@ -56,7 +56,7 @@ export default function DetailLocationPage() {
         console.error('Error loading location:', error);
         const errorMessage = error.response?.data?.message || 'Error al cargar la población';
         setError(errorMessage);
-        toast.error(errorMessage);
+        showError(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -94,26 +94,34 @@ export default function DetailLocationPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-cohispania-blue">
+          <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
             Población: {location.location_name}
           </h1>
-          <p className="text-gray-300 mt-1">
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
             {location.holidays?.length || 0} festivos configurados
           </p>
         </div>
 
         {/* Botones de acción */}
-        <div className="flex gap-3">
-          <Button variant="ghost" onClick={() => navigate('/locations')} className="flex items-center gap-2">
-            <ArrowLeft className="w-5 h-5" />
-            Volver
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/locations')}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Volver al listado
           </Button>
 
-          <Button variant="primary" onClick={() => navigate(`/locations/${id}/edit`)} className="flex items-center gap-2">
-            <Edit className="w-5 h-5" />
-            Editar
+          <Button
+            variant="secondary"
+            onClick={() => navigate(`/locations/${id}/edit`)}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto"
+          >
+            <Pencil className="w-4 h-4" />
+            Editar población
           </Button>
         </div>
       </div>
@@ -121,43 +129,11 @@ export default function DetailLocationPage() {
       {/* Contenido principal */}
       <Card padding={true}>
         <div className="space-y-6">
-          {/* Calendario de festivos (solo lectura) */}
-          <div>
-            <h2 className="text-xl font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-              <CalendarIcon className="w-6 h-6" />
-              Calendario de Festivos
-            </h2>
-            <p className="text-sm text-gray-300 mb-4">
-              Vista anual de todos los festivos configurados para {location.location_name}
-            </p>
-         <div className="bg-white border border-gray-stroke rounded-lg p-4">
-              <FullCalendar
-                plugins={[dayGridPlugin, multiMonthPlugin]}
-                initialView="multiMonthYear"
-                locale={esLocale}
-                events={calendarEvents}
-                headerToolbar={{
-                  left: 'prev,next',
-                  center: 'title',
-                  right: 'today',
-                }}
-                buttonText={{
-                  today: 'Hoy',
-                }}
-                height="auto"
-                dayMaxEvents={3}
-                fixedWeekCount={false}
-                selectable={false} // Solo lectura
-                editable={false}   // Solo lectura
-                eventClick={false} // Deshabilitar clicks en eventos
-              />
-            </div>
-          </div>
-
-{/* Lista de festivos */}
+          {/* Lista de festivos */}
           <div>
             <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-              📋 Lista de Festivos ({location.holidays?.length || 0})
+              <CalendarIcon className="w-5 h-5 text-cohispania-orange" />
+              Lista de Festivos ({location.holidays?.length || 0})
             </h3>
 
             {location.holidays && location.holidays.length > 0 ? (
@@ -171,7 +147,7 @@ export default function DetailLocationPage() {
                     >
                       <div>
                         <p className="font-semibold text-cohispania-blue">{holiday.holiday_name}</p>
-                        <p className="text-sm text-gray-300">{formatDate(holiday.holiday_date)}</p>
+                        <p className="text-sm text-gray-500">{formatDate(holiday.holiday_date)}</p>
                       </div>
                       <div className="text-sm text-gray-400">
                         ID: {holiday.id}
@@ -191,6 +167,39 @@ export default function DetailLocationPage() {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Calendario de festivos (solo lectura) */}
+          <div>
+            <h2 className="text-xl font-bold text-cohispania-blue mb-4 flex items-center gap-2">
+              <CalendarIcon className="w-6 h-6" />
+              Calendario de Festivos
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Vista anual de todos los festivos configurados para {location.location_name}
+            </p>
+            <div className="bg-white border border-gray-stroke rounded-lg p-4">
+              <FullCalendar
+                plugins={[dayGridPlugin, multiMonthPlugin]}
+                initialView="multiMonthYear"
+                locale={esLocale}
+                events={calendarEvents}
+                headerToolbar={{
+                  left: 'prev,next',
+                  center: 'title',
+                  right: 'today',
+                }}
+                buttonText={{
+                  today: 'Hoy',
+                }}
+                height="auto"
+                dayMaxEvents={3}
+                fixedWeekCount={false}
+                selectable={false}
+                editable={false}
+                eventClick={false}
+              />
+            </div>
           </div>
         </div>
       </Card>

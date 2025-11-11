@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 /**
  * Botón reutilizable con variantes y estados
  * @param {Object} props
- * @param {'primary' | 'secondary' | 'danger' | 'ghost'} props.variant - Estilo del botón
+ * @param {'primary' | 'secondary' | 'success' | 'danger' | 'ghost'} props.variant - Estilo del botón
  * @param {'small' | 'medium' | 'large'} props.size - Tamaño del botón
  * @param {boolean} props.loading - Muestra spinner y deshabilita el botón
  * @param {boolean} props.disabled - Deshabilita el botón
@@ -32,7 +32,8 @@ export default function Button({
   const variantStyles = {
     primary: 'bg-cohispania-orange text-cohispania-blue shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-blue)]',
     secondary: 'bg-cohispania-blue text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-cohispania-orange)]',
-    danger: 'bg-[var(--color-red-400)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-red-400)]',
+    success: 'bg-[var(--color-light-green-600)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-light-green-800)]',
+    danger: 'bg-[var(--color-red-600)] text-white shadow hover:opacity-90 focus-visible:ring-[var(--color-red-600)]',
     ghost: 'bg-transparent text-cohispania-blue border border-gray-stroke hover:bg-gray-100 focus-visible:ring-[var(--color-blue-stroke)]',
   };
 
@@ -49,7 +50,7 @@ export default function Button({
   // Combinar estilos
   const combinedClassName = `
     ${baseStyles}
-    ${variantStyles[variant]}
+    ${variantStyles[variant] || variantStyles.primary}
     ${sizeStyles[size]}
     ${widthStyle}
     ${className}

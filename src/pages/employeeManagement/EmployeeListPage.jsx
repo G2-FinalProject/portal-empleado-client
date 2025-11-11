@@ -123,7 +123,7 @@ export default function EmployeeListPage() {
     <main className="space-y-6">
       {/* Botón Nuevo Empleado */}
       <div className="flex justify-end">
-        <Link to="/employees/create">
+        <Link to="/employees/create" className="cursor-pointer">
           <Button variant="secondary" className="flex items-center gap-3 rounded-2xl">
             <UserPlus className="w-6 h-6" />
             Nuevo Empleado
@@ -136,7 +136,7 @@ export default function EmployeeListPage() {
         <h1 className="text-3xl font-bold text-cohispania-blue">
           Gestión de Empleados
         </h1>
-        <p className="text-sm text-gray-300 mt-2 sm:text-base">
+        <p className="text-sm text-gray-500 mt-2 sm:text-base">
           Administra la información de todos los empleados
         </p>
       </div>
@@ -147,7 +147,7 @@ export default function EmployeeListPage() {
         <div className="space-y-4 mb-6">
           {/* Barra de búsqueda */}
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               aria-label="Buscar empleado"
@@ -213,13 +213,13 @@ export default function EmployeeListPage() {
           !error &&
           (filteredUsers.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-300 text-lg">
+              <p className="text-gray-500 text-lg">
                 {searchQuery || selectedDepartmentId
                   ? "No se encontraron empleados con esos criterios"
                   : "No hay empleados registrados todavía"}
               </p>
               {!searchQuery && !selectedDepartmentId && (
-                <Link to="/employees/create" className="mt-4 inline-block">
+                <Link to="/employees/create" className="mt-4 inline-block cursor-pointer">
                   <Button variant="secondary" className="flex items-center gap-3 rounded-2xl mx-auto">
                     <UserPlus className="w-6 h-6" />
                     Crear primer empleado
@@ -230,26 +230,26 @@ export default function EmployeeListPage() {
           ) : (
             <>
               {/* Tabla Desktop */}
-              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-stroke">
+              <div className="hidden md:block overflow-hidden rounded-lg border border-gray-200">
                 <table className="w-full">
                   <thead className="border-b border-gray-stroke">
                     <tr>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-500">
                         Nombre Completo
                       </th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-500">
                         Email
                       </th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-500">
                         Rol
                       </th>
-                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-left py-3 px-6 text-sm font-medium text-gray-500">
                         Población
                       </th>
-                      <th className="text-center py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-center py-3 px-6 text-sm font-medium text-gray-500">
                         Días Disponibles
                       </th>
-                      <th className="text-right py-3 px-6 text-sm font-medium text-gray-300">
+                      <th className="text-right py-3 px-6 text-sm font-medium text-gray-500">
                         Acciones
                       </th>
                     </tr>
@@ -288,11 +288,12 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Ver detalles de ${user.first_name}`}
+                              title={`Ver detalles de ${user.first_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/employees/${user.id}`);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer shadow-sm hover:shadow-md"
                             >
                               <Eye className="w-5 h-5 text-gray-400" />
                             </button>
@@ -300,11 +301,12 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Editar ${user.first_name}`}
+                              title={`Editar ${user.first_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate(`/employees/${user.id}/edit`);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-stroke transition cursor-pointer shadow-sm hover:shadow-md"
                             >
                               <Pencil className="w-5 h-5 text-gray-400" />
                             </button>
@@ -312,13 +314,14 @@ export default function EmployeeListPage() {
                             <button
                               type="button"
                               aria-label={`Eliminar ${user.first_name}`}
+                              title={`Eliminar ${user.first_name}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClick(user);
                               }}
-                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                              className="inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-red-50 transition cursor-pointer shadow-sm hover:shadow-md"
                             >
-                              <Trash2 className="w-5 h-5 text-red-400" />
+                              <Trash2 className="w-5 h-5 text-[var(--color-red-600)]" />
                             </button>
                           </div>
                         </td>

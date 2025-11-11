@@ -1,22 +1,52 @@
 import { http, HttpResponse } from 'msw'
 
+const apiBase = 'http://localhost:3000/api'
+
 export const handlers = [
-  // Simula una petición POST al crear empleado
-  http.post('/api/employees', async () => {
+  // Autenticación
+  http.post(`${apiBase}/auth/login`, async ({ request }) => {
+    const body = await request.json()
+
+    if (body.email === 'lisi@example.com' && body.password === 'password123') {
+      return HttpResponse.json(
+        {
+          token: 'fakeToken123',
+          sesionData: { user: 'Lisi' },
+        },
+        { status: 200 }
+      )
+    }
+
     return HttpResponse.json(
-      { message: 'Empleado creado correctamente 🎉' },
-      { status: 201 }
+      { message: 'Credenciales inválidas' },
+      { status: 401 }
     )
   }),
 
-  // Simula una petición GET para listar empleados
-  http.get('/api/employees', async () => {
+  // Usuarios
+  http.get(`${apiBase}/users`, async () => {
     return HttpResponse.json(
       [
-        { id: 1, name: 'Lisi Cruz', email: 'lisi@example.com' },
-        { id: 2, name: 'Nicole', email: 'nicole@example.com' },
+        {
+          id: 1,
+          first_name: 'Lisi',
+          last_name: 'Cruz',
+          email: 'lisi@example.com',
+          available_days: 20,
+        },
       ],
       { status: 200 }
+    )
+  }),
+
+  http.post(`${apiBase}/users`, async ({ request }) => {
+    const body = await request.json()
+    return HttpResponse.json(
+      {
+        id: Date.now(),
+        ...body,
+      },
+      { status: 201 }
     )
   }),
 ]

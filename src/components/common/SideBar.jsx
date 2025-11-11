@@ -143,7 +143,7 @@ export default function Sidebar({ isOpen = true, onClose }) {
         {/* Menú de navegación */}
         <nav className="flex-1 px-4 py-6 overflow-y-auto">
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-3">
+            <p className="text-xs font-semibold text-gray-100 uppercase tracking-wider px-3 mb-3">
               Menú Principal
             </p>
 

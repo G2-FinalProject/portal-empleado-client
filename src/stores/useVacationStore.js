@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as vacationApi from "../services/vacationApi";
+import { getApiErrorMessage } from "../utils/errors";
 
 
 const mapRequest = (req) => ({
@@ -118,10 +119,7 @@ const useVacationStore = create((set, get) => ({
     } catch (error) {
       console.error("Error en fetchMyRequests:", error);
       set({
-        error:
-          error.response?.data?.message ||
-          error.message ||
-          "Error al cargar solicitudes",
+        error: getApiErrorMessage(error),
         loading: false,
       });
       throw error;

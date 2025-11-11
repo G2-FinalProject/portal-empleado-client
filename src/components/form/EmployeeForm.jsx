@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import React, { useEffect } from "react";
-import toast from "../../services/toast";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -52,11 +51,12 @@ export default function EmployeeForm({
   const handleFormSubmit = async (data) => {
     try {
       await onSubmit(data);
-      toast.success("Empleado creado correctamente 🎉");
-      reset();
+      if (!isEditMode) {
+        reset();
+      }
     } catch (error) {
-      console.error("Error al crear empleado:", error);
-      toast.error("Hubo un problema al crear el empleado");
+      console.error("Error al procesar el formulario de empleado:", error);
+      throw error;
     }
   };
 

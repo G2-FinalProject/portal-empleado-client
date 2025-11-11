@@ -23,7 +23,7 @@ export default function Badge({
     secondary: 'bg-cohispania-blue text-white',
     success: 'bg-light-green-600 text-white',
     warning: 'bg-cohispania-orange text-cohispania-blue',
-    danger: 'bg-red-400 text-white',
+    danger: 'bg-[var(--color-red-600)] text-white',
     info: 'bg-indigo-400 text-white',
     purple: 'bg-purple-400 text-white',
     neutral: 'bg-gray-stroke text-gray-400',

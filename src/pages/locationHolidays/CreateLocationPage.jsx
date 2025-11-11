@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle, Loader2 } from 'lucide-react';
+import { Trash2, Calendar as CalendarIcon, Save, X, AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { Modal, Card, Button } from '../../components/ui';
 import { create as createLocation } from '../../services/locationApi';
 import { create as createHoliday } from '../../services/holidaysApi';
@@ -211,14 +211,16 @@ export default function CreateLocationPage() {
 
       await Promise.all(holidayPromises);
 
-      toast.success('¡Población creada exitosamente!', { id: loadingToastId });
+      dismiss(loadingToastId);
+      showSuccess('¡Población creada exitosamente!');
       navigate('/locations');
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
         'Error al crear la población';
 
-      toast.error(errorMessage, { id: loadingToastId });
+      dismiss(loadingToastId);
+      showError(errorMessage);
 
       if (import.meta.env.MODE === "development") {
         console.warn("Error al crear población:", error);
@@ -258,17 +260,19 @@ export default function CreateLocationPage() {
     <div className="space-y-6">
       {/* Header unificado con CreateEmployeePage */}
       <div>
-        <button
+        <Button
+          variant="ghost"
           onClick={handleCancel}
-          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
+          className="mb-4 flex items-center gap-2 w-fit"
           disabled={isSubmitting}
         >
-          ← Volver al listado
-        </button>
-        <h1 className="text-3xl font-bold text-cohispania-blue">
+          <ArrowLeft className="w-4 h-4" />
+          Volver al listado
+        </Button>
+        <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
           Añade una nueva población
         </h1>
-        <p className="text-sm text-gray-300 mt-2">
+        <p className="text-sm sm:text-base text-gray-500 mt-2">
           Completa los datos para registrar una nueva población y sus festivos en el sistema.
         </p>
       </div>
@@ -287,14 +291,14 @@ export default function CreateLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full pl-4 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-cohispania-orange focus:border-2 outline-none transition"
+              className="w-full pl-4 pr-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:ring-0 focus:border-[var(--color-cohispania-orange)] outline-none transition"
               disabled={isSubmitting}
             />
             {/* Alerta cuando calendario está deshabilitado */}
             {isCalendarDisabled && (
               <p className="mt-2 text-sm text-gray-400 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4" />
-                Escribe el **nombre de la población** para habilitar el calendario de festivos.
+                Escribe el nombre de la población para habilitar el calendario de festivos.
               </p>
             )}
           </div>
@@ -304,8 +308,8 @@ export default function CreateLocationPage() {
             <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Festivos <span className="text-red-400">*</span>
             </label>
-            <p className="text-sm text-gray-300 mb-4">
-              Haz clic en un día o arrastra para seleccionar varios días laborables consecutivos
+            <p className="text-sm text-gray-500 mb-4">
+              Haz clic en un día del calendario para añadir festivos y arrastra para seleccionar varios días.
             </p>
 
             {/* Calendario (Estilos y funcionalidad unificados) */}
@@ -345,8 +349,8 @@ export default function CreateLocationPage() {
             </div>
 
             {/* Contador de días seleccionados */}
-            <p className="text-sm text-gray-300 mt-2">
-              Días festivos temporales añadidos: **{holidays.length}**
+            <p className="text-sm text-gray-500 mt-2">
+              Días festivos añadidos sin guardar: {holidays.length}
             </p>
           </div>
 
@@ -369,13 +373,14 @@ export default function CreateLocationPage() {
                     >
                       <div>
                         <p className="font-semibold text-cohispania-blue">{holiday.name}</p>
-                        <p className="text-sm text-gray-300">{formatDate(holiday.date)}</p>
+                        <p className="text-sm text-gray-500">{formatDate(holiday.date)}</p>
                       </div>
                       <button
                         onClick={() => handleDeleteHoliday(holiday.tempId)}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
+                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
                         disabled={isSubmitting}
                         aria-label={`Eliminar ${holiday.name}`}
+                        title={`Eliminar ${holiday.name}`}
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -435,7 +440,7 @@ export default function CreateLocationPage() {
               {formatDateRange()}
             </p>
             {selectedDates.length > 1 && (
-              <p className="text-sm text-gray-300 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 **{selectedDates.length} días** laborables
               </p>
             )}

@@ -8,7 +8,7 @@ import { create as createVacationRequest } from "../../services/vacationApi";
 import { getVacationSummary } from "../../services/authApi";
 import useVacationStore from "../../stores/useVacationStore";
 import Button from "../ui/Button";
-import toast from "../../services/toast";
+import { showError, showSuccess, showLoading, dismiss, showInfo } from "../../utils/notifications";
 import { eachDayOfInterval } from "date-fns";
 
 const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
@@ -85,7 +85,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       setHolidays([...holidayEvents, ...approvedVacations]);
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
-      toast.error("Error al cargar los datos. Por favor, recarga la página.");
+      showError("Error al cargar los datos. Por favor, recarga la página.");
     } finally {
       setIsLoading(false);
     }
@@ -108,10 +108,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
         selectInfo.view.calendar.unselect();
       }
 
-      toast.error('No puedes seleccionar fines de semana, festivos o días ya reservados', {
-        duration: 3000,
-        icon: '🚫',
-      });
+      showError('No puedes seleccionar fines de semana, festivos o días ya reservados');
       return;
     }
 
@@ -203,20 +200,19 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
 
   const handleSubmitRequest = async () => {
     if (!selectedRange) {
-      toast.error("Por favor, selecciona un rango de fechas en el calendario");
+      showError("Por favor, selecciona un rango de fechas en el calendario");
       return;
     }
 
     if (selectedRange.workingDays > vacationSummary.remaining_days) {
-      toast.error(
-        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`,
-        { duration: 5000 }
+      showError(
+        `No tienes suficientes días disponibles. Solicitaste ${selectedRange.workingDays} días pero solo tienes ${vacationSummary.remaining_days} disponibles.`
       );
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading("Enviando solicitud...");
+    const loadingToast = showLoading("Enviando solicitud...");
 
     try {
       const requestData = {
@@ -243,9 +239,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       }
       fetchInitialData();
 
-      toast.success("¡Solicitud enviada correctamente!", {
-        id: loadingToast,
-      });
+      dismiss(loadingToast);
+      showSuccess("¡Solicitud enviada correctamente!");
     } catch (error) {
       console.error("Error al crear solicitud:", error);
       const errorMessage =
@@ -253,10 +248,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
         error.response?.data?.errors?.[0]?.msg ||
         "Error al enviar la solicitud. Por favor, inténtalo de nuevo.";
 
-      toast.error(errorMessage, {
-        id: loadingToast,
-        duration: 5000,
-      });
+      dismiss(loadingToast);
+      showError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -270,7 +263,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       selectedRange.calendarApi.unselect();
     }
 
-    toast.info("Selección cancelada", { duration: 2000 });
+    showInfo("Selección cancelada");
   };
 
   if (isLoading) {
@@ -278,7 +271,7 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
       <div className="w-full bg-white rounded-lg border border-gray-stroke p-8">
         <div className="flex flex-col items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cohispania-orange mb-4" />
-          <p className="text-gray-300">Cargando calendario...</p>
+          <p className="text-gray-500">Cargando calendario...</p>
         </div>
       </div>
     );
@@ -301,8 +294,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
           <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
             Solicitar Vacaciones
           </h2>
-          <p className="text-gray-300 mt-1 text-sm sm:text-base">
-            Selecciona un rango de fechas en el calendario
+          <p className="text-gray-500 mt-1 text-sm sm:text-base">
+            Ajusta el rango de fechas según tus días disponibles.
           </p>
         </div>
 

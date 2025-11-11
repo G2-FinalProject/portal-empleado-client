@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { Pencil, ArrowLeft } from "lucide-react";
-import toast from "../../services/toast";
+import { showError } from "../../utils/notifications";
 import * as userApi from "../../services/userApi";
 import * as vacationApi from "../../services/vacationApi";
 import { Card, Button } from "../../components/ui";
@@ -50,7 +50,7 @@ export default function DetailEmployeePage() {
       } catch (err) {
         console.error("Error al cargar empleado:", err);
         setError("No se pudo cargar la información del empleado");
-        toast.error("Error al cargar el empleado");
+        showError("Error al cargar el empleado");
       } finally {
         setLoading(false);
       }
@@ -233,17 +233,19 @@ export default function DetailEmployeePage() {
       </div>
 
       {/* Botones de acción inferiores */}
-<div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 ">
+      <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/employees")}
-          className="flex-1 sm:flex-none"
+          className="flex-1 sm:flex-none gap-2 w-full sm:w-auto"
         >
+          <ArrowLeft className="w-4 h-4" />
           Volver al listado
         </Button>
-        <Link to={`/employees/${id}/edit`} className="flex-1 sm:flex-none">
-          <Button variant="secondary" fullWidth className="w-full">
-            Editar Empleado
+        <Link to={`/employees/${id}/edit`} className="flex-1 sm:flex-none cursor-pointer w-full sm:w-auto">
+          <Button variant="secondary" fullWidth className="w-full gap-2">
+            <Pencil className="w-4 h-4" />
+            Editar empleado
           </Button>
         </Link>
       </div>

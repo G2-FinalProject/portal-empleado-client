@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import esLocale from '@fullcalendar/core/locales/es';
-import { Trash2, Calendar as CalendarIcon, Save, X } from 'lucide-react';
+import { Trash2, Calendar as CalendarIcon, Save, X, ArrowLeft } from 'lucide-react';
 import { Modal, Card, Button } from '../../components/ui';
 import { getById as getLocationById, update as updateLocation } from '../../services/locationApi';
 import { create as createHoliday, deleteHoliday } from '../../services/holidaysApi';
@@ -334,15 +334,17 @@ export default function EditLocationPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="animate-fadeIn">
-        <button
+        <Button
+          variant="ghost"
           onClick={() => navigate(`/locations/${id}`)}
-          className="text-cohispania-blue hover:underline mb-4 flex items-center gap-2 cursor-pointer"
+          className="mb-4 flex items-center gap-2 w-fit"
           disabled={isSubmitting}
         >
-          ← Volver a detalles
-        </button>
-        <h1 className="text-3xl font-bold text-cohispania-blue">Editar población</h1>
-        <p className="text-gray-300 mt-1">
+          <ArrowLeft className="w-4 h-4" />
+          Volver a detalles
+        </Button>
+        <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">Editar población</h1>
+        <p className="text-sm sm:text-base text-gray-500 mt-1">
           Modifica el nombre y gestiona los festivos de la población
         </p>
       </div>
@@ -361,10 +363,87 @@ export default function EditLocationPage() {
               placeholder="Ej: Madrid, Barcelona..."
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-2 focus:border-cohispania-orange focus:ring-0 outline-none transition"
+              className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-gray-300 focus:border-[var(--color-cohispania-orange)] focus:ring-0 outline-none transition"
               disabled={isSubmitting}
               autoFocus
             />
+          </div>
+
+          {/* Lista de festivos con gestión */}
+          <div>
+            <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5" />
+              Festivos configurados ({allDisplayHolidays.length})
+            </h3>
+
+            {allDisplayHolidays.length > 0 ? (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {/* Festivos existentes (no eliminados) */}
+                {existingHolidays
+                  .filter(h => !deletedHolidayIds.includes(h.id))
+                  .sort((a, b) => new Date(a.holiday_date) - new Date(b.holiday_date))
+                  .map((holiday) => (
+                    <div
+                      key={holiday.id}
+                      className="flex items-center justify-between bg-light-background p-4 rounded-lg border border-gray-stroke"
+                    >
+                      <div>
+                        <p className="font-semibold text-cohispania-blue">{holiday.holiday_name}</p>
+                        <p className="text-sm text-gray-500">{formatDate(holiday.holiday_date)}</p>
+                        <p className="text-xs text-gray-400">Existente • ID: {holiday.id}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setHolidayToDelete({ event: holiday, isNew: false });
+                          setShowDeleteModal(true);
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
+                        disabled={isSubmitting}
+                        aria-label={`Eliminar ${holiday.holiday_name}`}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+
+                {/* Festivos nuevos */}
+                {newHolidays
+                  .sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .map((holiday) => (
+                    <div
+                      key={holiday.tempId}
+                      className="flex items-center justify-between p-4 rounded-lg border"
+                      style={{
+                        backgroundColor: 'rgba(156, 204, 101, 0.12)',
+                        borderColor: 'var(--color-light-green-600)',
+                      }}
+                    >
+                      <div>
+                        <p className="font-semibold text-[var(--color-light-green-600)]">{holiday.name}</p>
+                        <p className="text-sm text-[var(--color-light-green-600)] opacity-90">{formatDate(holiday.date)}</p>
+                        <p className="text-xs text-[var(--color-light-green-600)]/80">Nuevo</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setHolidayToDelete({ event: holiday, isNew: true });
+                          setShowDeleteModal(true);
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-50 text-[var(--color-red-600)] hover:text-[var(--color-red-600)] transition cursor-pointer shadow-sm hover:shadow-md"
+                        disabled={isSubmitting}
+                        aria-label={`Eliminar festivo temporal ${holiday.name}`}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 border border-dashed border-gray-stroke rounded-lg">
+                <p className="text-sm text-gray-400">
+                  Aún no hay festivos en la lista. Selecciona días en el calendario para añadirlos.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Calendario interactivo */}
@@ -372,9 +451,17 @@ export default function EditLocationPage() {
             <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Festivos <span className="text-red-400">*</span>
             </label>
-            <p className="text-sm text-gray-300 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               Haz clic en un día para añadir festivos. Haz clic en un evento existente para eliminarlo.
             </p>
+
+            {/* Leyenda de colores unificada */}
+            <div className="mb-3 flex gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-[var(--color-red-400)] rounded"></div>
+                <span className="text-gray-400">Festivos</span>
+              </div>
+            </div>
 
             {/* ✅ Wrapper unificado con clase vacation-calendar-wrapper */}
             <div className="vacation-calendar-wrapper bg-white border border-gray-stroke rounded-lg p-4">
@@ -401,89 +488,14 @@ export default function EditLocationPage() {
                 fixedWeekCount={false}
               />
             </div>
-
-            {/* Leyenda de colores unificada */}
-            <div className="mt-3 flex gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-[var(--color-red-400)] rounded"></div>
-                <span className="text-gray-400">Festivos</span>
-              </div>
-            </div>
           </div>
 
-          {/* Lista de festivos con gestión */}
-          {allDisplayHolidays.length > 0 && (
-            <div>
-              <h3 className="text-lg font-bold text-cohispania-blue mb-4 flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5" />
-                Festivos configurados ({allDisplayHolidays.length})
-              </h3>
-
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {/* Festivos existentes (no eliminados) */}
-                {existingHolidays
-                  .filter(h => !deletedHolidayIds.includes(h.id))
-                  .sort((a, b) => new Date(a.holiday_date) - new Date(b.holiday_date))
-                  .map((holiday) => (
-                    <div
-                      key={holiday.id}
-                      className="flex items-center justify-between bg-light-background p-4 rounded-lg border border-gray-stroke"
-                    >
-                      <div>
-                        <p className="font-semibold text-cohispania-blue">{holiday.holiday_name}</p>
-                        <p className="text-sm text-gray-300">{formatDate(holiday.holiday_date)}</p>
-                        <p className="text-xs text-gray-400">Existente • ID: {holiday.id}</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setHolidayToDelete({ event: holiday, isNew: false });
-                          setShowDeleteModal(true);
-                        }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
-                        disabled={isSubmitting}
-                        aria-label={`Eliminar ${holiday.holiday_name}`}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-
-                {/* Festivos nuevos */}
-                {newHolidays
-                  .sort((a, b) => new Date(a.date) - new Date(b.date))
-                  .map((holiday) => (
-                    <div
-                      key={holiday.tempId}
-                      className="flex items-center justify-between bg-green-50 p-4 rounded-lg border border-green-200"
-                    >
-                      <div>
-                        <p className="font-semibold text-green-700">{holiday.name}</p>
-                        <p className="text-sm text-green-600">{formatDate(holiday.date)}</p>
-                        <p className="text-xs text-green-500">Nuevo</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setHolidayToDelete({ event: holiday, isNew: true });
-                          setShowDeleteModal(true);
-                        }}
-                        className="p-2 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition cursor-pointer"
-                        disabled={isSubmitting}
-                        aria-label={`Eliminar ${holiday.name}`}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-              </div>
-
-              {/* Festivos eliminados (info) */}
-              {deletedHolidayIds.length > 0 && (
-                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-600">
-                    {deletedHolidayIds.length} festivo{deletedHolidayIds.length > 1 ? 's' : ''} será{deletedHolidayIds.length > 1 ? 'n' : ''} eliminado{deletedHolidayIds.length > 1 ? 's' : ''} al guardar
-                  </p>
-                </div>
-              )}
+          {/* Festivos eliminados (info) */}
+          {deletedHolidayIds.length > 0 && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600">
+                {deletedHolidayIds.length} festivo{deletedHolidayIds.length > 1 ? 's' : ''} será{deletedHolidayIds.length > 1 ? 'n' : ''} eliminado{deletedHolidayIds.length > 1 ? 's' : ''} al guardar
+              </p>
             </div>
           )}
 
@@ -536,8 +548,8 @@ export default function EditLocationPage() {
               {formatDateRange()}
             </p>
             {selectedDates.length > 1 && (
-              <p className="text-sm text-gray-300 mt-1">
-                {selectedDates.length} días consecutivos
+              <p className="text-sm text-gray-500 mt-1">
+                Esta acción eliminará los festivos seleccionados y los volverá a dejar disponibles en el calendario.
               </p>
             )}
           </div>

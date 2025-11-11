@@ -17,7 +17,7 @@ export default function Card({
   ...props
 }) {
   const baseStyles =
-    "bg-white rounded-lg transition-all duration-200 border border-gray-stroke";
+    "bg-white rounded-lg transition-all duration-200 border border-gray-200";
 
   const paddingStyles = padding ? "p-6" : "";
 

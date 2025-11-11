@@ -87,8 +87,8 @@ export default function MyRequestsTabs() {
         <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
           Solicitudes
         </h2>
-        <p className="text-gray-300 mt-1">
-          Revisa el estado de tus solicitudes
+        <p className="text-gray-500 mt-1">
+          Gestiona tus solicitudes de vacaciones y controla su estado en tiempo real.
         </p>
       </div>
       <Tabs tabs={tabs} defaultTab="pending" />
@@ -117,7 +117,7 @@ function RequestsList({
   if (requests.length === 0) {
     return (
       <div className="text-center py-12">
-        <Calendar className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+        <Calendar className="mx-auto h-16 w-16 text-gray-400 mb-4" />
         <p className="text-gray-400 text-lg">{emptyMessage}</p>
       </div>
     );
@@ -275,7 +275,7 @@ function RequestRow({ request }) {
                 <Eye className="h-5 w-5 cursor-pointer" />
               </button>
             ) : (
-              <span className="text-gray-300 text-sm">-</span>
+              <span className="text-gray-400 text-sm">-</span>
             )}
           </div>
         </td>
@@ -305,7 +305,7 @@ function RequestRow({ request }) {
               <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Tu comentario:
               </h3>
-              <p className="text-base text-gray-300 bg-light-background p-4 rounded-lg">
+              <p className="text-base text-gray-500 bg-light-background p-4 rounded-lg">
                 {request.reason}
               </p>
             </div>
@@ -440,7 +440,7 @@ function RequestCard({ request }) {
               <h3 className="text-base font-semibold text-cohispania-blue mb-2">
                 Tu comentario:
               </h3>
-              <p className="text-base text-gray-300 bg-light-background p-4 rounded-lg">
+              <p className="text-base text-gray-500 bg-light-background p-4 rounded-lg">
                 {request.reason}
               </p>
             </div>

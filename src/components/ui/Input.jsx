@@ -71,10 +71,10 @@ export default function Input({
           text-cohispania-blue
           border border-gray-stroke
           placeholder-cohispania-blue placeholder-opacity-60
-          focus:ring-1 focus:ring-cohispania-orange focus:border-cohispania-orange
+          focus:ring-0 focus:border-[var(--color-cohispania-orange)]
           outline-none transition
           disabled:opacity-50 disabled:cursor-not-allowed
-          ${hasError ? 'border-red-400 focus:ring-red-400 focus:border-red-400' : ''}
+          ${hasError ? 'border-red-400 focus:ring-0 focus:border-red-400' : ''}
         `}
         {...(register ? register(name, validation) : {})}
         {...props}

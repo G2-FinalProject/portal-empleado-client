@@ -9,6 +9,7 @@
   --color-blue-stroke: #273758;
 
   --color-red-400: #EC5B59;
+  --color-red-600: #D32F2F;
   --color-light-green-400: #9CCC65;
   --color-light-green-600: #7CB342;
   --color-light-green-800: #558B2F;
@@ -90,32 +91,6 @@
 }
 
 
-/* Ajustes para el calendario en móvil */
-@media (max-width: 640px) {
-  /* Hacer el texto del calendario más pequeño */
-  .fc .fc-toolbar-title {
-    font-size: 1rem !important;
-  }
-
-  .fc .fc-button {
-    padding: 0.25rem 0.5rem !important;
-    font-size: 0.75rem !important;
-  }
-
-  .fc .fc-daygrid-day-number {
-    font-size: 0.75rem !important;
-  }
-
-  .fc .fc-col-header-cell-cushion {
-    padding: 0.25rem !important;
-    font-size: 0.75rem !important;
-  }
-
-  /* Reducir altura de las celdas */
-  .fc .fc-daygrid-day {
-    min-height: 2.5rem !important;
-  }
-}
 
 /* ============================================
    ESTILOS PERSONALIZADOS PARA FULLCALENDAR
@@ -149,12 +124,6 @@
   cursor: not-allowed !important;
 }
 
-/* Mejorar la visualización en mobile */
-@media (max-width: 640px) {
-  .fc-day-weekend-disabled::after {
-    font-size: 1rem;
-  }
-}
 
 /* Asegurar que la selección se mantenga visible */
 .fc .fc-highlight {
@@ -167,9 +136,8 @@
   background-color: rgba(246, 141, 46, 0.05) !important; /* cohispania-orange muy transparente */
   transition: background-color 0.2s ease;
 }
-/* Ajustes CRÍTICOS para el calendario en móvil */
+/* Ajustes para el calendario en móvil */
 @media (max-width: 640px) {
-  /* Hacer el texto del calendario más pequeño */
   .fc .fc-toolbar-title {
     font-size: 1rem !important;
   }
@@ -188,23 +156,19 @@
     font-size: 0.75rem !important;
   }
 
-  /* Reducir altura de las celdas */
   .fc .fc-daygrid-day {
     min-height: 2.5rem !important;
   }
 
-  /* ✅ CRÍTICO: Hacer la leyenda más pequeña en móvil */
   .fc .fc-daygrid-event {
     font-size: 0.65rem !important;
     padding: 1px 2px !important;
   }
 
-  /* ✅ CRÍTICO: Ajustar padding del calendario */
   .fc .fc-daygrid-day-frame {
     padding: 2px !important;
   }
 
-  /* ✅ NUEVO: Ocultar emoji de fin de semana en móvil si ocupa mucho */
   .fc-day-weekend-disabled::after {
     font-size: 0.8rem !important;
     opacity: 0.2 !important;

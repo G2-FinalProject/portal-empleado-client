@@ -7,7 +7,7 @@ import { login as apiLogin } from '../../services/authApi';
 import useAuthStore from '../../stores/authStore';
 import logo from '../../assets/cohispania_logo.svg';
 import loginImage from '../../assets/images/login_image.jpg';
-import toast from '../../services/toast';
+import { showSuccess, showError } from '../../utils/notifications';
 import { Button } from '../../components/ui';
 
 export default function LoginPage() {
@@ -32,13 +32,13 @@ export default function LoginPage() {
 
       loginStore(response.token, response.sesionData);
       //Toast de éxito
-      toast.success('¡Bienvenido de vuelta!');
+      showSuccess('¡Bienvenido de vuelta!');
       navigate('/myportal');
 
     } catch (error) {
       console.error('❌ Error en login:', error);
       // Toast de error
-      toast.error(error.response?.data?.message || 'Email o contraseña incorrectos');
+      showError(error.response?.data?.message || 'Email o contraseña incorrectos');
     } finally {
       setIsLoading(false);
     }
@@ -64,8 +64,8 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold mb-2 text-cohispania-blue">
               Iniciar sesión
             </h1>
-            <p className="text-sm text-gray-300">
-              Ingresa tus credenciales para acceder a la plataforma
+            <p className="text-sm text-gray-500">
+              Accede con tu correo corporativo y contraseña.
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function LoginPage() {
                 type="email"
                 placeholder="tu.email@cohispania.com"
                 disabled={isLoading}
-                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-1 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('email', {
                   required: 'El email es obligatorio',
                   pattern: {
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 type="password"
                 placeholder="········"
                 disabled={isLoading}
-                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-2 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 rounded-lg bg-light-background border border-gray-stroke text-cohispania-blue placeholder-cohispania-blue placeholder-opacity-60 focus:ring-1 focus:ring-cohispania-orange focus:border-cohispania-orange outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 {...register('password', {
                   required: 'La contraseña es obligatoria',
                   minLength: {

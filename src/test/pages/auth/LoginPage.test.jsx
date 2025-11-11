@@ -3,12 +3,12 @@ import { vi } from 'vitest'
 import LoginPage from '../../../pages/auth/LoginPage'
 import { MemoryRouter } from 'react-router-dom'
 
-// 🧩 Mock de react-hot-toast
-vi.mock('react-hot-toast', () => ({
-  default: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
+vi.mock('../../../utils/notifications', () => ({
+  showSuccess: vi.fn(),
+  showError: vi.fn(),
+  showInfo: vi.fn(),
+  showLoading: vi.fn(),
+  dismiss: vi.fn(),
 }))
 
 // 🧩 Mock de authApi
@@ -17,11 +17,11 @@ vi.mock('../../../services/authApi', () => ({
 }))
 
 // 🧩 Mock de Zustand store
-const mockLoginFn = vi.fn() // esta es la función real que el componente debe llamar
+export const mockLoginFn = vi.fn()
 
 vi.mock('../../../stores/authStore', () => ({
   __esModule: true,
-  default: vi.fn((selector) => selector({ login: mockLoginFn })),
+  default: (selector) => selector({ login: mockLoginFn }),
 }))
 
 // 🧩 Mock de navigate
@@ -47,14 +47,15 @@ vi.mock('../../../assets/cohispania_logo.svg', () => ({ default: 'mocked-logo.sv
 vi.mock('../../../assets/images/login_image.jpg', () => ({ default: 'mocked-image.jpg' }))
 
 // Imports reales después de mocks
-import toast from 'react-hot-toast'
 import { login as apiLogin } from '../../../services/authApi'
 
-import useAuthStore from '../../../stores/authStore'
+import { showSuccess, showError } from '../../../utils/notifications'
+
 
 describe('🔐 LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockLoginFn.mockClear()
   })
 
   test('envía el formulario correctamente con credenciales válidas', async () => {
@@ -63,9 +64,6 @@ describe('🔐 LoginPage', () => {
       token: 'fakeToken123',
       sesionData: { user: 'Lisi' },
     })
-
-    const loginStore = vi.fn()
-    useAuthStore.mockReturnValue({ login: loginStore })
 
     render(
       <MemoryRouter>
@@ -93,11 +91,8 @@ describe('🔐 LoginPage', () => {
       })
     })
 
-    expect(mockLoginFn).toHaveBeenCalled()
-    expect(toast.success).toHaveBeenCalledWith(
-      '¡Bienvenido de vuelta!',
-      expect.any(Object)
-    )
+    expect(mockLoginFn).toHaveBeenCalledWith('fakeToken123', { user: 'Lisi' })
+    expect(showSuccess).toHaveBeenCalledWith('¡Bienvenido de vuelta!')
     expect(mockNavigate).toHaveBeenCalledWith('/myportal')
   })
 
@@ -123,10 +118,7 @@ describe('🔐 LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }))
 
     await waitFor(() => {
-      expect(toast.error).toHaveBeenCalledWith(
-        'Credenciales inválidas',
-        expect.any(Object)
-      )
+      expect(showError).toHaveBeenCalledWith('Credenciales inválidas')
     })
   })
 })
