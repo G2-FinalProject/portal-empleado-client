@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import React, { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Card from "../ui/Card";
 import Input from "../ui/Input";
@@ -14,15 +13,12 @@ export default function EmployeeForm({
   departments = [],
   locations = [],
   onSubmit,
-  initialData = null,
-  isEditMode = false,
 }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm({
     defaultValues: {
       first_name: "",
@@ -142,13 +138,10 @@ export default function EmployeeForm({
 
           {/* Rol */}
           <div>
-            <label 
-            htmlFor="role_id"
-            className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Rol <span className="text-red-400">*</span>
             </label>
             <select
-            id="role_id"
               {...register("role_id", { required: "Selecciona un rol" })}
               className={inputBase}
             >
@@ -168,13 +161,10 @@ export default function EmployeeForm({
 
           {/* Departamento */}
           <div>
-            <label 
-            htmlFor="department_id"
-            className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Departamento <span className="text-red-400">*</span>
             </label>
             <select
-            id="department_id"
               {...register("department_id", {
                 required: "Selecciona un departamento",
               })}
@@ -196,13 +186,10 @@ export default function EmployeeForm({
 
           {/* Población */}
           <div className="md:col-span-2">
-            <label 
-            htmlFor="location_id"
-            className="block text-sm font-semibold mb-2 text-cohispania-blue">
+            <label className="block text-sm font-semibold mb-2 text-cohispania-blue">
               Población <span className="text-red-400">*</span>
             </label>
             <select
-            id="location_id"
               {...register("location_id", {
                 required: "Selecciona una localización",
               })}
