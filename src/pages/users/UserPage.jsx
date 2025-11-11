@@ -112,7 +112,7 @@ function SidebarRequestSummary({ selectedRange, onClearSelection }) {
         start_date: selectedRange.startStr,
         end_date: selectedRange.endStr,
         requested_days: selectedRange.workingDays,
-        comments: comments || null,
+        requester_comment: comments || null,
       };
 
       await createVacationRequest(requestData);
