@@ -35,9 +35,9 @@ export default function UserPage() {
       </div>
 
       {/* SECCIÓN PRINCIPAL */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* CALENDARIO - 2 columnas en desktop */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 order-1">
           <VacationRequestCalendar
             onRequestCreated={fetchMyRequests}
             onSelectionChange={setSelectedRange}
@@ -45,7 +45,7 @@ export default function UserPage() {
         </div>
 
         {/* SIDEBAR DERECHO - 1 columna en desktop */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block order-2">
           {/* VacationSummaryCards O RequestSummaryForm */}
           {!selectedRange ? (
             <VacationSummaryCards />
@@ -56,6 +56,23 @@ export default function UserPage() {
             />
           )}
         </div>
+
+        {/* Formulario móvil cuando hay selección - visible solo en móvil/tablet */}
+        {selectedRange && (
+          <div className="lg:hidden order-2">
+            <SidebarRequestSummary
+              selectedRange={selectedRange}
+              onClearSelection={clearSelection}
+            />
+          </div>
+        )}
+
+        {/* VacationSummaryCards en móvil cuando NO hay selección */}
+        {!selectedRange && (
+          <div className="lg:hidden order-2">
+            <VacationSummaryCards />
+          </div>
+        )}
       </div>
 
       {/* Tabla de solicitudes */}

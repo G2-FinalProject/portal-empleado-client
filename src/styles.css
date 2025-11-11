@@ -143,12 +143,27 @@
   }
 
   .fc .fc-button {
-    padding: 0.25rem 0.5rem !important;
-    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    touch-action: manipulation;
+  }
+
+  /* Mejorar área táctil de los días */
+  .fc .fc-daygrid-day {
+    min-height: 3rem !important;
+    touch-action: manipulation;
   }
 
   .fc .fc-daygrid-day-number {
-    font-size: 0.75rem !important;
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Mejorar selección táctil */
+  .fc .fc-highlight {
+    border-width: 3px !important;
   }
 
   .fc .fc-col-header-cell-cushion {
