@@ -193,10 +193,7 @@ export default function EmployeeListPage() {
 
         {/* Loading State */}
         {loading?.users && (
-          <div
-          role="status" 
-          aria-label="cargando..."
-          className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-cohispania-blue" />
           </div>
         )}
@@ -331,10 +328,9 @@ export default function EmployeeListPage() {
               {/* Cards Mobile */}
               <div className="md:hidden space-y-4">
                 {paginatedUsers.map((user) => (
-                  <div
+                  <Card
                     key={user.id}
                     className="p-4 border border-gray-stroke cursor-pointer"
-                    role="button"
                     onClick={() => navigate(`/employees/${user.id}`)}
                   >
                     <div className="space-y-3">
@@ -405,7 +401,7 @@ export default function EmployeeListPage() {
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
 
