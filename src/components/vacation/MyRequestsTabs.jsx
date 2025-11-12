@@ -389,7 +389,7 @@ function RequestCard({ request }) {
             <Calendar className="h-4 w-4 text-cohispania-orange shrink-0 mt-0.5" />
             <div className="flex items-start gap-2">
               <p className="text-xs text-gray-400 font-semibold">Período</p>
-              <p className="text-xs sm:text-sm text-cohispania-blue font-medium break-words">
+              <p className="text-xs sm:text-sm text-cohispania-blue font-medium wrap-break-word">
                 {formatDate(request.startDate)} - {formatDate(request.endDate)}
               </p>
             </div>
