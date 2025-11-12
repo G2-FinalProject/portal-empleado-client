@@ -23,7 +23,7 @@ export default function UserPage() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-6 px-3 sm:px-0">
       {/* Header de bienvenida */}
       <div className="px-2 sm:px-0">
         <h1 className="text-2xl sm:text-3xl font-bold text-cohispania-blue">
@@ -35,7 +35,7 @@ export default function UserPage() {
       </div>
 
       {/* SECCIÓN PRINCIPAL */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
         {/* CALENDARIO - 2 columnas en desktop */}
         <div className="lg:col-span-2">
           <VacationRequestCalendar

@@ -32,28 +32,28 @@ export default function Modal({ isOpen, onClose, title, children }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 border-gray-stroke bg-opacity-90 backdrop-blur-xs z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4"
       onClick={onClose}
     >
       {/* Modal */}
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[80vh] overflow-y-auto border border-gray-100"
+        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-gray-stroke">
-          <h2 className="text-xl font-bold text-cohispania-blue">{title}</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-stroke">
+          <h2 className="text-base sm:text-lg lg:text-xl font-bold text-cohispania-blue">{title}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-cohispania-blue transition-colors"
             aria-label="Cerrar modal"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6">{children}</div>
+        <div className="p-4 sm:p-6">{children}</div>
       </div>
     </div>,
     document.body

@@ -362,7 +362,7 @@ export default function EmployeeListPage() {
                       </div>
 
                       {/* Botones de acción en mobile */}
-                      <div className="flex gap-2 pt-2 border-t border-gray-stroke">
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-stroke">
                         <Button
                           variant="ghost"
                           size="small"
@@ -370,10 +370,10 @@ export default function EmployeeListPage() {
                             e.stopPropagation();
                             navigate(`/employees/${user.id}`);
                           }}
-                          className="flex-1 cursor-pointer"
+                          className="flex-1 min-w-[90px] cursor-pointer"
                         >
-                          <Eye className="w-4 h-4 mr-2" />
-                          Ver
+                          <Eye className="w-4 h-4 mr-1" />
+                          <span className="text-xs">Ver</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -382,10 +382,10 @@ export default function EmployeeListPage() {
                             e.stopPropagation();
                             navigate(`/employees/${user.id}/edit`);
                           }}
-                          className="flex-1 cursor-pointer"
+                          className="flex-1 min-w-[90px] cursor-pointer"
                         >
-                          <Pencil className="w-4 h-4 mr-2" />
-                          Editar
+                          <Pencil className="w-4 h-4 mr-1" />
+                          <span className="text-xs">Editar</span>
                         </Button>
                         <Button
                           variant="danger"
@@ -394,10 +394,10 @@ export default function EmployeeListPage() {
                             e.stopPropagation();
                             handleDeleteClick(user);
                           }}
-                          className="flex-1 cursor-pointer"
+                          className="flex-1 min-w-[90px] cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Eliminar
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          <span className="text-xs">Eliminar</span>
                         </Button>
                       </div>
                     </div>

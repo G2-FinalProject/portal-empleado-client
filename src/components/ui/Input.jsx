@@ -52,7 +52,7 @@ export default function Input({
       {label && (
         <label
           htmlFor={name}
-          className="block text-sm font-semibold mb-2 text-cohispania-blue"
+          className="block text-xs sm:text-sm font-semibold mb-2 text-cohispania-blue"
         >
           {label}
           {required && <span className="text-red-400 ml-1">*</span>}
@@ -66,7 +66,7 @@ export default function Input({
         placeholder={placeholder}
         disabled={disabled}
         className={`
-          w-full px-4 py-3 rounded-lg
+          w-full px-3 py-2 sm:px-4 sm:py-3 rounded-lg
           bg-light-background
           text-cohispania-blue
           border border-gray-stroke
@@ -82,7 +82,7 @@ export default function Input({
 
       {/* Error Message */}
       {hasError && (
-        <p className="mt-2 text-sm text-red-400">
+        <p className="mt-2 text-xs sm:text-sm text-red-400">
           {hasError.message}
         </p>
       )}

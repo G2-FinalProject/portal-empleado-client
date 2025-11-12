@@ -29,9 +29,9 @@ export default function MainLayout() {
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
       {/* Contenedor principal */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="h-12 bg-white border-b border-gray-stroke flex items-center justify-between px-4 md:px-6">
+        <header className="h-12 bg-white border-b border-gray-stroke flex items-center justify-between px-3 sm:px-4 md:px-6 shrink-0">
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg hover:bg-cohispania-orange transition-colors text-cohispania-blue"
@@ -42,7 +42,7 @@ export default function MainLayout() {
         </header>
 
         {/* Contenido principal */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6">
           <Outlet />
         </main>
       </div>

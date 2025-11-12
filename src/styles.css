@@ -20,6 +20,8 @@
   --color-gray-200:#A5A6AE;
   --color-gray-300: #80828E;
   --color-gray-400: #656775;
+  --color-light-green-custom: #e1f0d3;
+  --color-light-green-custom-400: #abdc7c;
 
   /* Tipografía */
   --font-family-sans: 'Open Sans', system-ui, sans-serif;

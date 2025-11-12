@@ -173,15 +173,15 @@ function RequestsList({
       </div>
 
       {/* Vista Mobile: Cards */}
-      <div className="md:hidden space-y-4">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-gray-400 font-semibold">
+      <div className="md:hidden space-y-3">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs sm:text-sm text-gray-400 font-semibold">
             {requests.length}{" "}
             {requests.length === 1 ? "solicitud" : "solicitudes"}
           </p>
           <button
             onClick={() => onSortChange(sortOrder === "desc" ? "asc" : "desc")}
-            className="flex items-center gap-1 px-3 py-2 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-sm"
+            className="flex items-center gap-1 px-2 py-1.5 bg-cohispania-blue text-white rounded-lg hover:opacity-90 transition-opacity text-xs"
             title={
               sortOrder === "desc"
                 ? "Ordenar ascendente"
@@ -189,9 +189,9 @@ function RequestsList({
             }
           >
             {sortOrder === "desc" ? (
-              <ArrowDown className="h-4 w-4" />
+              <ArrowDown className="h-3 w-3" />
             ) : (
-              <ArrowUp className="h-4 w-4" />
+              <ArrowUp className="h-3 w-3" />
             )}
           </button>
         </div>
@@ -369,15 +369,15 @@ function RequestCard({ request }) {
 
   return (
     <>
-      <Card padding={true}>
-        <div className="space-y-3">
+      <Card padding={false} className="p-3">
+        <div className="space-y-2">
           {/* Header con fecha de solicitud y estado */}
-          <div className="flex items-start justify-between">
-            <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
               <p className="text-xs text-gray-400 font-semibold">
                 Fecha de solicitud
               </p>
-              <p className="text-sm text-cohispania-blue font-medium">
+              <p className="text-xs sm:text-sm text-cohispania-blue font-medium truncate">
                 {formatDate(request.createdAt)}
               </p>
             </div>
@@ -386,10 +386,10 @@ function RequestCard({ request }) {
 
           {/* Período */}
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-cohispania-orange" />
-            <div>
+            <Calendar className="h-4 w-4 text-cohispania-orange shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2">
               <p className="text-xs text-gray-400 font-semibold">Período</p>
-              <p className="text-sm text-cohispania-blue font-medium">
+              <p className="text-xs sm:text-sm text-cohispania-blue font-medium wrap-break-word">
                 {formatDate(request.startDate)} - {formatDate(request.endDate)}
               </p>
             </div>
@@ -409,10 +409,10 @@ function RequestCard({ request }) {
           {hasAnyComment && (
             <button
               onClick={() => setShowModal(true)}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-light-background rounded-lg text-cohispania-blue hover:bg-cohispania-orange hover:text-white transition-colors mt-2"
             >
-              <Eye className="h-4 w-4" />
-              <span className="text-sm font-medium">Ver comentarios</span>
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">Ver comentarios</span>
             </button>
           )}
         </div>

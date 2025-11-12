@@ -41,7 +41,7 @@ export default function Tabs({
     <div className={className}>
       {/* Pestañas con fondo gris */}
       <div
-        className="bg-light-background rounded-lg p-1 flex gap-1"
+        className="bg-light-background rounded-lg p-0.5 sm:p-1 flex gap-0.5 sm:gap-1"
         role="tablist"
       >
         {tabs.map((tab) => {
@@ -55,10 +55,10 @@ export default function Tabs({
               aria-controls={`tabpanel-${tab.id}`}
               onClick={() => handleTabChange(tab.id)}
               className={`
-                flex-1 px-4 py-3 rounded-md
-                flex items-center justify-center gap-2
+                flex-1 px-2 py-2 sm:px-4 sm:py-3 rounded-md
+                flex items-center justify-center gap-1 sm:gap-2
                 transition-all duration-200
-                font-medium text-sm
+                font-medium text-xs sm:text-sm
                 focus:outline-none focus:ring-1 focus:ring-cohispania-orange focus:ring-offset-2
                 ${
                   isActive
@@ -68,7 +68,7 @@ export default function Tabs({
               `}
 
             >
-              <span className="text-base">{tab.label}</span>
+              <span className="text-xs sm:text-base truncate">{tab.label}</span>
 
               {/* Badge con el contador */}
               {tab.count !== undefined && tab.count > 0 && (
@@ -86,7 +86,7 @@ export default function Tabs({
         id={`tabpanel-${activeTab}`}
         role="tabpanel"
         aria-labelledby={`tab-${activeTab}`}
-        className="mt-6"
+        className="mt-4 sm:mt-6"
       >
         {activeTabData?.content}
       </div>

@@ -47,8 +47,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
         title: isMobileDevice ? "🎉 F " : "Festivo",
         start: holiday.holiday_date,
         display: "background",
-        backgroundColor: "#fee2e2",
-        borderColor: "#fca5a5",
+        backgroundColor: "var(--color-red-400)",
+        borderColor: "var(--color-red-400)",
         extendedProps: {
           isHoliday: true,
         },
@@ -75,8 +75,8 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
               title: isMobileDevice ? "✈️ V " : "Vacaciones",
               start: dateStr,
               display: "background",
-              backgroundColor: "#d1fae5",
-              borderColor: "#10b981",
+              backgroundColor: "var(--color-light-green-400)",
+              borderColor: "var(--color-light-green-600)",
               extendedProps: {
                 isApprovedVacation: true,
                 requestId: req.id,
@@ -276,10 +276,10 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
   return (
     <div className="w-full">
       {/* Card contenedor principal */}
-      <div className="bg-white rounded-lg border border-gray-stroke overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-stroke overflow-hidden mx-3 sm:mx-0">
         {/* Header de la card */}
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-stroke">
-          <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-stroke">
+          <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-cohispania-blue">
             Solicitar Vacaciones
           </h2>
           <p className="text-gray-300 mt-1 text-sm sm:text-base">
@@ -288,15 +288,15 @@ const VacationRequestCalendar = ({ onRequestCreated, onSelectionChange }) => {
         </div>
 
         {/* Contenido */}
-        <div className="p-4 sm:p-6">
+        <div className="p-3 sm:p-6">
           {/* Leyenda del calendario */}
-          <div className="flex flex-wrap gap-4 mb-4 text-xs sm:text-sm">
+          <div className="flex flex-wrap gap-2 sm:gap-4 mb-3 sm:mb-4 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+              <div className="w-4 h-4 bg-red-200 border border-red-300 rounded"></div>
               <span className="text-gray-400">Festivos</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-100 border border-green-500 rounded"></div>
+              <div className="w-4 h-4 bg-light-green-custom border border-light-green-custom-400 rounded"></div>
               <span className="text-gray-400">Vacaciones aprobadas</span>
             </div>
           </div>
@@ -375,7 +375,7 @@ function RequestSummaryForm({
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const year = d.getFullYear();
     return `${day}/${month}/${year}`;
-  }
+  };
   const textareaId = useId();
 
   return (
