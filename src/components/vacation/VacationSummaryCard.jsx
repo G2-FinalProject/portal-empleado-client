@@ -9,9 +9,9 @@ const VacationSummaryCards = () => {
   const percentageUsed = stats.total > 0 ? (stats.used / stats.total) * 100 : 0;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-stroke p-4 sm:p-6 w-full h-fit">
+    <div className="bg-white rounded-lg border border-gray-stroke p-3 sm:p-6 w-full h-fit">
       {/* Título de la card */}
-      <h2 className="text-xl sm:text-2xl font-bold text-cohispania-blue mb-4">
+      <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-cohispania-blue mb-3 sm:mb-4">
         Balance de Vacaciones
       </h2>
 
