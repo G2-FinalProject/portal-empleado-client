@@ -56,43 +56,41 @@ describe("🧾 EmployeeForm", () => {
     expect(screen.getByLabelText("Días de Vacaciones Disponibles")).toBeInTheDocument();
   });
 
-
   test("envía el formulario correctamente y llama a onSubmit", async () => {
-    render(<EmployeeForm {...mockProps} />);
+  render(<EmployeeForm {...mockProps} />);
 
-    fireEvent.change(screen.getByPlaceholderText("Introduce el nombre del empleado"), {
-      target: { value: "Lisi" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Introduce los apellidos del empleado"), {
-      target: { value: "Cruz" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Introduce el correo corporativo"), {
-      target: { value: "lisi@test.com" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("********"), {
-      target: { value: "password123" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Introduce los días disponibles"), {
-      target: { value: 15 },
-    });
-
-
-    fireEvent.change(screen.getByDisplayValue("Selecciona un rol"), {
-      target: { value: "1" },
-    });
-    fireEvent.change(screen.getByDisplayValue("Selecciona departamento"), {
-      target: { value: "1" },
-    });
-    fireEvent.change(screen.getByDisplayValue("Selecciona una localización"), {
-      target: { value: "1" },
-    });
-
-    fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
-
-    await waitFor(() => {
-      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
-    });
+  fireEvent.change(screen.getByPlaceholderText("Introduce el nombre"), {
+    target: { value: "Lisi" },
   });
+  fireEvent.change(screen.getByPlaceholderText("Introduce los apellidos"), {
+    target: { value: "Cruz" },
+  });
+  fireEvent.change(screen.getByPlaceholderText("correo@cohispania.com"), {
+    target: { value: "lisi@test.com" },
+  });
+  fireEvent.change(screen.getByPlaceholderText("*Mínimo 8 caracteres*"), {
+    target: { value: "password123" },
+  });
+  fireEvent.change(screen.getByPlaceholderText("Introduce los días disponibles. Ej: 23"), {
+    target: { value: 15 },
+  });
+
+  fireEvent.change(screen.getByDisplayValue("Selecciona un rol"), {
+    target: { value: "1" },
+  });
+  fireEvent.change(screen.getByDisplayValue("Selecciona departamento"), {
+    target: { value: "1" },
+  });
+  fireEvent.change(screen.getByDisplayValue("Selecciona una localización"), {
+    target: { value: "1" },
+  });
+
+  fireEvent.submit(screen.getByRole("button", { name: /guardar empleado/i }));
+
+  await waitFor(() => {
+    expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+  });
+});
 
 
   test("muestra errores si faltan campos requeridos", async () => {

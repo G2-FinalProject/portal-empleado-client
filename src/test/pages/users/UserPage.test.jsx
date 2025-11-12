@@ -516,7 +516,10 @@ createButtons[0].click();
     const mainContainer = container.querySelector(".max-w-7xl");
     expect(mainContainer).toBeInTheDocument();
     expect(mainContainer).toHaveClass("mx-auto");
-    expect(mainContainer).toHaveClass("space-y-6");
+    // expect(mainContainer).toHaveClass("space-y-6");
+     expect(mainContainer).toHaveClass("space-y-3");
+    expect(mainContainer).toHaveClass("sm:space-y-6");
+
   });
 });
 
