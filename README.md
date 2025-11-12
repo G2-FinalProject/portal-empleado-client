@@ -109,3 +109,23 @@ Validaciones de formularios y datos:
 - `vacationValidator.js` - Validar solicitud de vacaciones
 - `userValidator.js` - Validar datos de usuario
 
+---
+
+## 👥 Equipo
+
+Este proyecto fue desarrollado por:
+
+| Desarrolladora | GitHub | LinkedIn |
+|----------------|--------|----------|
+| **Gema Yébenes** | [GitHub](https://github.com/gemayc) | [LinkedIn](https://www.linkedin.com/in/gema-yebenes-83b6a6100/) |
+| **Olga Ramírez** | [GitHub](https://github.com/olgararo) | [LinkedIn](https://www.linkedin.com/in/olga-ramirez-rodriguez/) |
+| **Rocio Coronel** | [GitHub](https://github.com/Rocio-Coronel) | [LinkedIn](https://www.linkedi) |
+| **Gabriela Hernández Berbesi** | [GitHub](https://github.com/gabriela-her) | [LinkedIn](https://www.linkedin.com/in/gabriela-hernandez-67aa491b3/) |
+| **Maryori Cruz Eguizabal** | [GitHub](https://github.com/MaryoriCruz?tab=repositories) | [LinkedIn](https://www.linkedin.com/in/maryori-cruz-6b440116b/) |
+
+
+**Bootcamp:** Desarrollo Web Fullstack + intro a DevOps   
+**Organización:** Femcoders - Factoría F5  
+**Año:** 2025
+
+---
