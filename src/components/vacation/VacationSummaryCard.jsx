@@ -16,13 +16,13 @@ const VacationSummaryCards = () => {
       </h2>
 
       {/* Lista de estadísticas */}
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {/* Total Asignado */}
         <div className="flex justify-between items-center">
-          <span className="text-base font-medium text-gray-600">
+          <span className="text-sm sm:text-base font-medium text-gray-600">
             Total Asignados
           </span>
-          <span className="font-extrabold text-xl text-cohispania-blue">
+          <span className="font-extrabold text-lg sm:text-xl text-cohispania-blue">
             {stats.total}
           </span>
         </div>
